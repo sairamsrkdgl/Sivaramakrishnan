@@ -1,0 +1,280 @@
+Path: xanth!mcnc!rutgers!tut.cis.ohio-state.edu!cwjcc!hal!ncoast!allbery
+From: mouse%mcgill-vision.UUCP@Larry.McRCIM.McGill.EDU (der Mouse )
+Newsgroups: comp.sources.misc
+Subject: v04i038: generalized base converter
+Message-ID: <8808271107.AA22874@Larry.McRCIM.McGill.EDU>
+Date: 27 Aug 88 11:07:19 GMT
+Sender: allbery@ncoast.UUCP
+Reply-To: mouse%mcgill-vision.UUCP@Larry.McRCIM.McGill.EDU (der Mouse )
+Lines: 269
+Approved: allbery@ncoast.UUCP
+
+Posting-number: Volume 4, Issue 38
+Submitted-by: "der Mouse " <mouse%mcgill-vision.UUCP@Larry.McRCIM.McGill.EDU>
+Archive-name: cvtbase
+
+A generalized base-conversion program.  No compilation options needed;
+"cc -o cvtbase cvtbase.c" should work fine.
+
+Known to work on BSD and at least one SV-based system.  Read the
+leading comment for more info.
+
+As always, bug reports are welcome.  Bug fixes are even more welcome.
+Flames are merely accepted :-).  All of the above should be mailed to
+me at one of the addresses below.
+
+					der Mouse
+
+			old: mcgill-vision!mouse
+			new: mouse@larry.mcrcim.mcgill.edu
+
+#! /bin/sh
+#
+# Shar: Shell Archiver
+#
+# This archive created Sat Aug 27 07:01:24 1988
+# Run this through sh to create:
+#	cvtbase.c
+echo x - cvtbase.c \(4639 characters\)
+sed 's/^X//' > cvtbase.c << \EOF
+X/*
+X * cvtbase -- convert from one base to another.  Usage:
+X *
+X * cvtbase input-base-spec output-base-spec < input > output
+X *
+X * where a base spec is one of:
+X *
+X *	d
+X *	D	Specifies "decimal" -- digits 0 through 9
+X *
+X *	x
+X *	h	Specifies "hexadecimal" -- digits 0-9 and a-f
+X *
+X *	X
+X *	H	Specifies "Hexadecimal" -- digits 0-9 and A-F
+X *
+X *	o
+X *	O	Specifies "octal" -- digits 0 through 7
+X *
+X *	b
+X *	B	Specifies "binary" -- digits 0 and 1
+X *
+X * or a string of two or more characters, which are the digits (eg. 012 would
+X *  use ternary notation).  Any of these may be preceded by a - sign to
+X *  indicate that the base in question is negative.  A leading + sign is
+X *  stripped; to enter a string of digits beginning with a + or - sign, you
+X *  must precede the string with a + or - sign (depending on whether you want
+X *  a positive or negative base).
+X *
+X * Any base specifier may be preceded by an m (or an M) and one other
+X *  character to change the minus sign (the default is of course -).
+X *
+X * For a minus sign to be recognized in the input, it must be immediately
+X *  followed by the number.  If anything (such as a space) intervenes, the
+X *  minus sign will be echoed and ignored (as if it were an ordinary
+X *  character).
+X *
+X * Bases -1, 0, and 1 are disallowed.
+X *
+X * Input is taken from the standard input; the converted output appears
+X *  on the standard output.
+X *
+X * Copyright 1988 by Mike Parker.  All rights reserved.  Non-profit
+X *  redistribution permitted.
+X */
+X#include <stdio.h>
+X
+X/* extern */ char **argvec;
+X
+Xstatic int errs;
+X
+Xstatic int indig;
+Xstatic char *idigits;
+Xstatic char isign;
+Xstatic int ondig;
+Xstatic char *odigits;
+Xstatic char osign;
+X
+Xchar *index();
+X
+Xlong int get_number(ndig,digits,sign)
+Xint ndig;
+Xchar *digits;
+Xchar sign;
+X{
+X long int retval;
+X int minus;
+X char c;
+X char *cp;
+X
+X retval = 0;
+X minus = 1;
+X while (1)
+X  { c = getchar();
+X    if (feof(stdin))
+X     { if (minus < 0)
+X	{ putchar(sign);
+X	  minus = 1;
+X	}
+X       exit(0);
+X     }
+X    if ((cp=index(digits,c)) != 0)
+X     { break;
+X     }
+X    if ((c == sign) && (ndig > 0))
+X     { minus = - minus;
+X     }
+X    else
+X     { if (minus < 0)
+X	{ putchar(sign);
+X	  minus = 1;
+X	}
+X       putchar(c);
+X     }
+X  }
+X while (1)
+X  { retval *= ndig;
+X    retval += (cp-digits);
+X    c = getchar();
+X    if (feof(stdin))
+X     { break;
+X     }
+X    if ((cp=index(digits,c)) == 0)
+X     { break;
+X     }
+X  }
+X ungetc(c,stdin);
+X return(minus*retval);
+X}
+X
+Xput_number(ndig,digits,sign,value)
+Xint ndig;
+Xchar *digits;
+Xchar sign;
+Xlong int value;
+X{
+X if ((value < 0) && (ndig > 0))
+X  { putchar(sign);
+X    value = - value;
+X  }
+X _put_number(ndig,digits,value);
+X}
+X
+X_put_number(ndig,digits,value)
+Xint ndig;
+Xchar *digits;
+Xlong int value;
+X{
+X long int i;
+X int j;
+X
+X i = value / ndig;
+X j = value % ndig;
+X if (j < 0)
+X  { j -= ndig;
+X    i ++;
+X  }
+X if (i != 0)
+X  { _put_number(ndig,digits,i);
+X  }
+X putchar(digits[j]);
+X}
+X
+Xget_base(arg,Ndig,Digits,Sign)
+Xchar *arg;
+Xint *Ndig;
+X#define ndig (*Ndig)
+Xchar **Digits;
+X#define digits (*Digits)
+Xchar *Sign;
+X#define sign (*Sign)
+X{
+X int isneg;
+X char *origarg = arg;
+X
+X sign = '-';
+X isneg = 0;
+X if ((*arg == 'm') || (*arg == 'M'))
+X  { sign = *++arg;
+X    if (sign == '\0')
+X     { fprintf(stderr,"%s: %c must be followed by a sign character\n",
+X			argvec[0],arg[-1]);
+X       errs = 1;
+X       return;
+X     }
+X    arg ++;
+X  }
+X if ((*arg == '+') || (*arg == '-'))
+X  { isneg = (*arg++ == '-');
+X  }
+X switch (*arg++)
+X  { case 'b': case 'B':
+X       digits = "01";
+X       break;
+X    case 'o': case 'O':
+X       digits = "01234567";
+X       break;
+X    case 'd': case 'D':
+X       digits = "0123456789";
+X       break;
+X    case 'h': case 'x':
+X       digits = "0123456789abcdef";
+X       break;
+X    case 'H': case 'X':
+X       digits = "0123456789ABCDEF";
+X       break;
+X    case '\0':
+X       fprintf(stderr,"%s: null base specifier `%s'\n",argvec[0],origarg);
+X       errs = 1;
+X       return;
+X       break;
+X    default:
+X       if (*arg == '\0')
+X	{ fprintf(stderr,"%s: unknown base key `%c' (or base 1)\n",
+X			argvec[0],arg[-1]);
+X	  errs = 1;
+X	  return;
+X	}
+X       digits = arg-1;
+X       arg = "";
+X       break;
+X  }
+X if (*arg)
+X  { fprintf(stderr,"%s: junk `%s' at end of base spec `%s'\n",
+X				argvec[0],arg,origarg);
+X    errs = 1;
+X    return;
+X  }
+X ndig = strlen(digits) * (isneg ? -1 : 1);
+X}
+X
+Xmain(ac,av)
+Xint ac;
+Xchar **av;
+X{
+X long int value;
+X
+Xargvec=av;/*grrr...*/
+X if (ac < 3)
+X  { fprintf(stderr,"Usage: %s <input-base> <output-base>\n",
+X			argvec[0]);
+X    exit(1);
+X  }
+X errs = 0;
+X get_base(av[1],&indig,&idigits,&isign);
+X get_base(av[2],&ondig,&odigits,&osign);
+X if (errs)
+X  { exit(1);
+X  }
+X while (1)
+X  { value = get_number(indig,idigits,isign);
+X    put_number(ondig,odigits,osign,value);
+X  }
+X}
+EOF
+if test 4639 -ne "`wc -c cvtbase.c`"
+then
+echo shar: error transmitting cvtbase.c \(should have been 4639 characters\)
+fi
+exit 0
+# end of shell archive

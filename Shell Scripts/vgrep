@@ -1,0 +1,14 @@
+#!/bin/sh
+# 
+# vgrep - create a list of files that don't contain a specified pattern
+
+case $# in
+0|1) echo "Usage: `basename $0` pattern file [files...]" 1>&2 ;;
+*)  pat="$1"; shift
+
+    # Look for pattern in files specified, piping the result through
+    # sed.  sed prints out lines ending with :0, stripping the :0 
+    # before printing.
+    grep -c "$pat" "$@" | sed -n 's/:0$//p'
+	;;
+esac

@@ -1,0 +1,33 @@
+#!/bin/sh
+#
+# watchq - "daemon" script that watches printer queue(s) for errors
+
+# Change these next variables to suit your situation
+watch=/usr/local/lib/watchqs   # File that holds names of the queues to watch
+writeto=lisa                   # User who gets notices about printer
+temp=/tmp/WATCHQ$$             # Temporary file that holds the output of lpq
+
+queues="`cat $watch`"          # Put list of queue names in $queues
+trap 'queues="`cat $watch`"' 1 # Reset $queues if we get a SIGHUP
+trap 'rm -f $temp; exit' 0 15  # Clean up temp file when killed
+
+# Loop forever (until someone kills script):
+while :
+do
+    # for each queue
+    for queue in $queues
+    do
+        # Query the printer
+        lpq -P$queue >$temp
+
+        # Look for errors
+        if egrep '(out of paper|error|warning)' $temp > /dev/null
+
+        # If there were errors, let someone know about them
+        then echo "PRINTER QUEUE $queue:" | cat - $temp | write $writeto
+        fi
+    done
+
+    # Sleep 30 seconds in between checking printers
+    sleep 30
+done

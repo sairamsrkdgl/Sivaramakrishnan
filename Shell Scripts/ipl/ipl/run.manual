@@ -1,0 +1,27 @@
+#!/bin/sh
+
+if [ -f Introduction ]; then echo 
+else
+	echo "Wrong directory."; exit; fi
+
+echo -n "
+This script will run off the Users Guide for IPL 1.0.
+Examples will not be included-- they can be run using the
+command: run.examples.
+
+Begin? (y/n): "
+read x
+if [ "$x " != "y " ]; then exit; fi
+
+
+pipl tplates/gallery.g
+lpr Cover
+lpr New
+lpr Introduction
+
+pipl tplates/areas.g
+pipl tplates/areas2.g
+pipl tplates/areadef.g
+lpr tplates/[A-Z]*
+
+

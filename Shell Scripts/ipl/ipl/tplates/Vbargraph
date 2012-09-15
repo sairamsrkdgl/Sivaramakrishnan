@@ -1,0 +1,93 @@
+==============
+Proc Vbargraph
+==============
+
+The following is an alphabetical list of the Vbargraph parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+-----------------------------------------------------------------
+Field:		dfield (list8)			: 	     **
+  This specifies the data field which should contain the values
+  to be plotted.  If doing stacked or clustered bars, one field
+  for every sub-bar should be given.
+-----------------------------------------------------------------
+Format:		{single,cluster,stack}		: single	
+  Selects either single bars, clusters, or bars stacked up.
+-----------------------------------------------------------------
+Idfield:	dfield (list8)			: 		
+  It is possible for an identifier to come from the data.  This
+  indicates the field where that identifier can be found.  Again,
+  if doing stacked or clustered bars, one field for every sub-bar
+  should be given.
+-----------------------------------------------------------------
+Idfield.size: 	charsize			: 6		
+  Char size of labels.
+-----------------------------------------------------------------
+Idfield.position: -1 to 1			: 0.02		
+  Distance of label above (or below) top of bar (inches).
+-----------------------------------------------------------------
+Killwild:	number				: 		
+  If a data value greater than this is found, abort.  Typically
+  used for low N on percentage distributions. 
+-----------------------------------------------------------------
+Outlinebars:	{y,n}				: y		
+  Allows bars to be outlined.
+-----------------------------------------------------------------
+Segment:	{y,n}				: n		
+  Style parameter causing bars to be segmented by white lines.
+-----------------------------------------------------------------
+Separation:	0 to 1				: 0.20		
+  This controls the distance between bars.
+-----------------------------------------------------------------
+Separation.sub: 0 to 1				: 0.03		
+  Distance between sub-bars in cluster.
+-----------------------------------------------------------------
+Shade: 		color (list8)			: .2 .5 .8 1 0  
+  A shade for each bar (sub-bar).
+-----------------------------------------------------------------
+Ystart.0or1:	{0,1}				: 1		
+  Start bars at Y=0 or Y=1.  Almost always, bars work better when
+  started at Y=1.
+-----------------------------------------------------------------
+Yfield:		dfield				:		
+  Y position of bars (optional).
+-----------------------------------------------------------------
+Zeroat:		number				: 
+  Bars point left at values less than this (usually 0)
+-----------------------------------------------------------------
+#
+#   Vbargraph - for producing single, clustered or stacked bar graphs.
+# Exactly the same as Bargraph except that bars grow from left to right.
+# Format parameter can be used to select which type of bargraph.  If 
+# clustered or stacked, data for each sub-bar must come from a different
+# field.  The Field parameter should contain the field or fields in the
+# order that they are to appear, from left to right. Each line of data 
+# produces one major bar (a bar or set of sub-bars).
+#
+#   Unless Yfield is specified, bars will be drawn starting at the bottom
+# and moving to the top, one per data unit.  For example, if the Y axis
+# is scaled from 0 to 10, 9 bars will be produced at Y=1 through Y=9, 
+# assuming there are 9 or more lines of data.  Ystart.0or1 can be set 
+# to 0 to have the bars start at 0 instead of 1.
+#
+#   If Yfield is specified, that field will be used as the Y location of
+# the center of the bar or sub-bars.
+#
+#   The Killwild parameter can be used to abort the bar graph if any 
+# values exceed it.
+#
+#   The Zeroat parameter can be used to determine a point in X at which
+# becomes the effective origin for the bars, meaning that any values 
+# less than the Zeroat value will produce leftward bars.
+#
+#   Bars can be outlined (using Outlinebars), shaded (using Shade), or 
+# labeled# (using Idfield).  Shading and labeling require one value for 
+# each sub-bar, if doing clustered or stacked bars.  Labeling is done 
+# by specifying field(s) from the data.
+#
+#   Note that the Percents option can be set in Proc Getdata to transform 
+# your data into percentages for percentage distributions. 
+#
+#   Bugs: It should be possible to specify bar labels literally.

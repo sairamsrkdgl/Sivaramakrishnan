@@ -1,0 +1,5 @@
+sipl ../tplates/gallery.g areadef1.g areadef2.g bargraph1.g distrib1.g distrib2.g \
+  errorbar1.g legend1.g lineplot1.g map1.g nicetab1.g pie1.g rangebar1.g vbargraph1.g \
+  vector1.g vrangebar1.g absunits.g 
+sipl examp1.g examp2.g examp10.g examp12.g examp13.g examp14.g examp16.g \
+  examp3.g examp4.g examp6.g examp7.g 

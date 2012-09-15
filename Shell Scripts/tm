@@ -1,0 +1,42 @@
+#!/bin/sh
+# $Id: tm 1.1 1996/07/28 12:22:02 jerry Exp $
+#
+# tm - show current time in another timezone, or list timezones
+# Usage: tm [timezone]
+
+pager="more -d"			# pager, gives instructions on bottom line
+cd /usr/lib/zoneinfo || exit	# Holds timezone files
+
+case $# in
+
+0)	# With no argument, shows the possible timezones.
+	# All the "useful" files start with uppercase letters.
+	# Find them, sort list, print in 3 columns, use pager:
+	(echo '*** Use one of these timezones ***'
+	find * -type f -name '[A-Z]*' -print | sort | pr -w80 -l1 -3 -t) |
+	$pager
+	exit 0
+	;;
+
+1)	case "$1" in
+	[A-Z]*)	if [ -f "$1" ]
+		then
+			# show date
+			TZ="$1" date
+			exit 0
+		else
+			echo "$1??  For timezone list, use:  `basename $0`" 1>&2
+			exit 2
+		fi
+		;;
+	*)	echo "`basename $0`: Timezone Names All Start Uppercase." 1>&2
+		exit 3
+		;;
+	esac
+	;;
+
+*)	echo "Usage: `basename $0` [timezone]" 1>&2
+	exit 1
+	;;
+
+esac

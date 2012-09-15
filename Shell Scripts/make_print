@@ -1,0 +1,17 @@
+# This is a makefile that lets you be sure you have printouts of the
+# latest versions of certain files.
+
+# Replace 'xyz' with the name of your printer
+LPR = lpr -Pxyz
+
+# Replace these filenames with names of files you want to print
+FILES = preface chap1 chap2 chap3 chap4 chap5 appendix
+
+# The lines 'pr ...' and 'touch ...' MUST start with a TAB character.
+print: $(FILES)
+	pr $? | $(LPR)
+	touch print
+
+# Print all the files, regardless of when they were modified
+printall:
+	pr $(FILES) | $(LPR)

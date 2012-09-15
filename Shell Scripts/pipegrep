@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+
+# Usage: pipegrep [\-l] pattern command [files]
+
+if ($ARGV[0] eq '\-l') {
+    shift;
+    $action = <<'EOF';
+            print $file,"\n";
+            next file;
+EOF
+}
+else {
+    $action = <<'EOF';
+            print $file,":\t", $_;
+EOF
+}
+
+# Get pattern and protect the delimiter we'll use.
+
+$pat = shift;
+$pat =~ s/!/\\!/g;
+
+# Get command and make sure it has a {}.
+
+$cmd = shift;
+$cmd .= ' {}' unless $cmd =~ /{}/;
+
+# Modify each filename into the corresponding command.
+
+for (@ARGV) {
+    $file = $_;
+    $_ = $cmd;
+    s/{}/$file/;
+    s/$/ |/;
+}
+
+# Generate the program.
+
+$prog = <<EOF;
+file: foreach \$file (\@ARGV) {
+    open(FILE,\$file) || do {
+        print STDERR "Can't open \$file: \$!\\n";
+        next;
+    };
+    while (<FILE>) {
+        if (m!$pat!) {
+            $action
+        }
+    }
+}
+EOF
+print $prog if $debugging;
+
+# And finally, do it.
+
+eval $prog;
+die $@ if $@;

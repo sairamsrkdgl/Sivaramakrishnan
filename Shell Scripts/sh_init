@@ -1,0 +1,281 @@
+# 
+# # - - - - - - - - - - -
+# 
+# # variable with wildcards to match all names starting with "."
+# # (on bash, you may need to use echo -e option to make this work):
+# dots=".[`echo \\\\001--0-\\\\0177`]*"
+# # Version of above for shells whose echo doesn't understand \nnn
+# #dots=".[`echo Y--0-Z | tr YZ \\001\\177`]*"
+# 
+# # - - - - - - - - - - -
+# 
+# # functions for vi -- switching between .exrc files and calling vi with a search
+# 
+#         # --- INITIALIZATION FOR 'vi' FUNCTIONS --- #
+# EXSTAT=text
+# export EXSTAT
+# 
+#         # --- THESE ALIASES RESET THE .exrc FILE --- #
+# # SET 'vi' FOR 4-CHARACTER TABS/SHIFTS:
+# vi4() { cp $HOME/lib/vi/exrc4 $HOME/.exrc; EXSTAT=programming; }
+# # SET 'vi' FOR 8-CHARACTER TABS/SHIFTS:
+# vi8() { cp $HOME/lib/vi/exrc8 $HOME/.exrc; EXSTAT=text; }
+# # SET 'vi' FOR QUICK WORK WHEN SYSTEM IS SLOW (NO .exrc FILE):
+# qvi() { rm $HOME/.exrc; EXSTAT=quick; }
+# 
+#         # --- THESE ARE THE vi ALIASES. ONE SETS THE vi MODE FIRST --- #
+# vi() { echo "MODE: $EXSTAT"; /usr/ucb/vi "$@"; }
+# # CALL vi WITH A SEARCH:
+# vs() { vi8; vi +/"$@"; }
+# 
+# # - - - - - - - - - - -
+# 
+# # Automatic Setup When You Enter and Exit A Directory
+# #
+# # When you cd into a directory and a file named `.enter.sh' exists,
+# # the commands in it will be run by your current shell.
+# # When you cd out of a directory and a file named `.exit.sh' exists,
+# # the commands in it will be run by your current shell.
+# 
+# # Korn Shell version (needs an alias to override builtin "cd"):
+# alias cd=_cd
+# _cd() {
+#    test -r .exit.sh && . .exit.sh
+#    cd "$1"
+#    test -r .enter.sh && . .enter.sh
+# }
+# 
+# # Bash version:
+# cd() {
+#    test -O .exit.sh && . .exit.sh
+#    builtin cd "$1"
+#    test -O .enter.sh && . .enter.sh
+# }
+# 
+# # - - - - - - - - - - -
+# 
+# # Set and remove write permissions from a file
+# # Two versions, one for Korn shell
+# 
+# # change mode to read only
+# alias -w='chmod -w'
+# # change mode to add write permission
+# alias +w='chmod u+w'
+# 
+# # Korn shell doesn't want to store an alias named '-w', so use these:
+# #alias c-w='chmod -w'
+# #alias c+w='chmod u+w'
+# 
+# # - - - - - - - - - - -
+# 
+# # Aliases to alter your umask
+# #
+# # With these two values of umask, new files and directories will have
+# # permissions of 775 or 755, respectively.
+# 
+# alias open='umask 002'
+# alias shut='umask 022'
+# 
+# # - - - - - - - - - - -
+# 
+# # Find repeated words.  Reads files or standard input.
+# #
+# # CHOOSE ONE:
+# # For Berkeley tr(1):
+# ww() { cat $* | tr -cs "a-z'" "\012" | uniq -d; }
+# # For System V tr(1):
+# #ww() { cat $* | tr -cs "[a-z]'" "[\012*]" | uniq -d; }
+# 
+# # - - - - - - - - - - -
+# 
+# # Find files only in the current directory with -prune
+# 
+# # print using -print (complete path name only)
+# Find() { find . \( -type d ! -name . -prune \) -o \( "$@" -print \); }
+# 
+# # print using -s (gives output similar to `ls -ilds')
+# Findls() { find . \( -type d ! -name . -prune \) -o \( "$@" -ls \); }
+# 
+# # - - - - - - - - - - -
+# 
+# # This sets a three-line prompt for the bash shell: one blank line,
+# # one line with the hostname and current directory, and a third
+# # with the history number and a percent sign.
+# # This should be placed in your .bash_profile and/or .bashrc file.
+# #
+# # The prompt will look something like:
+# # <blank line>
+# # username@hostname current_directory
+# # history_number % 
+# 
+# PS1='\n\u@\h \w\n\! \$ '
+# 
+# # - - - - - - - - - - -
+# 
+# # VT102 alias: puts $host:$cwd in status line. Escape sequences are:
+# # ${e}7 = save cursor position, ${e}[25;1f = move to start of status line
+# # (line 25), ${e}[0K = erase line, ${e}8 = restore cursor
+# 
+# e=`echo \\\\033`             # An ESCape character
+# #e=`echo x | tr x \\\\033`   # Use this if your echo can't handle \nnn
+# host=`uname -n`
+# 
+# # For Korn shell:
+# #alias cd=_cd
+# #_cd() { cd "$1" && echo "${e}7${e}[25;1f${e}[0K${host}:${PWD}${e}8\c"; }
+# 
+# # For bash:
+# cd() { builtin cd "$1" && echo -e "${e}7${e}[25;1f${e}[0K${host}:${PWD}${e}8\c"; }
+# 
+# # - - - - - - - - - - -
+# 
+# # Make a blinking prompt.  This example makes the prompt:
+# # root:hostname
+# # with `root' blinking.
+# # Notice that prompt is set inside doublequotes -- so the uname -n command
+# # is run once, when the PS1 string is first stored.
+# #
+# # For Bourne and Korn shells, put ESCape character in $e.
+# # Use to start blinking mode (${e}[5m) and go back to normal mode (${e}[0m)
+# # on VT100-series terminals.
+# e="`echo x | tr x '\033'`"
+# PS1="${e}[5mroot${e}[0m@`uname -n`# "
+# 
+# # For bash, comment out the two lines above.  Use octal character values:
+# #PS1="\033[5mroot\033[0m@`uname -n`# "
+# 
+# # - - - - - - - - - - -
+# 
+# # This makes a multi-line prompt that shows the directory stack.  These
+# # commands should be put in your .bash_profile and/or .bashrc file.
+# #
+# # The prompt will look something like:
+# # <blank line>
+# # username@hostname directory_stack
+# # history_number % 
+# #
+# # This makes a blank line before each prompt; to avoid that,
+# # remove the first \n.
+# 
+# PS1='\n\u@\h $(dirs)\n\! \$ '
+# 
+# # - - - - - - - - - - -
+# 
+# # Shell functions that run "ls" with options.
+# #
+# # We don't recommend making a function named "ls" that overrides the
+# # standard ls.  Instead, we recommend using other names for "ls"
+# # (like la and lf) -- and leaving the standard ls for times you might
+# # need it.
+# #
+# la () { ls -a "$@"; }
+# lf () { ls -F "$@"; }
+# 
+# # - - - - - - - - - - -
+# 
+# # print a file, lines folded at right margin, filename in heading:
+# prF() { fold "$1" | pr -h "$1"; }
+# 
+# # - - - - - - - - - - -
+# 
+# # number lines and print, lines folded at right margin, filename in heading:
+# prnF() { cat -n "$1" | fold | pr -h "$1"; }
+# 
+# # - - - - - - - - - - -
+# 
+# # Use perl to find all "text" files (files that contain less than
+# # 10% non-control characters) in the current directory:
+# findtext() { perl -le '-T && print while $_ = shift' *; }
+# 
+# # - - - - - - - - - - -
+# 
+# # shell function that prints the name of the newest file in a group
+# newer() { ls -dt "$@" | head -1; }
+# # Use this instead if your system doesn't have "head":
+# #newer() { ls -dt "$@" | sed 1q; }
+# 
+# # - - - - - - - - - - -
+# 
+# # compare modification times of /etc/motd and ~/.hushlogin to see
+# # which is newer.  If /etc/motd is newer, show it.
+# 
+# case "`ls -t /etc/motd $HOME/.hushlogin`" in
+# /etc/motd*)	# ls printed the motd filename first
+#     cat /etc/motd
+#     touch $HOME/.hushlogin
+#     ;;
+# esac
+# 
+# # - - - - - - - - - - -
+# 
+# # This shell function is for systems that don't have the tail(1) utility.
+# # It outputs the last ten lines of a file or standard input.
+# ptail() { sed -e :a -e '$q;N;11,$D;ba' $1; }
+# 
+# # - - - - - - - - - - -
+# 
+# # Shell function front-end to the "which" utility on the Power Tools disc.
+# # Edit the "/usr/local/bin/which" to the right pathname for your system.
+# which()
+# {
+# 	eval last=\"\$$#\"
+# 	set | sed -n "/^$last(){$/,/^}$/p" |
+# 		/usr/local/bin/which -i ${1+"$@"}
+# }
+# 
+# # - - - - - - - - - - -
+# 
+# # Put date and time in the Bourne Shell prompt; update every 60 seconds:
+# trap 'PS1=`date "+%a %D %H:%M%n"`\
+# $\ ' 5
+# while :
+# do
+#     sleep 60
+#     kill -5 $$
+# done &
+# promptpid=$!
+# 
+# 
+# # - - - - - - - - - - -
+# 
+# # Runs vi on the filename you give; adds today's date to end of name
+# vid() { vi "$1".`date +%m.%d`; }
+# 
+# # - - - - - - - - - - -
+# 
+# # cd with abbreviated pathnames -- Just type the initials (first
+# # letter, or more) of each directory in the pathname, starting at the
+# # root direcctory.  Put a period after each part.
+# #   eg: c u.i.h.  might match with /usr/include/hsfs
+# 
+# c()
+# {
+# 	dir="$1"
+# 
+# 	# Delete dots.  Surround every letter with "/" and "*".
+# 	# Add a final "/." to be sure this only matches a directory:
+# 	dirpat="`echo $dir | sed 's/\([^.]*\)\./\/\1*/g'`/."
+# 
+# 	# In case $dirpat is empty, set dummy "x" then shift it away:
+# 	set x $dirpat; shift
+# 
+# 	# Do the cd if we got one match, else print error:
+# 	if [ "$1" = "$dirpat" ]; then
+# 		# pattern didn't match (shell didn't expand it)
+# 		echo "c: no match for $dirpat" 1>&2
+# 	elif [ $# = 1 ]; then
+# 		echo "$1"
+# 		cd "$1"
+# 	else
+# 		echo "c: too many matches for $dir:" 1>&2
+# 		ls -d "$@"
+# 	fi
+# 
+# 	unset dir dirpat
+# }
+# 
+# # - - - - - - - - - - -
+# 
+# # shell function to search down, starting at the current directory, for
+# # any file or directory name which contains the name you give this.
+# ff() { find . -name "*$1*" -ls; }

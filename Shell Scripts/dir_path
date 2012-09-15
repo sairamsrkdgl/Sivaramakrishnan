@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# usage: dir_path [directory ...]
+# Find All Directories With the Same Name - list directory and path to directory
+# (default to the argument . (current directory))
+#
+# You could also use this idea for finding duplicate files.  Change
+# the `-type d' to `-type f'.
+#
+# print in the format `base_directory_name	full_directory_path'
+
+find ${*-.} -type d -print  | awk -F/  '
+{
+        printf ("%s\t%s\n",$NF,$0);
+}' | sort  # sort to make similar directories adjacent in the output

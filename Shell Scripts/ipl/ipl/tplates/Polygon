@@ -1,0 +1,41 @@
+============
+Proc Polygon
+============
+
+The following is an alphabetical list of the Polygon parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+-------------------------------------------------------------------
+Linetype:	0 to 8				: 0		
+  Line dash pattern for outline.
+-------------------------------------------------------------------
+Linetype.magnify: 0.1 to 10			: 1		
+  Magnification of patterns for outline.
+-------------------------------------------------------------------
+Linethick:	0.1 to 10			: 1		
+  Thickness of line for outline.
+-------------------------------------------------------------------
+Outline:	{y,n}				: n		
+  Allows outlining of polygon with a line.
+-------------------------------------------------------------------
+Points:		text (M) (C)			:		**
+  This is where the points describing the polygon boundary get
+  specified.  There should be one coordinate pair per line. 
+-------------------------------------------------------------------
+Rectangle:	2coordpair			:		
+  Convenient way to specify a rectangle.  Give two coordinate
+  pairs (on the same line), one for the lower-left and one for
+  the upper-right.
+-------------------------------------------------------------------
+Shade:		color				: 0.5		
+  The shade of the polygon goes here.
+-------------------------------------------------------------------
+System:		{data,absolute}			: absolute	
+  Allows either the absolute or the data coordinate system 
+  to be used for specifying points.
+-------------------------------------------------------------------
+#
+# Creates a shaded rectangle or convex polygon, optionally outlined.
+# Should add Position, so that a polygon can be replicated

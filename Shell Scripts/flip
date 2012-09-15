@@ -1,0 +1,6 @@
+#!/usr/local/bin/perl
+###	flip - reverse the lines in a file, bottom-to-top
+###	Usage: flip [file]
+##
+##	flip IS LIKE tail -r, BUT IT HANDLES MUCH BIGGER FILES
+print reverse <>

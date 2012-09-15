@@ -1,0 +1,23 @@
+==========
+Proc Point
+==========
+
+The following is an alphabetical list of the Point parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+----------------------------------------------------------------
+Mark:		token		: sym6e		
+  Symbol code (see example point1.g).
+----------------------------------------------------------------
+Position:	text (M) (C) 	:		
+  Position in absolute data system.
+----------------------------------------------------------------
+Size:		1 to 20		: 5		
+  Marker size, in points.
+----------------------------------------------------------------
+
+# This proc draws a single marker at the specified position.  It 
+# should be used for annotation only.  See also Proc Distribution 
+# and Proc Legend.  

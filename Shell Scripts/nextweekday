@@ -1,0 +1,60 @@
+#! /bin/sh
+#
+###	nextday, nextweekday - return name (or number) of next day, weekday
+###	Usage: nextday/nextweekday [-n]
+##
+##	nextday RETURNS THE NAME OF THE NEXT DAY.  IT'S ESPECIALLY
+##	USEFUL WITH SELF-REPEATING at SCRIPTS.  FOR EXAMPLE, IF
+##	TODAY IS MONDAY,
+##		% nextday
+##		Tuesday
+##	YOU CAN CONVERT THIS TO LOWER-CASE BY USING tr; YOU CAN CHOP OFF
+##	THE TRAILING CHARACTERS WITH THE HELP OF, SAY, colrm 4.
+##
+##	AND, THIS COMMAND RUNS A JOB AT 6 PM TOMORROW (ASSUMING THAT IT'S
+##	NOT 6 PM YET TODAY):
+##		% at 6 pm "`nextday`"
+##
+##	WITH THE -n OPTION, nextday RETURNS A NUMBER BETWEEN 0 (SUNDAY)
+##	AND 6 (SATURDAY):
+##		% nextday -n
+##		1
+##
+##	IF YOU CALL THE PROGRAM nextweekday, IT WON'T EVER RETURN SATURDAY
+##	OR SUNDAY (ON FRIDAY, SATURDAY, OR SUNDAY, IT RETURNS MONDAY).
+
+date=/usr/5bin/date	# UNDERSTANDS +xxx FORMAT STRING
+
+case "$1" in
+"")	# USE DAY OF WEEK (Sun, Mon, etc.) FROM "date":
+	case "`$date +%a`" in
+	Sun) echo Monday ;;
+	Mon) echo Tuesday ;;
+	Tue) echo Wednesday ;;
+	Wed) echo Thursday ;;
+	Thu) echo Friday ;;
+	Fri) case "$0" in
+		*nextday) echo Saturday ;;
+		*nextweekday) echo Monday ;;
+		esac
+		;;
+	Sat) case "$0" in
+		*nextday) echo Sunday ;;
+		*nextweekday) echo Monday ;;
+		esac
+		;;
+	*)	echo "`basename $0`: Help!  Shouldn't get here!" 1>&2
+		exit 1
+		;;
+	esac
+	;;
+-n)	# USE NUMBER (1, 2, etc.) FROM "date"; MAKE tr CONVERT (PORTABLY):
+	case "$0" in
+	*nextday) $date +%w | tr '0123456' '1234560' ;;
+	*nextweekday) $date +%w | tr '0123456' '1234511' ;;
+	esac
+	;;
+*)	echo "Usage: `basename $0` [-n]" 1>&2
+	exit 1
+	;;
+esac

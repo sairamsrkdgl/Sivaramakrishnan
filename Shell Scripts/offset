@@ -1,0 +1,49 @@
+#! /bin/sh
+#
+###	offset - indent each line (default: 5 spaces); write to stdout
+###	Usage: offset [-##] [files]
+
+# GET INDENTATION (IF ANY) AND CHECK FOR BOGUS NUMBERS:
+case "$1" in
+-[0-9]|-[0-9][0-9]) indent="$1"; shift ;;
+-*)	echo "`basename $0`: '$1' isn't -number or is > 99." 1>&2; exit 1 ;;
+esac
+
+# SET DEFAULT:
+case "$indent" in
+"")	indent=-5 ;;
+esac
+
+# BUILD THE SPACES FOR sed.
+# FIRST case DOES MULTIPLES OF 10; SECOND case DOES SINGLE SPACES:
+s="          "	# TEN SPACES
+case "$indent" in
+-?)	;;	# LESS THAN 10; SKIP IT
+-1?) pad="$s" ;;
+-2?) pad="$s$s" ;;
+-3?) pad="$s$s$s" ;;
+-4?) pad="$s$s$s$s" ;;
+-5?) pad="$s$s$s$s$s" ;;
+-6?) pad="$s$s$s$s$s$s" ;;
+-7?) pad="$s$s$s$s$s$s$s" ;;
+-8?) pad="$s$s$s$s$s$s$s$s" ;;
+-9?) pad="$s$s$s$s$s$s$s$s$s" ;;
+*)	echo "`basename $0`: Help! \$indent is '$indent'!?!" 1>&2; exit 1 ;;
+esac
+
+case "$indent" in
+-0|-?0)	;;	# SKIP IT; IT'S A MULTIPLE OF 10
+-1|-?1) pad="$pad " ;;
+-2|-?2) pad="$pad  " ;;
+-3|-?3) pad="$pad   " ;;
+-4|-?4) pad="$pad    " ;;
+-5|-?5) pad="$pad     " ;;
+-6|-?6) pad="$pad      " ;;
+-7|-?7) pad="$pad       " ;;
+-8|-?8) pad="$pad        " ;;
+-9|-?9) pad="$pad         " ;;
+*)	echo "`basename $0`: Help! \$indent is '$indent'!?!" 1>&2; exit 1 ;;
+esac
+
+# MIGHT ADD expand FIRST TO TAKE CARE OF TABS:
+sed "s/^/$pad/" $*

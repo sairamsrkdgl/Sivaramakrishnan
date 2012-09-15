@@ -1,0 +1,29 @@
+                                        December 20, 1990
+
+I wrote bsdtar when we switched from using 4.2BSD UNIX to UNIX System V.
+We had lots of tar tapes containing lots of files with names longer than
+System V's archaic 14 character limit.  (Forget kernel differences -- this
+file system difference has caused me more grief than all other differences
+combined!)  I wrote bsdtar from the specifications in the Ugly Green Book
+(IEEE Std 1003.1-1988, "IEEE Standard Portable Operating System Interface
+for Computer Environments"), so AT&T has absolutely no claim to it.
+
+For the paranoid, here's the output of "wc" and "sum -r" for the files in
+the bsdtar distribution:
+
+file              wc                    sum -r
+--------        ------------------      -----------
+COPYING           34    284   1803      44474     4
+Makefile           9     30    251      06675     1
+README            29    204   1452      -----     -
+bsdtar.1          99    622   3597      34159     8
+bsdtar.c        1221   4458  31017      57279    61
+
+bsdtar has helped us quite a bit, both in retrieving our own data written
+in the Good Old Days when we had a BSD system, and in reading tapes acquired
+from elsewhere.  I hope it will be of use to others as well.
+
+Stephen McConnel
+Summer Institute of Linguistics  PHONE: 214-709-2418
+7500 W. Camp Wisdom Road          UUCP: ...!{convex|utafll}!txsil!steve
+Dallas, TX 75236              Internet: steve@txsil.lonestar.org

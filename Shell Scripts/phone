@@ -1,0 +1,39 @@
+#!/bin/sh
+#
+# phone, address - look a phone or address in a file.
+# LINK BOTH THE phone AND address SCRIPTS TOGETHER; BOTH USE THIS FILE!
+
+myname="`basename $0`"  # NAME OF THIS SCRIPT (USUALLY address OR phone)
+case "$myname" in
+phone|address)
+    sysfile=/work/ora/$myname   # SYSTEM FILE
+    persfile=${HOME?}/$myname   # PERSONAL FILE
+    ;;
+*) echo "$0: HELP!  I don't know how to run myself." 1>&2; exit 1 ;;
+esac
+
+if test ! -f $persfile
+then touch $persfile
+fi
+
+case $# in
+0)  echo "Usage: $myname searchfor [...searchfor]
+    (You didn't tell me what you want to search for.)" 1>&2
+    exit 1
+    ;;
+*)  # BUILD egrep EXPRESSION LIKE (arg1|arg2|...) FROM NAME(S) USER TYPES:
+    for arg
+    do
+        case "$expr" in
+        "") expr="($arg" ;;
+        *) expr="$expr|$arg" ;;
+        esac
+    done
+    expr="$expr)"
+esac
+
+# SEARCH WITH egrep, USE sed TO ADD sys> TO START OF FILENAMES FROM
+# SYSTEM FILE AND pers> TO START OF FILENAMES FROM HOME LIST:
+egrep -i "$expr" $persfile $sysfile |
+sed -e "s@^$sysfile:@sys>@" -e "s@^$persfile:@pers>@"
+exit

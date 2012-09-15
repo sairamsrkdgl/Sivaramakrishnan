@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# Usage: lookfor <directory> <-/+days> <word> <word> ...
+# lookfor - look for all files in the specified directory hierarchy
+# modified within a certain time, and pass the resulting names to
+# egrep to scan for a particular pattern.  
+
+where="$1"
+when="$2"
+shift; shift
+# Build egrep expression like (word1|word2|...) in $expr
+for word
+do
+    case "$expr" in
+    "") expr="($word" ;;
+    *) expr="$expr|$word" ;;
+    esac
+done
+expr="$expr)"
+
+# Do the search in one sweep, passing the results of the find to egrep
+find $where -mtime $when -print | xargs egrep -i "$expr" /dev/null

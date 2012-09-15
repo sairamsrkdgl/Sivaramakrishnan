@@ -1,0 +1,37 @@
+.TH STAT 1u UNSUP
+.UC 4
+.SH NAME
+stat \- print inode contents
+.SH SYNOPSIS
+.B stat
+.I filename
+.I [filenames ... ]
+.SH DESCRIPTION
+.PP
+.I Stat
+prints out the contents of an inode as they appear to \fIstat(2)\fR
+in a human-readable format.
+.PP
+Here is a sample output from \fIstat\fR:
+.nf
+  File: \*(lq/\*(rq
+  Size: 1024         Allocated Blocks: 2            Filetype: Directory
+  Mode: (0755/drwxr-xr-x)         Uid: (    0/    root)  Gid: (    0/  system)
+Device:  0,0   Inode: 2         Links: 20   
+Access: Wed Jan  8 12:40:16 1986(00000.00:00:01)
+Modify: Wed Dec 18 09:32:09 1985(00021.03:08:08)
+Change: Wed Dec 18 09:32:09 1985(00021.03:08:08)
+.fi
+.PP
+.SH DIAGNOSTICS
+\*(lqCan't stat file\*(rq or \*(lqCan't lstat file\*(rq usually means that it doesn't exist.
+\*(lqCan't readlink file\*(rq implies something is amiss with a symbolic link.
+.SH SEE ALSO
+stat(2), ls(1)
+.SH AUTHOR
+Rich Kulawiec, Purdue University
+.SH BUGS
+The output is not entirely comprehensible.
+.sp 1.5
+.ce
+NOT SUPPORTED BY PUCC

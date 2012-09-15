@@ -1,0 +1,36 @@
+#! /bin/sh
+### crontab - front-end to make INTERACTIVE crontab act like Sun's version
+### Usage: crontab -e | -l | -d 
+##
+##  THIS WON'T LET YOU GIVE A FILENAME ARGUMENT, SO IT'S NOT QUITE LIKE SUN'S...
+##  ALSO REQUIRES A FLAG (-e, -l, -d)
+cmd=/usr/bin/crontab    # THE SYSTEM VERSION
+
+# MAKE SURE EVERYONE KNOWS WHAT THEY'RE RUNNING:
+echo "Running Jerry's crontab command..." 1>&2
+
+case $# in
+1)  ;;  # OK
+*)  echo "Usage: `/bin/basename $0` -e | -l | -d"; exit 1 ;;
+esac
+
+case "$1" in
+-[ld]) $cmd $1 ;;   # EXIT WITH STATUS OF REAL COMMAND
+-e) # EDIT IT:
+    umask 077
+    stat=1  # DEFAULT EXIT STATUS; RESET TO 0 FOR NORMAL EXIT
+    start=/tmp/CRONTAB$$s   end=/tmp/CRONTAB$$e
+    trap 'rm -f $start $end; exit $stat' 0 1 2 15
+    $cmd -l > $start || exit    # GET COPY OF CRONTAB
+    /bin/cp $start $end
+    ${VISUAL-${EDITOR-vi}} $end
+    if cmp -s $start $end
+    then echo "The crontab file was not changed." 1>&2; exit
+    else
+        $cmd $end
+        stat=$? # EXIT WITH STATUS FROM REAL crontab COMMAND
+        exit
+    fi
+    ;;
+*)  echo "Usage: `/bin/basename $0` -e | -l | -d"; exit 1;;
+esac

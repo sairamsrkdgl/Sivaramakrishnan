@@ -1,0 +1,53 @@
+========
+Proc Map
+========
+
+The following is an alphabetical list of the Map parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+--------------------------------------------------------------------
+Country:	{usa,usa+canada}		: usa+canada	
+  Selects the overall format: USA only, or USA and Canada.
+--------------------------------------------------------------------
+Country.linethick: 0.1 to 5			: 1		
+  Thickness for country boundary lines.
+--------------------------------------------------------------------
+List:		{y,n}				: y		
+  Allows text listing of state tabulations (to the right of the map).
+--------------------------------------------------------------------
+Mode:		{country,state,statedist}	: state		
+  Selects the overall mode.  For country outlines use "country";
+  for country and state outlines use "state"; for shaded state
+  distribution based on data, use "statedist".
+--------------------------------------------------------------------
+Shade:		color (list10)			: 1 .9 .8 .6 .4 .2 
+  When doing shaded state distribution, use this parameter to
+  select shades for the breakdowns.
+--------------------------------------------------------------------
+Statefield:	dfield				:		
+  When doing shaded state distribution, this selects which field
+  in the data contains the identifying state abbreviation.  
+  Abbreviations must be the standard Postal Service state
+  abbreviations, in lower case.
+--------------------------------------------------------------------
+State.linethick: 0.1 to 5			: 0.2		
+  Thickness for state boundary lines.
+--------------------------------------------------------------------
+Threshold:	number (list10)			:		
+  This sets up a list of thresholds for determining shading break-
+  down when doing a state distribution.  They should be in increasing
+  order.  For example, "1 10 20 30 40 50" will set up 6 categories
+  (1-9, 10-19, 20-29, 30-39, 40-49, >50) and produce states with 6 
+  different shades based on the value totals associated with each
+  state.  
+--------------------------------------------------------------------
+Valfield:	dfield				:		
+  This allows specification of a field in the data containing values
+  which will be added up.  If not specified, each record will add
+  one to its state's total.
+--------------------------------------------------------------------
+#
+# USA maps and state distributions
+# For best results, scale the graphics area to 40x40.

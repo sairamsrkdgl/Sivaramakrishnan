@@ -1,0 +1,99 @@
+.TH BSDTAR 1L
+.SH NAME
+bsdtar \- read a tar tape from 4.2BSD, handling long filenames
+.SH SYNOPSIS
+.B bsdtar {-t|-x} [-s] [-v] [-f archive] [-n blocking] [filespec(s)]
+.SH DESCRIPTION
+.I bsdtar
+is very similar to
+.I tar,
+except that its command arguments conform to normal UNIX usage (hyphens and
+all), and it only reads archives, it cannot create archives.
+.PP
+.I bsdtar
+handles filenames (and directory names) longer than 14 characters by copying
+the first 12 characters of the name and replacing the rest of the name with
+the string ``+0''.  If a file (or directory) by that name has already been
+created, it replaces ``+0'' with ``+1'', and so on to ``+9'', ``+A'', ``+Z'',
+``+a'', and eventually to ``+z''.  If all 62 names have already been used, then
+.I bsdtar
+tries ``=0'' through ``=z'', then ``:0'' through ``:z'', then ``~0'' through
+``~z'', and then ``@0'' through ``@z''.  If all 310 names are in use,
+.I bsdtar
+gives up and prompts the user for a name.
+When mapping a long name to a 14 character name, 
+.I bsdtar
+writes the mapping information to the standard error file.
+.PP
+One place where
+.I bsdtar
+differs from
+.I tar
+is its handling of existing files.
+.I tar
+silently overwrites existing files.
+.I bsdtar
+prompts the user for how to handle existing files: either replace the old file
+with the one from the archive, extract the file from the archive with a new
+name, or ignore the file in the archive.  Beware: if you specify a new name,
+.I bsdtar
+will blindly write the file with that name even if a file of the same name
+already exists.
+.SH OPTIONS
+Command line options are described below.
+.IP \-t
+The \-t option causes
+.I bsdtar
+to list the contents of the archive on the standard output.
+.IP \-x
+The \-x option causes
+.I bsdtar
+to extract files from the archive, creating directories as needed to store
+the files.
+Either \-t or \-x is required, but not both.
+.IP \-s
+The \-s option causes
+.I bsdtar
+to swap adjacent bytes throughout when reading an archive.  This is useful
+for reading tapes written on some 680x0-based systems.
+.IP \-v
+The \-v option causes
+.I bsdtar
+to work verbosely.  With \-t, this means that a directory information is
+listed for each file, not just the pathname.  With \-x, this means that the
+pathname of each file is printed as it is extracted.
+.IP \-f archive
+The \-f option causes
+.I bsdtar
+to use the specified file as the archive.  /dev/mt0 is the default archive.
+.IP \-n blocking
+The \-n option causes
+.I bsdtar
+to read the given number of blocks in a lump together while accessing the
+archive.  (This makes sense only for tape archives, where a read operation
+should match a tape record.)  The default value is 20.
+.SH SEE ALSO
+tar(C)
+.SH BUGS and LIMITATIONS
+Lots more could be done.
+.br
+It's certainly not as thoroughly tested as the standard tar provided with the
+system.
+In particular, no effort has been made to make it easily portable to anything
+except UNIX System V.
+.br
+Possibly the pdtar program on the 1987 Usenix tape would have been a good
+starting point, but I wrote this from scratch, from the specifications
+published in IEEE Std 1003.1-1988, ``IEEE Standard Portable Operating System
+Interface for Computer Environments''.
+.SH AUTHOR
+Stephen McConnel <steve@txsil.lonestar.org>
+.SH COPYRIGHT
+Copyright 1990 Summer Institute of Linguistics.  All rights reserved.
+.PP
+Permission is granted to anyone to use
+.I bsdtar
+for any purpose on any computer system, and to alter it and redistribute it
+freely, subject only to the minor restrictions listed in the file COPYING,
+which must be included in any distribution of
+.I bsdtar .

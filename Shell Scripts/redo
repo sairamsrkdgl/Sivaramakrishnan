@@ -1,0 +1,40 @@
+# (The name of the author of the script below, which apparently was obtained
+# from Usenet years ago, has been lost.)
+# 
+# This script gives csh users the capability of command line editing by
+# invoking the open mode of ex on a file containing a history list, and then
+# sourcing the edited version of the desired command.
+# 
+# 1) install it in /usr/local/bin/redo (or wherever else you'd like) with
+#    read-only-for-world permissions (i.e., do *not* make it executable);
+# 
+# 2) do
+#       alias r source /usr/local/bin/redo
+#    (or whatever, corresponding to where you installed it), and also put this
+#    alias in your favorite "dot" file;
+# 
+# 3) type "r" to invoke it; use the "hjkl" keys to get to the line you want to
+#    edit; edit the line (remember that you're in the open mode of ex); and,
+#    when you're done, hit <CR> (*not* ZZ).
+# 
+
+# Get up to 22 most recent commands.
+history -h 22 >! /tmp/redo.$$
+
+# Put CR in $c[1] and ESC in $c[2]:
+set c=(`echo "m e" | tr me '\015\033'`)
+
+# Make CR map to :wq! and start ex quietly at 2nd to last line in open mode.
+(setenv EXINIT "map $c[1] :.wq\!$c[2]|map! $c[1] ${c[2]}:.wq\!$c[2]";\
+        ex '+$-1 open' /tmp/redo.$$)
+tail -1 /tmp/redo.$$ >! /tmp/cmd.$$
+
+# Insert into history without executing.
+source -h /tmp/cmd.$$
+
+# Clear out temporaries.
+/bin/rm -f /tmp/{cmd,redo}.$$
+unset c
+
+# If thing chosen to redo is the redo alias itself then DON'T redo it.
+if (!-2:0 != !!:0) !!

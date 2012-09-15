@@ -1,0 +1,53 @@
+#! /bin/sh
+###	findcmd - hunt through PATH for all command names containing string
+###	Usage: findcmd string
+#
+#	WOULD BE NICE IF IT USED ONE OF THE "APPROXIMATE MATCH" GREPS
+#	THAT CAME ACROSS THE NET A WHILE AGO...
+
+# ls -l OPTION TO SHOW JUST OWNER NAME, NOT GROUP.  ON SYSTEM V, USE -dlo:
+lsopt=-dl
+
+case $# in
+1) ;;
+*)	echo "Usage: `basename $0` string" 1>&2; exit 1 ;;
+esac
+
+# REPLACE NULL FIELD IN $PATH WITH A .:
+fixpath="`echo $PATH | sed \
+	-e 's/^:/.:/' \
+	-e 's/::/:.:/g' \
+	-e 's/:$/:./'`"
+
+# WE NEED TO PICK FILES EXECUTABLE BY OTHER OR GROUP OR OWNER...
+# DEPENDING ON WHO USER IS AND ETC...
+# THIS sed STUFF DOESN'T REALLY CUT IT...
+# IT READS THE INPUT LINES, WHICH LOOK LIKE THIS:
+# -rwxr-xr-x  1 jdpeek        577 Aug 21 07:09 /xxx/yyy/findcmd
+# DELETES ALL LINES WITH "$1" not found; ALSO ZAPS DIRECTORIES.
+# FOR OTHER LINES THAT LOOK EXECUTABLE, IT BRANCHES TO :printit,
+# WHICH STRIPS OFF COLUMNS 1-44 (LEAVING THE PATHNAME) AND STRIPS
+# OFF ANY SYMLINK INFO (-> TARGET) THEN IT PRINTS.
+# (WHAT SHOULD IT DO WITH SYMLINKS?)
+IFS=":$IFS"
+thisdir="`/bin/pwd`"
+for dir in $fixpath
+do
+	case "$dir" in
+	.) cd "$thisdir" || exit 1 ;;
+	*) cd "$dir" || exit 1 ;;
+	esac
+	# USING ls -dl $dir/*${1}* MIGHT BOMB WITH Arguments too long...
+	# SO USE sed TO CHANGE " ./" IN THE ls OUTPUT INTO " $dir/":
+	ls $lsopt ./*${1}* 2>&1 | sed "s@ \./@ $dir/@"
+done |
+sed -n "
+	/not found$/d
+	/^d/d
+	/^...[sx]......... $USER/b printit
+	/^......[sx]..[sx]/b printit
+	b
+	:printit
+	s/^.............................................//
+	s/ -> .*$//
+	p"

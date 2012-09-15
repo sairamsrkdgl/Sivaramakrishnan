@@ -1,0 +1,38 @@
+#! /usr/local/bin/gawk -f
+BEGIN {
+	inTable = 0
+	TSlineno = 0
+	TElineno = 0
+	prevFile = ""
+}
+# check for unclosed table in first file, when more than one file
+FILENAME != prevFile {
+	if (inTable)
+		printf ("%s: found .TS at File %s: %d without .TE before end of file\n",
+			$0, prevFile, TSlineno)
+	inTable = 0
+	prevFile = FILENAME
+}
+# match TS and see if we are in Table
+/^\.TS/ {
+	if (inTable) {
+		printf("%s: nested starts, File %s: line %d and %d\n",
+			$0, FILENAME, TSlineno, FNR)
+        }
+	inTable = 1
+	TSlineno = FNR
+}
+/^\.TE/ {
+	if (! inTable)
+		printf("%s: too many ends, File %s: line %d and %d\n", 
+			$0, FILENAME, TElineno, FNR)
+	else
+		inTable = 0
+	TElineno = FNR
+}
+# this catches end of input.
+END {
+	if (inTable)
+		printf ("found .TS at File %s: %d without .TE before end of file\n",
+			FILENAME, TSlineno)
+}

@@ -1,0 +1,40 @@
+========
+Proc Pie	
+========
+
+The following is an alphabetical list of the Pie parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+-----------------------------------------------------------------------
+Field:	 dfield (M) 	:	 	:	 		**
+  Data field for numbers describing size of sections.  Numbers should
+  be percentages, e.g. 100 corersponds to the entire circle.
+-----------------------------------------------------------------------
+Center:	 coordpair 	:	4.0 5.5 :	 
+  Location of center, in absolute units. 
+-----------------------------------------------------------------------
+Radius:	 0 to 5 	:	  3 	:	 
+  Radius of pie, in absolute units.
+-----------------------------------------------------------------------
+Shade:	 color list20 	:	 	:	 
+  Shades of pie sections.  One should be specified for each section.
+-----------------------------------------------------------------------
+Linethick: 0 to 10 	:	 1 	:	 
+  Thickness of section outlines.
+-----------------------------------------------------------------------
+Explode:   0 to 3 	:	 0.1 	:	 
+  Distance in abs units to 'explode' each piece.
+-----------------------------------------------------------------------
+Rotate:	 0 to 360 	:	 0 	:	 
+  Rotate entire pie this many degrees counterclockwise.  This is handy
+  for final appearance.
+-----------------------------------------------------------------------
+
+# Produces a pie graph.  Shaded and/or 'exploded' sections can be
+# done.  Unlike most other types of plots, the pie graph operates
+# strictly in absolute units, so no graphics area needs to be defined.
+# Use the "Rotate" paramter to adjust the pie to the desired position.
+# There is no built-in way to label sections-- use vipl to add 
+# annotations.

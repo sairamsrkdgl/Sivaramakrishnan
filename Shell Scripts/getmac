@@ -1,0 +1,34 @@
+#!/bin/sh
+# getmac - get a *roff macro definition
+# Usage: getmac -package macro
+
+case $1 in
+ -mm) file="/usr/lib/macros/mmt";;
+ -ms) file="/usr/lib/tmac/tmac.s";;
+ -me) file="/usr/lib/tmac/tmac.e";;
+ -man) file="/usr/lib/tmac/tmac.an";;
+ *) echo "Usage: getmac -package macro" 1>&2; exit 1;;
+esac
+mac=$2
+
+# Have sed search text without printing until it finds a line starting with
+# ".de", optional spaces, and the macro name (passed in from the $mac shell
+# variable, which is outside the quotes).  From there until the closing
+# "..", do the commands inside the braces:
+# - the first command happens at the .de line; it prints a three-line *roff
+#   comment with the macro package and filename (which the shell inserts
+#   because they're outside quotes).
+# - print all lines of the macro definition
+# - make sed quit after the closing ".." is printed.  This won't show
+#   any subsequent re-definition of the macro in the same file.  But
+#   that isn't likely to happen, so this saves time because sed doesn't
+#   have to waste time reading the rest of the macro file.
+sed -n '
+/^\.de *'$mac'/,/^\.\.$/ {
+	/^\.de/i\
+.\\"\
+.\\" The following definition of '$mac' was found in '$file':\
+.\\"
+	p
+	/^\.\.$/q
+}' $file

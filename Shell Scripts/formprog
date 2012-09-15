@@ -1,0 +1,40 @@
+#! /bin/sh
+# formprog - fill in template form from $1, leave completed form in $2
+# TABSTOPS ARE SET AT 4 IN THIS SCRIPT
+
+template="$1"   completed="$2"   errors=/tmp/formprog$$
+myname=`basename $0`	# BASENAME OF THIS SCRIPT (NO LEADING PATH)
+trap 'rm -f $errors; exit' 0 1 2 15
+
+# READ $template LINE-BY-LINE, WRITE COMPLETED LINES TO $completed:
+exec 4<&0	# SAVE ORIGINAL stdin (USUALLY TTY) AS FD 4
+while read label text
+do
+	case "$label" in
+	?*:) # FIRST WORD ENDS WITH A COLON; LINE IS OKAY
+		case "$text" in
+		?*) # SHOW LINE ON SCREEN AND PUT INTO completed FILE:
+			echo "$label $text"
+			echo "$label $text" 1>&3
+			;;
+		*)	# FILL IT IN OURSELVES:
+			echo -n "$label "
+			exec 5<&0	# SAVE template FILE FD; DO NOT CLOSE!
+			exec 0<&4	# RESTORE ORIGINAL stdin TO READ ans
+			read ans
+			exec 0<&5	# RECONNECT template FILE TO stdin
+			case "$ans" in
+			"") ;;		# EMPTY; DO NOTHING
+			*)	echo "$label $ans" 1>&3 ;;
+			esac
+			;;
+		esac
+		;;
+	*)	echo "$myname: bad $1 line:   '$label $text'" 1>&2; break;;
+	esac
+done <"$template" 2>$errors 3>"$completed"
+
+if [ -s $errors ]; then
+	/bin/cat $errors 1>&2
+	echo "$myname: should you remove '$completed' file?" 1>&2
+fi

@@ -1,0 +1,174 @@
+Path: xanth!nic.MR.NET!hal!ncoast!allbery
+From: knop@dutesta.UUCP (Peter Knoppers, Delft Univ. of Technology)
+Newsgroups: comp.sources.misc
+Subject: v05i083: bsplit - a split-like program for binary files
+Message-ID: <1238@dutesta.UUCP>
+Date: 14 Dec 88 03:10:06 GMT
+Sender: allbery@ncoast.UUCP
+Reply-To: knop@dutesta.UUCP (Peter Knoppers, Delft Univ. of Technology)
+Organization: DELFT UNIVERSITY OF TECHNOLOGY Faculty of Electrical Engineering Computer architecture and Digital Technique Mekelweg 4   -   2628 CD  Delft
+Lines: 162
+Approved: allbery@ncoast.UUCP
+
+Posting-number: Volume 5, Issue 83
+Submitted-by: "Peter Knoppers, Delft Univ. of Technology" <knop@dutesta.UUCP>
+Archive-name: bsplit
+
+Below follows my program bsplit.c. It is a short and simple program
+that we use rather often. Manual is not included, as the use is
+almost identical to that of the un*x split program. As furnished
+it compiles and works on the systems that I tried. It may not
+work on systems where ints are 16 bits. For local use you may
+change this program into anything you like.
+
+Modified versions must not be re-distributed. Distribution of the
+original version with diff is OK. If someone really improves this,
+mail the diffs to me, so that I can re-post the really-improved 
+version. The copyright message is there to prevent uncontrolled
+spreading of many slightly different versions.
+
+My present email address is knop@dutesta.UUCP, this will soon
+change to knop@duteca.UUCP.
+
+#! /bin/sh
+# This file was wrapped with "dummyshar".  "sh" this file to extract.
+# Contents:  bsplit.c
+echo extracting 'bsplit.c'
+if test -f 'bsplit.c' -a -z "$1"; then echo Not overwriting 'bsplit.c'; else
+sed 's/^X//' << \EOF > 'bsplit.c'
+X/*
+X * bsplit.c - split binary files in manageable pieces.
+X * usage is exactly like the split program.
+X *
+X * This program was written from scratch, without looking at the
+X * sources of split.
+X *
+X * Copyright (C) 1988 P. Knoppers
+X *                    Bilderdijkhof 59
+X *                    2624 ZG  Delft
+X *                    The Netherlands
+X */
+X
+Xchar copy0[] = "Copyright (C) 1988 P. Knoppers";
+Xchar copy1[] = "Permission to use and distribute copies of this";
+Xchar copy2[] = "program WITH SOURCE is granted to anyone, provided";
+Xchar copy3[] = "that it is NOT CHANGED in any way.";
+X
+X#include <stdio.h>
+X#define DEFSIZE 50000
+X#define DEFPREFIX "x"
+X#define MAXNAME 200
+X
+Xchar   *malloc ();
+X
+Xmain (argc, argv)		/* bsplit - split binary file */
+Xchar   *argv[];
+X{
+X    char   *buf;
+X    char   *myname;
+X    int     bulksize = DEFSIZE;
+X    int     level;
+X    int     got;
+X    int     fno = 0;
+X    char    outfname[MAXNAME + 1];
+X    char    outbase[MAXNAME + 3];
+X    int     foundinname = 0;
+X    FILE * infile = stdin;
+X    FILE * outfile;
+X
+X    myname = *argv;
+X    strcpy (outbase, DEFPREFIX);
+X    while (--argc > 0)
+X    {
+X	argv++;
+X	if ((*argv)[0] == '-')
+X	{
+X	    if ((*argv)[1] == '\0')
+X	    {
+X		if (foundinname != 0)
+X		{
+X		    fprintf (stderr,
+X			    "usage: %s [-size] [file [prefix]]\n",
+X			    myname);
+X		    exit (1);
+X		}
+X		foundinname++;
+X	    }
+X	    else
+X		if (sscanf (*argv, "-%d", &bulksize) != 1)
+X		{
+X		    fprintf (stderr,
+X			    "usage: %s [-size] [file [prefix]]\n",
+X			    myname);
+X		    exit (1);
+X		}
+X	}
+X	else
+X	    if (foundinname != 0)
+X	    {
+X		if (strlen (*argv) > MAXNAME)
+X		{
+X		    fprintf (stderr, "%s: prefix too long\n",
+X			    myname);
+X		    exit (1);
+X		}
+X		strcpy (outbase, *argv);
+X	    }
+X	    else
+X	    {
+X		if ((infile = fopen (*argv, "r")) == NULL)
+X		{
+X		    fprintf (stderr, "%s: cannot open %s\n",
+X			    myname, *argv);
+X		    exit (1);
+X		}
+X		foundinname++;
+X	    }
+X    }
+X
+X    if ((buf = malloc (bulksize)) == NULL)
+X    {
+X	fprintf (stderr, "%s: malloc failed\n", myname);
+X	exit (1);
+X    }
+X    level = 0;
+X    while (1)
+X    {
+X	got = read (fileno (infile), &buf[level], bulksize - level);
+X	level += got;
+X	if ((level < bulksize) && (got > 0))
+X	    continue;
+X	if ((level == bulksize) || ((got == 0) && (level > 0)))
+X	{
+X	    sprintf (outfname, "%s%c%c", outbase, fno / 26 + 'a',
+X		    fno % 26 + 'a');
+X	    if ((outfile = fopen (outfname, "w")) == NULL)
+X	    {
+X		fprintf (stderr, "%s: cannot create %s\n", myname,
+X			outfname);
+X		exit (1);
+X	    }
+X	    if (write (fileno (outfile), buf, level) != level)
+X	    {
+X		fprintf (stderr, "%s: write failed\n", myname);
+X		exit (1);
+X	    }
+X	    fclose (outfile);
+X	    level = 0;
+X	    fno++;
+X	}
+X	if (got == 0)
+X	    break;
+X    }
+X}
+EOF
+chars=`wc -c < 'bsplit.c'`
+if test $chars !=    2804; then echo 'bsplit.c' is $chars characters, should be    2804 characters!; fi
+fi
+exit 0
+-- 
+ _____      __  __  __  __   ____   _____   _____   ______  _____    _____ 
+|  _  \    |  |/  ||  \|  | /    \ |  _  \ |  _  \ |   ___||  _  \  /  ___|
+|   __/ _  |     < |      ||  ||  ||   __/ |   __/ |   >__ |     <  \__  \
+|__|   |_| |__|\__||__|\__| \____/ |__|    |__|    |______||__|\__||_____/
+P. Knoppers, Delft Univ. of Technology, The Netherlands - knop@dutesta.UUCP

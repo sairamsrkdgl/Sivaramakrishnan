@@ -1,0 +1,18 @@
+# COPY THIS FILE INTO $HOME/.logout 
+
+# CLEAN FILES (IF ANY) OUT OF /tmp:
+
+# Returns the filename substitution pattern, rather than an error, if
+# the pattern is not matched.
+set nonomatch
+
+# look for temporary files
+set tmpf="`ls -d $tf-* $TF-* | grep -v ' not found'`"
+
+# If any exist, echo their names, and ask for confirmation to delete them.
+if ( "$tmpf" =~ ?* ) then
+	echo; echo "Your files in /tmp:"
+	ls -d $tmpf
+	echo -n "'rm -rf' them? [ny](n) "
+	if ( "$<" =~ y* ) rm -rf $tmpf
+endif

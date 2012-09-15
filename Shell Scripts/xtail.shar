@@ -1,0 +1,1335 @@
+Newsgroups: comp.sources.misc
+organization: Dallas Semiconductor
+subject: v07i108: xtail - a kind of "tail -f" for multiple files
+From: allbery@uunet.UU.NET (Brandon S. Allbery - comp.sources.misc)
+Reply-To: chip@vector.Dallas.TX.US.UUCP (Chip Rosenthal)
+
+Posting-number: Volume 7, Issue 108
+Submitted-by: chip@vector.Dallas.TX.US.UUCP (Chip Rosenthal)
+Archive-name: xtail
+
+"xtail" watches the growth of files.  It is similar to "tail -f", but may
+watch many files at once.  The syntax is:
+
+	xtail pathname ...
+	
+"xtail" will monitor all the specified files and display information added
+to them.  If you specify a directory name, "xtail" will watch all the
+files in that directory - including those created after "xtail" was
+started.  If you give "xtail" a name which doesn't exist, it will watch
+for the creation of the named entry.  My favorite usage is:
+
+	xtail /usr/spool/uucp/.Log/*
+
+--- cut here -----------------------------------------------------------------
+#! /bin/sh
+# this is a "shar" archive - run through "/bin/sh" to extract 7 files:
+#   README xtail.h xtail.c entryfuncs.c miscfuncs.c Makefile xtail.man
+# Wrapped by bin@vector on Wed Jul 26 19:18:07 CDT 1989
+# Unpacking this archive requires:  sed test wc (possibly mkdir)
+# Existing files will not be clobbered unless "-c" is specified on the cmd line.
+if test -f README -a "$1" != "-c" ; then
+    echo "README: file exists - will not be overwritten"
+else
+    echo "x - README (file 1 of 7, 1709 chars)"
+    sed -e 's/^X//' << 'END_OF_FILE_README' > README
+X"xtail" watches the growth of files.  It is similar to "tail -f", but may
+Xwatch many files at once.  The syntax is:
+X
+X	xtail pathname ...
+X	
+X"xtail" will monitor all the specified files and display information added
+Xto them.  If you specify a directory name, "xtail" will watch all the
+Xfiles in that directory - including those created after "xtail" was
+Xstarted.  If you give "xtail" a name which doesn't exist, it will watch
+Xfor the creation of the named entry.  My favorite usage is:
+X
+X	xtail /usr/spool/uucp/.Log/*
+X
+X"xtail" is distributed with a configuration for SCO XENIX.  It has also
+Xbeen tested on MIPS System V.  I took a shot at BSD portability.  The
+Xmain difference is how the "directory" support library is accessed.
+X
+XTo build "xtail":
+X
+X	- edit the definitions in "xtail.h"
+X	- run a "make"
+X
+XA version of "xtail" was originally posted in alt.sources a few months
+Xback.  There are several improvements between this version and the
+Xoriginal:
+X
+X       - the ability to watch directories
+X       - the ability to watch entries which don't exist yet
+X       - the recently changed files display (given upon SIGINT)
+X       - performance improvements
+X       - portability improvements
+X
+XMany of these changes were suggested by David Dykstra <dwd@cbnewsc.ATT.COM>.
+XThe idea of keeping files open and use fstat() rather than stat() was
+Xsuggested by changes by another poster (sorry, I lost the article so I
+Xcan't provide credit).  However, that version kept *everything* open, and
+Xthat just eats too many entries in the file table for me.  You can tweak
+Xthe values in "xtail.h" to optimize the response/load characteristics of
+X"xtail".
+X
+XChip Rosenthal
+X<chip@vector.Dallas.TX.US>
+X
+X@(#) README 2.1 89/07/26 19:16:34
+END_OF_FILE_README
+    size="`wc -c < README`"
+    if test 1709 -ne "$size" ; then
+	echo "README: extraction error - got $size chars"
+    fi
+fi
+if test -f xtail.h -a "$1" != "-c" ; then
+    echo "xtail.h: file exists - will not be overwritten"
+else
+    echo "x - xtail.h (file 2 of 7, 7187 chars)"
+    sed -e 's/^X//' << 'END_OF_FILE_xtail.h' > xtail.h
+X/*
+X * @(#) xtail.h 2.1 89/07/26 19:16:49
+X *
+X * Package:	xtail version 2
+X * File:	xtail.h
+X * Description:	header definitions
+X *
+X * Mon Jul 10 02:56:22 1989 - Chip Rosenthal <chip@vector.Dallas.TX.US>
+X *	Original composition.
+X */
+X
+X
+X/*****************************************************************************
+X *
+X * Start of Site-Specific Customizations
+X *
+X *****************************************************************************/
+X
+X/*
+X * Define one of the following.  It says how to use your "directory" library.
+X */
+X#define DIR_XENIX	/* include <sys/ndir.h>, use "struct direct"	*/
+X/*#define DIR_BSD	/* include <ndir.h>, use "struct direct"	*/
+X/*#define DIR_SYSV	/* include <dirent.h>, use "struct dirent"	*/
+X
+X/*
+X * Define one of the following.  It specifies the return type of "signal()".
+X */
+X#define SIGTYPE		int	/* declare as "int (*signal)()"		*/
+X/*#define SIGTYPE	void	/* declare as "void (*signal)()"	*/
+X
+X/*
+X * STATUS_ENAB	If defined, a SIGINT causes a summary of the opened files to
+X *		be displayed, and a SIGQUIT terminates the program.  If not
+X *		defined, these signals act normally.
+X */
+X#define STATUS_ENAB	/**/
+X
+X/*
+X * SLEEP_TIME	An iteration through the checking loop is performed once
+X *		per this many seconds.
+X */
+X#define SLEEP_TIME	1
+X
+X/*
+X * MAX_OPEN	This number of most recently changed files is kept open, and
+X *		they are checked every iteration through the checking loop.
+X *		Keeping these files open improves the performance because we
+X *		can use "fstat()" rather than "stat()".  Keeping too many
+X *		files open may overflow your open file table, and will reduce
+X *		performance by checking more files more frequently.
+X */
+X#define MAX_OPEN	6
+X
+X/*
+X * CHECK_COUNT	Everything besides open files are checked once per this
+X *		many iterations through the checking loop.
+X */
+X#define CHECK_COUNT	5
+X
+X/*
+X * MAX_ENTRIES	The maximum number of entries in any list.  It can be fairly
+X *		large -- each unused entry only eats 3*sizeof(char*) bytes.
+X */
+X#define MAX_ENTRIES	512
+X
+X
+X/*****************************************************************************
+X *
+X * End of Site-Specific Customizations
+X *
+X *****************************************************************************/
+X
+X
+X#define TRUE 1
+X#define FALSE 0
+X
+X#define Dprintf		if ( !Debug ) ; else (void) fprintf
+X
+X
+X/*
+X * Codes returned by the "stat_entry()" procedure.
+X */
+X#define ENTRY_ERROR	0	/* stat error or permissions error	*/
+X#define ENTRY_SPECIAL	1	/* entry is a special file		*/
+X#define ENTRY_FILE	2	/* entry is a regular file		*/
+X#define ENTRY_DIR	3	/* entry is a directory			*/
+X#define ENTRY_ZAP	4	/* specified entry doesn't exist	*/
+X
+X
+X/*
+X * Diagnostic message codes.
+X *   The ordering of codes must correspond to the "mssg_list[]" defined below.
+X */
+X#define MSSG_NONE	0	/* no message - just reset header	*/
+X#define MSSG_BANNER	1	/* display banner for file output	*/
+X#define MSSG_CREATED	2	/* file has been created		*/
+X#define MSSG_ZAPPED	3	/* file has been deleted		*/
+X#define MSSG_TRUNC	4	/* file has been truncated		*/
+X#define MSSG_NOTAFIL	5	/* error - not a regular file or dir	*/
+X#define MSSG_STAT	6	/* error - stat() failed		*/
+X#define MSSG_OPEN	7	/* error - open() failed		*/
+X#define MSSG_SEEK	8	/* error - lseek() failed		*/
+X#define MSSG_READ	9	/* error - read() failed		*/
+X#define MSSG_UNKNOWN	10	/* unknown error - must be last in list */
+X
+X
+X#ifdef INTERN
+X#   define EXTERN
+X#else
+X#   define EXTERN extern
+X#endif
+X
+X
+X/*
+X * Each item we are watching is stored in a (struct entry_descrip).  These
+X * entries are placed in lists, which are managed as (struct entry_list).
+X *
+X * There are three lists maintained:
+X *
+X * List_file	All of the regular files we are watching.  We will try to
+X *		keep the MAX_OPEN most recently modified files open, and
+X *		they will be checked more frequently.
+X *
+X * List_dir	All of the directories we are watching.  If a file is created
+X *		in one of these directories, we will add it to "List_file".
+X *
+X * List_zap	All the entries which don't exist.  When something appears
+X *		under one of these names, the entry will be moved to either
+X *		"List_file" or "List_dir", as appropriate.
+X */
+X
+Xstruct entry_descrip {
+X    char *name;		/* pathname to the entry			*/
+X    int fd;		/* opened fd, or <= 0 if not opened		*/
+X    long size;		/* size of entry last time checked		*/
+X    long mtime;		/* modification time last time checked		*/
+X};
+X
+Xstruct entry_list {
+X    struct entry_descrip *list[MAX_ENTRIES];
+X    int num;
+X};
+X
+X/*
+X * The lists of entries being watched.
+X */
+XEXTERN struct entry_list List_file;	/* regular files		*/
+XEXTERN struct entry_list List_dir;	/* directories			*/
+XEXTERN struct entry_list List_zap;	/* nonexistent entries		*/
+X
+X
+X/*
+X * List sorting status.
+X *   This flag indicates that "List_file" is sorted, and the right entries
+X *   are open.  Anything which possibly effects this state (e.g. an entry
+X *   is added to "List_file", the mtime of a file is changed, etc.) must set
+X *   this flag FALSE.  We will periodically check this flag and call the
+X *   "fixup_open_files()" procedure to resort and organize the list.
+X */
+XEXTERN int Sorted;
+X
+X
+X/*
+X * Entry status control flag.
+X *   The procedures which manipulate entries will reset the status information
+X *   if this flag is TRUE.  When initializing the lists we want this FALSE.
+X *   For example, consider the file size.  When initializing we want to use
+X *   the current file size, otherwise we would dump the file from the beginning.
+X *   However, later when we notice things are created we want to reset the
+X *   size to zero so that we do dump from the beginning.
+X */
+XEXTERN int Reset_status;
+X
+X
+X/*
+X * Debugging output flag.
+X */
+XEXTERN int Debug;
+X
+X
+X/*
+X * Diagnostic messages produced by the "message()" procedure.
+X *   The first "%s" is the entry name.  The second "%s" is the errno descrip.
+X */
+X#ifdef INTERN
+X    char *mssg_list[] = {
+X	NULL,							/*MSSG_NONE   */
+X	"\n*** %s ***\n",					/*MSSG_BANNER */
+X	"\n*** '%s' has been created ***\n",			/*MSSG_CREATED*/
+X	"\n*** '%s' has been deleted ***\n",			/*MSSG_ZAPPED */
+X	"\n*** '%s' has been truncated - rewinding ***\n",	/*MSSG_TRUNC  */
+X	"\n*** error - '%s' not a file or dir - removed ***\n",	/*MSSG_NOTAFIL*/
+X	"\n*** error - couldn't stat '%s' (%s) - removed ***\n",/*MSSG_STAT   */
+X	"\n*** error - couldn't open '%s' (%s) - removed ***\n",/*MSSG_OPEN   */
+X	"\n*** error - couldn't seek '%s' (%s) - removed ***\n",/*MSSG_SEEK   */
+X	"\n*** error - couldn't read '%s' (%s) - removed ***\n",/*MSSG_READ   */
+X	"\n*** error - unknown error on file '%s' ***\n",	/*MSSG_UNKNOWN*/
+X    };
+X#else
+X    extern char *mssg_list[];
+X#endif
+X
+X
+X/*
+X * Entry managment procedures.
+X */
+Xstruct entry_descrip *new_entry();	/* create a new entry and add to list */
+Xvoid move_entry();			/* move an entry between lists	      */
+Xvoid rmv_entry();			/* remove an entry from a list	      */
+Xint stat_entry();			/* get the inode status for an entry  */
+Xint open_entry();			/* open an entry		      */
+X
+X/*
+X * Miscelaneous procedures.
+X */
+Xvoid fixup_open_files();		/* manage the open files	      */
+Xint scan_directory();			/* scan a dir for files not on a list */
+Xvoid message();				/* standard message interface	      */
+Xvoid show_status();			/* display currently opened files     */
+X
+END_OF_FILE_xtail.h
+    size="`wc -c < xtail.h`"
+    if test 7187 -ne "$size" ; then
+	echo "xtail.h: extraction error - got $size chars"
+    fi
+fi
+if test -f xtail.c -a "$1" != "-c" ; then
+    echo "xtail.c: file exists - will not be overwritten"
+else
+    echo "x - xtail.c (file 3 of 7, 8883 chars)"
+    sed -e 's/^X//' << 'END_OF_FILE_xtail.c' > xtail.c
+X/*
+X * @(#) xtail.c 2.1 89/07/26 19:15:42
+X *
+X * Package:	xtail version 2
+X * File:	xtail.c
+X * Description:	main program
+X *
+X * Mon Jul 10 02:56:22 1989 - Chip Rosenthal <chip@vector.Dallas.TX.US>
+X *	Original composition.
+X */
+X
+X#ifndef LINT
+Xstatic char SCCSID[] = "@(#) xtail.c 2.1 89/07/26 19:15:42";
+X#endif
+X
+X#include <stdio.h>
+X#include <signal.h>
+X#include <sys/types.h>
+X#include <sys/stat.h>
+X#define  INTERN
+X#include "xtail.h"
+X
+X#ifdef M_XENIX
+X# undef  NULL
+X# define NULL 0
+X#endif
+X
+X
+Xint sigcaught = 0;
+X
+XSIGTYPE sigcatcher(sig)
+Xint sig;
+X{
+X    extern SIGTYPE (*signal)();
+X    if ( sig == SIGQUIT )
+X	(void) exit(0);
+X    sigcaught = sig;
+X#ifdef STATUS_ENAB
+X    (void) signal(SIGINT,sigcatcher);
+X    (void) signal(SIGQUIT,sigcatcher);
+X#endif
+X}
+X
+X
+Xmain(argc,argv)
+Xint argc;
+Xchar *argv[];
+X{
+X    int open_files_only, already_open, iteration, i;
+X    struct entry_descrip *entryp;
+X    struct stat sbuf;
+X
+X    /* 
+X     * Initialize.
+X     */
+X    List_file.num = 0;
+X    List_dir.num = 0;
+X    List_zap.num = 0;
+X    Sorted = FALSE;
+X    Reset_status = FALSE;
+X    Debug = FALSE;
+X    sigcatcher(0);
+X
+X
+X    /*
+X     * Place all of the entries onto lists.
+X     */
+X    for ( i = 1 ; i < argc ; ++i )  {
+X
+X	if ( i == 1 && strcmp(argv[i],"-D") == 0 ) {
+X	    Debug = TRUE;
+X	    continue;
+X	}
+X
+X	/*
+X	 * Temporarily throw this entry onto the end of the zapped list.
+X	 */
+X	entryp = new_entry( &List_zap, argv[i] );
+X
+X	/*
+X	 * Stat the file and get it to its proper place.
+X	 */
+X	switch ( stat_entry( &List_zap, List_zap.num-1, &sbuf ) ) {
+X
+X	case ENTRY_FILE:		/* move entry to file list	*/
+X	    move_entry( &List_file, &List_zap, List_zap.num-1 );
+X	    entryp->size = sbuf.st_size;
+X	    entryp->mtime = sbuf.st_mtime;
+X	    break;
+X
+X	case ENTRY_DIR:			/* move entry to dir list	*/
+X	    move_entry( &List_dir, &List_zap, List_zap.num-1 );
+X	    entryp->size = sbuf.st_size;
+X	    entryp->mtime = sbuf.st_mtime;
+X	    if ( scan_directory( entryp->name ) != 0 ) {
+X		message( MSSG_OPEN, entryp );
+X		rmv_entry( &List_dir, List_dir.num-1 );
+X	    }
+X	    break;
+X
+X	case ENTRY_ZAP:			/* keep entry on zap list	*/
+X	    break;
+X
+X	case ENTRY_SPECIAL:		/* entry is a special file	*/
+X	    message( MSSG_NOTAFIL, entryp );
+X	    rmv_entry( &List_zap, List_zap.num-1 );
+X	    break;
+X
+X	default:			/* stat error			*/
+X	    message( MSSG_STAT, entryp );
+X	    rmv_entry( &List_zap, List_zap.num-1 );
+X	    break;
+X
+X	}
+X
+X    }
+X
+X    /*
+X     * Make sure we are watching something reasonable.
+X     */
+X    if ( List_file.num == 0 ) {
+X	if ( List_dir.num == 0 && List_zap.num == 0 ) {
+X	    (void) fprintf(stderr, "%s: no valid entries specified\n", argv[0]);
+X	    (void) exit(1);
+X	}
+X	(void) puts("\n*** warning - no files are being watched ***");
+X    }
+X
+X
+X    /*
+X     * From this point on we want to reset the status of an entry any
+X     * time we move it around to another list.
+X     */
+X    Reset_status = TRUE;
+X
+X
+X    /*
+X     * Force a check of everything first time through the loop.
+X     */
+X    iteration = CHECK_COUNT;
+X
+X
+X    /* 
+X     * Loop forever.
+X     */
+X    for (;;) {
+X
+X	/*
+X	 * Once every CHECK_COUNT iterations check everything.
+X	 * All other times only look at the opened files.
+X	 */
+X	open_files_only = ( ++iteration < CHECK_COUNT );
+X	if ( !open_files_only )
+X	    iteration = 0;
+X
+X
+X	/*
+X	 * Make sure that the most recently modified files are open.
+X	 */
+X	if ( !Sorted )
+X	    fixup_open_files();
+X
+X
+X	/*
+X	 * Display what we are watching if a SIGINT was caught.
+X	 */
+X	if ( sigcaught ) {
+X	    show_status();
+X	    sigcatcher(0);
+X	}
+X
+X
+X	/*
+X	 * Go through all of the files looking for changes.
+X	 */
+X	Dprintf(stderr, ">>> checking files list (%s)\n",
+X	    ( open_files_only ? "open files only" : "all files" ));
+X	for ( i = 0 ; i < List_file.num ; ++i ) {
+X
+X	    entryp = List_file.list[i];
+X	    already_open = ( entryp->fd > 0 ) ;
+X
+X	    /*
+X	     * Ignore closed files except every CHECK_COUNT iterations.
+X	     */
+X	    if ( !already_open && open_files_only )
+X		continue;
+X
+X	    /*
+X	     * Get the status of this file.
+X	     */
+X	    switch ( stat_entry( &List_file, i, &sbuf ) ) {
+X	    case ENTRY_FILE:		/* got status OK		*/
+X		break;
+X	    case ENTRY_DIR:		/* huh??? it's now a dir	*/
+X		move_entry( &List_dir, &List_file, i-- );
+X		continue;
+X	    case ENTRY_ZAP:		/* entry has been deleted	*/
+X		message( MSSG_ZAPPED, entryp );
+X		move_entry( &List_zap, &List_file, i-- );
+X		continue;
+X	    case ENTRY_SPECIAL:		/* entry is a special file	*/
+X		message( MSSG_NOTAFIL, entryp );
+X		rmv_entry( &List_file, i-- );
+X		continue;
+X	    default:			/* stat error			*/
+X		message( MSSG_STAT, entryp );
+X		rmv_entry( &List_file, i-- );
+X		continue;
+X	    }
+X
+X
+X	    /*
+X	     * See if an opened file has been deleted.
+X	     */
+X	    if ( already_open && sbuf.st_nlink == 0 ) {
+X		message( MSSG_ZAPPED, entryp );
+X		move_entry( &List_zap, &List_file, i-- );
+X		continue;
+X	    }
+X
+X	    /*
+X	     * If nothing has changed then continue on.
+X	     */
+X	    if ( entryp->size==sbuf.st_size && entryp->mtime==sbuf.st_mtime )
+X		continue;
+X
+X	    /*
+X	     * If the file isn't already open, then do so.
+X	     *   Note -- it is important that we call "fixup_open_files()"
+X	     *   at the end of the loop to make sure too many files don't
+X	     *   stay opened.
+X	     */
+X	    if ( !already_open && open_entry( &List_file, i ) != 0 ) {
+X		--i;
+X		continue;
+X	    }
+X
+X	    /*
+X	     * See if the file has been truncated.
+X	     */
+X	    if ( sbuf.st_size < entryp->size ) {
+X		message( MSSG_TRUNC, entryp );
+X		entryp->size = 0;
+X	    }
+X
+X	    /*
+X	     * Seek to where the changes begin.
+X	     */
+X	    {
+X		extern long lseek();
+X		if ( lseek( entryp->fd, entryp->size, 0 ) < 0 ) {
+X		    message( MSSG_SEEK, entryp );
+X		    rmv_entry( &List_file, i-- );
+X		    continue;
+X		}
+X	    }
+X
+X	    /*
+X	     * Dump the recently added info.
+X	     */
+X	    {
+X		int nb;
+X    		static char buf[BUFSIZ];
+X		message( MSSG_BANNER, entryp );
+X		while ( ( nb = read( entryp->fd, buf, sizeof(buf) ) ) > 0 ) {
+X		    (void) fwrite( buf, sizeof(char), (unsigned) nb, stdout );
+X		    entryp->size += nb;
+X		}
+X		if ( nb < 0 ) {
+X		    message( MSSG_READ, entryp );
+X		    rmv_entry( &List_file, i-- );
+X		    continue;
+X		}
+X	    }
+X
+X	    /*
+X	     * Update the modification time.
+X	     */
+X	    entryp->mtime = sbuf.st_mtime;
+X
+X	    /*
+X	     * Since we've changed the mtime, the list might no longer be
+X	     * sorted.  However if this entry is already at the top of the
+X	     * list then it's OK.
+X	     */
+X	    if ( i != 0 )
+X		Sorted = FALSE;
+X
+X	    /*
+X	     * If we've just opened the file then force a resort now to
+X	     * prevent too many files from being opened.
+X	     */
+X	    if ( !already_open )
+X		fixup_open_files();
+X
+X	}
+X
+X
+X	/*
+X	 * Go through list of nonexistent entries to see if any have appeared.
+X	 *   This is done only once every CHECK_COUNT iterations.
+X	 */
+X	if ( !open_files_only ) {
+X	    Dprintf(stderr, ">>> checking zapped list\n");
+X	    for ( i = 0 ; i < List_zap.num ; ++i ) {
+X		entryp = List_zap.list[i];
+X		switch ( stat_entry( &List_zap, i, &sbuf ) ) {
+X		case ENTRY_FILE:	/* entry has appeared as a file	*/
+X		    message( MSSG_CREATED, entryp );
+X		    move_entry( &List_file, &List_zap, i-- );
+X		    break;
+X		case ENTRY_DIR:		/* entry has appeared as a dir	*/
+X		    message( MSSG_CREATED, entryp );
+X		    move_entry( &List_dir, &List_zap, i-- );
+X		    break;
+X		case ENTRY_ZAP:		/* entry still doesn't exist	*/
+X		    break;
+X		case ENTRY_SPECIAL:	/* entry is a special file	*/
+X		    message( MSSG_NOTAFIL, entryp );
+X	    	    rmv_entry( &List_zap, i-- );
+X		    break;
+X		default:		/* error - entry removed	*/
+X	    	    message( MSSG_STAT, entryp );
+X	    	    rmv_entry( &List_zap, i-- );
+X		    break;
+X		}
+X	    }
+X	}
+X
+X
+X	/*
+X	 * Go through the list of dirs to see if any new files were created.
+X	 *   This is done only once every CHECK_COUNT iterations.
+X	 */
+X	if ( !open_files_only ) {
+X	    Dprintf(stderr, ">>> checking directory list\n");
+X	    for ( i = 0 ; !open_files_only && i < List_dir.num ; ++i ) {
+X		entryp = List_dir.list[i];
+X		switch ( stat_entry( &List_dir, i, &sbuf ) ) {
+X		case ENTRY_DIR:		/* got status OK		*/
+X		    break;
+X		case ENTRY_FILE:	/* huh??? it's now a reg file	*/
+X		    move_entry( &List_file, &List_dir, i-- );
+X		    continue;
+X		case ENTRY_ZAP:		/* entry has been deleted	*/
+X	    	    message( MSSG_ZAPPED, entryp );
+X	    	    move_entry( &List_zap, &List_dir, i-- );
+X		    continue;
+X		case ENTRY_SPECIAL:	/* entry is a special file	*/
+X		    message( MSSG_NOTAFIL, entryp );
+X		    rmv_entry( &List_dir, i-- );
+X		    continue;
+X		default:		/* stat error			*/
+X		    message( MSSG_STAT, entryp );
+X		    rmv_entry( &List_dir, i-- );
+X		    continue;
+X		}
+X		if ( entryp->mtime == sbuf.st_mtime )
+X		    continue;
+X		if ( scan_directory( entryp->name ) != 0 ) {
+X		    message( MSSG_OPEN, entryp );
+X		    rmv_entry( &List_dir, i-- );
+X		}
+X		entryp->mtime = sbuf.st_mtime;
+X	    }
+X	}
+X
+X
+X	/*
+X	 * End of checking loop.
+X	 */
+X	{
+X	    extern unsigned sleep();
+X	    (void) fflush(stdout);
+X	    (void) sleep(SLEEP_TIME);
+X	}
+X
+X    }
+X
+X    /*NOTREACHED*/
+X
+X}
+X
+END_OF_FILE_xtail.c
+    size="`wc -c < xtail.c`"
+    if test 8883 -ne "$size" ; then
+	echo "xtail.c: extraction error - got $size chars"
+    fi
+fi
+if test -f entryfuncs.c -a "$1" != "-c" ; then
+    echo "entryfuncs.c: file exists - will not be overwritten"
+else
+    echo "x - entryfuncs.c (file 4 of 7, 5152 chars)"
+    sed -e 's/^X//' << 'END_OF_FILE_entryfuncs.c' > entryfuncs.c
+X/*
+X * @(#) entryfuncs.c 2.1 89/07/26 19:16:49
+X *
+X * Package:	xtail version 2
+X * File:	entryfuncs.c
+X * Description:	procedures to manage individual entries
+X *
+X * Mon Jul 10 02:56:22 1989 - Chip Rosenthal <chip@vector.Dallas.TX.US>
+X *	Original composition.
+X */
+X
+X#ifndef LINT
+Xstatic char SCCSID[] = "@(#) entryfuncs.c 2.1 89/07/26 19:16:49";
+X#endif
+X
+X#include <stdio.h>
+X#include <fcntl.h>
+X#include <sys/types.h>
+X#include <sys/stat.h>
+X#include <sys/errno.h>
+X#include "xtail.h"
+X
+X#ifdef M_XENIX
+X# undef  NULL
+X# define NULL 0
+X#endif
+X
+Xextern int errno;
+X
+X
+Xstatic struct entry_descrip *E_append(listp,entryp)
+Xstruct entry_list *listp;
+Xstruct entry_descrip *entryp;
+X{
+X    if ( listp->num >= MAX_ENTRIES ) {
+X	(void) fprintf(stderr,"%s: too many entries (%d max)\n",
+X	    entryp->name, MAX_ENTRIES);
+X	(void) exit(2);
+X    }
+X    listp->list[listp->num++] = entryp;
+X    Sorted = FALSE;
+X    return entryp;
+X}
+X
+X
+Xstatic void E_remove(listp,entryno)
+Xstruct entry_list *listp;
+Xint entryno;
+X{
+X    while ( ++entryno < listp->num )
+X	listp->list[entryno-1] = listp->list[entryno];
+X    --listp->num;
+X    Sorted = FALSE;
+X}
+X
+X
+Xstatic char *list_name(listp)		/* for debug output only */
+Xstruct entry_list *listp;
+X{
+X    if ( listp == &List_file )	return "<file>";
+X    if ( listp == &List_dir )	return "<dir>";
+X    if ( listp == &List_zap )	return "<zap>";
+X    return "?unknown?";
+X}
+X
+X
+X/*
+X * Create a new entry description and append it to a list.
+X */
+Xstruct entry_descrip *new_entry(listp,name)
+Xstruct entry_list *listp;
+Xchar *name;
+X{
+X    struct entry_descrip *entryp;
+X    static char malloc_error[] = "malloc: out of space\n";
+X    extern char *strcpy(), *malloc();
+X
+X    Dprintf(stderr, ">>> creating entry '%s' on %s list\n",
+X	name, list_name(listp));
+X
+X    entryp = (struct entry_descrip *) malloc( sizeof(struct entry_descrip) );
+X    if ( entryp == NULL ) {
+X	(void) fputs(malloc_error,stderr);
+X	(void) exit(2);
+X    }
+X
+X    entryp->name = malloc( (unsigned) strlen(name) + 1 );
+X    if ( entryp->name == NULL ) {
+X	(void) fputs(malloc_error,stderr);
+X	(void) exit(2);
+X    }
+X    (void) strcpy(entryp->name,name);
+X
+X    entryp->fd = 0;
+X    entryp->size =  0;
+X    entryp->mtime = 0;
+X
+X    return E_append(listp,entryp);
+X}
+X
+X
+X/*
+X * Remove an entry from a list and free up its space.
+X */
+Xvoid rmv_entry(listp,entryno)
+Xstruct entry_list *listp;
+Xint entryno;
+X{
+X    struct entry_descrip *entryp = listp->list[entryno];
+X    extern void free();
+X
+X    Dprintf(stderr, ">>> removing entry '%s' from %s list\n",
+X	listp->list[entryno]->name, list_name(listp));
+X    E_remove(listp,entryno);
+X    if ( entryp->fd > 0 )
+X	(void) close(entryp->fd);
+X    free( entryp->name );
+X    free( (char *) entryp );
+X}
+X
+X
+X/*
+X * Move an entry from one list to another.
+X *	In addition we close up the entry if appropriate.
+X */
+Xvoid move_entry(dst_listp,src_listp,src_entryno)
+Xstruct entry_list *dst_listp;
+Xstruct entry_list *src_listp;
+Xint src_entryno;
+X{
+X    struct entry_descrip *entryp = src_listp->list[src_entryno];
+X
+X    Dprintf(stderr, ">>> moving entry '%s' from %s list to %s list\n",
+X	src_listp->list[src_entryno]->name,
+X	list_name(src_listp), list_name(dst_listp));
+X    if ( entryp->fd > 0 ) {
+X	(void) close(entryp->fd);
+X	entryp->fd = 0;
+X    }
+X    E_remove(src_listp,src_entryno);
+X    (void) E_append(dst_listp,entryp);
+X    if ( Reset_status ) {
+X	entryp->size = 0;
+X	entryp->mtime = 0;
+X    }
+X}
+X
+X
+X/*
+X * Get the inode status for an entry.
+X *	Returns code describing the status of the entry.
+X */
+Xint stat_entry(listp,entryno,sbuf)
+Xstruct entry_list *listp;
+Xint entryno;
+Xregister struct stat *sbuf;
+X{
+X    register int status;
+X    register struct entry_descrip *entryp = listp->list[entryno];
+X    static int my_gid = -1;
+X    static int my_uid = -1;
+X
+X    if ( my_gid < 0 ) {
+X	my_gid = getegid();
+X	my_uid = geteuid();
+X    }
+X
+X    status = 
+X	( entryp->fd > 0 ? fstat(entryp->fd,sbuf) : stat(entryp->name,sbuf) );
+X
+X    if ( status != 0 )
+X	return ( errno == ENOENT ? ENTRY_ZAP : ENTRY_ERROR );
+X
+X    if (
+X	( ( sbuf->st_mode & 0004 ) == 0 ) &&
+X	( ( sbuf->st_mode & 0040 ) == 0 || sbuf->st_gid != my_gid ) &&
+X	( ( sbuf->st_mode & 0400 ) == 0 || sbuf->st_uid != my_uid )
+X    ) {
+X	errno = EACCES;
+X	return ENTRY_ERROR;
+X    }
+X
+X    switch ( sbuf->st_mode & S_IFMT ) {
+X	case S_IFREG:	return ENTRY_FILE;
+X	case S_IFDIR:	return ENTRY_DIR;
+X	default:	return ENTRY_SPECIAL;
+X    }
+X
+X    /*NOTREACHED*/
+X}
+X
+X
+X/*
+X * Open an entry.
+X *	Returns 0 if the open is successful, else returns errno.  In the case
+X *	of an error, an appropriate diagnostic will be printed, and the entry
+X *	will be moved or deleted as required.  If the entry is already opened,
+X *	then no action will occur and 0 will be returned.
+X */
+Xint open_entry(listp,entryno)
+Xstruct entry_list *listp;
+Xint entryno;
+X{
+X    struct entry_descrip *entryp = listp->list[entryno];
+X
+X    if ( entryp->fd > 0 )
+X	return 0;
+X
+X    Dprintf(stderr, ">>> opening entry '%s' on %s list\n",
+X	listp->list[entryno]->name, list_name(listp));
+X    if ( (entryp->fd=open(entryp->name,O_RDONLY)) > 0 )
+X	return 0;
+X
+X    if ( errno == ENOENT ) {
+X	message( MSSG_ZAPPED, entryp );
+X	move_entry( &List_zap, listp, entryno );
+X    } else {
+X	message( MSSG_OPEN, entryp );
+X	rmv_entry( listp, entryno );
+X    }
+X    return -1;
+X}
+X
+X
+END_OF_FILE_entryfuncs.c
+    size="`wc -c < entryfuncs.c`"
+    if test 5152 -ne "$size" ; then
+	echo "entryfuncs.c: extraction error - got $size chars"
+    fi
+fi
+if test -f miscfuncs.c -a "$1" != "-c" ; then
+    echo "miscfuncs.c: file exists - will not be overwritten"
+else
+    echo "x - miscfuncs.c (file 5 of 7, 5423 chars)"
+    sed -e 's/^X//' << 'END_OF_FILE_miscfuncs.c' > miscfuncs.c
+X/*
+X * @(#) miscfuncs.c 2.1 89/07/26 19:16:50
+X *
+X * Package:	xtail version 2
+X * File:	miscfuncs.c
+X * Description:	miscelaneous support procedures
+X *
+X * Mon Jul 10 02:56:22 1989 - Chip Rosenthal <chip@vector.Dallas.TX.US>
+X *	Original composition.
+X */
+X
+X#ifndef LINT
+Xstatic char SCCSID[] = "@(#) miscfuncs.c 2.1 89/07/26 19:16:50";
+X#endif
+X
+X#include <stdio.h>
+X#include <fcntl.h>
+X#include <time.h>
+X#include <sys/types.h>
+X#include <sys/stat.h>
+X#include "xtail.h"
+X
+X#ifdef M_XENIX
+X# undef  NULL
+X# define NULL 0
+X#endif
+X
+X/*
+X * How come the portable directory routines are so !$*&@# unportable?
+X */
+X#ifdef DIR_XENIX
+X#   include <sys/ndir.h>
+X    typedef struct direct DIRENT;
+X#endif
+X#ifdef DIR_BSD
+X#   include <ndir.h>
+X    typedef struct direct DIRENT;
+X#endif
+X#ifdef DIR_SYSV
+X#   include <dirent.h>
+X    typedef struct dirent DIRENT;
+X#endif
+X
+Xextern int errno;
+Xextern char *sys_errlist[];
+X
+X
+X/*
+X * Scan a directory for files not currently on a list.
+X */
+Xint scan_directory(dirname)
+Xchar *dirname;
+X{
+X    register int i;
+X    register DIRENT *dp;
+X    register struct entry_descrip **elist, *entryp;
+X    char *basename;
+X    struct stat sbuf;
+X    DIR *dirp;
+X    static char pathname[MAXNAMLEN];
+X    extern char *strcpy(), *strcat();
+X
+X    Dprintf(stderr, ">>> scanning directory '%s'\n", dirname);
+X    if ( (dirp=opendir(dirname)) == NULL )
+X	return -1;
+X
+X    (void) strcat( strcpy(pathname,dirname), "/" );
+X    basename = pathname + strlen(pathname);
+X
+X#define SKIP_DIR(D) \
+X    ( D[0] == '.' && ( D[1] == '\0' || ( D[1] == '.' && D[2] == '\0' ) ) )
+X
+X    while ( (dp=readdir(dirp)) != NULL ) {
+X
+X	if ( SKIP_DIR(dp->d_name) )
+X	    continue;
+X	(void) strcpy( basename, dp->d_name );
+X	if ( stat(pathname,&sbuf) != 0 )
+X	    continue;
+X	if ( (sbuf.st_mode&S_IFMT) != S_IFREG )
+X	    continue;
+X
+X	for ( i=List_file.num, elist=List_file.list ; i > 0 ; --i, ++elist ) {
+X	    if ( strcmp( (*elist)->name, pathname ) == 0 )
+X		break;
+X	}
+X	if ( i > 0 )
+X	    continue;
+X
+X	for ( i=List_zap.num, elist=List_zap.list ; i > 0 ; --i, ++elist ) {
+X	    if ( strcmp( (*elist)->name, pathname ) == 0 )
+X		break;
+X	}
+X	if ( i > 0 )
+X	    continue;
+X
+X	entryp = new_entry( &List_file, pathname );
+X	if ( Reset_status ) {
+X	    message( MSSG_CREATED, entryp );
+X	} else {
+X	    entryp->mtime = sbuf.st_mtime;
+X	    entryp->size = sbuf.st_size;
+X	}
+X
+X    }
+X
+X    (void) closedir(dirp);
+X    return 0;
+X
+X}
+X
+X
+X/*
+X * Compare mtime of two entries.  Used by the "qsort()" in "fixup_open_files()".
+X */
+Xstatic int ecmp(ep1,ep2)
+Xregister struct entry_descrip **ep1, **ep2;
+X{
+X    return ( (*ep2)->mtime - (*ep1)->mtime );
+X}
+X
+X/*
+X * Manage the open files.
+X *   A small number of entries in "List_file" are kept open to minimize
+X *   the overhead in checking for changes.  The strategy is to make sure
+X *   the MAX_OPEN most recently modified files are all open.
+X */
+Xvoid fixup_open_files()
+X{
+X    register int i;
+X    register struct entry_descrip **elist;
+X    extern void qsort();
+X
+X    Dprintf(stderr, ">>> resorting file list\n");
+X    (void) qsort(
+X	(char *) List_file.list,
+X	List_file.num,
+X	sizeof(struct entry_descrip *),
+X	ecmp
+X    );
+X    Sorted = TRUE;
+X
+X    /*
+X     * Start at the end of the list.
+X     */
+X    i = List_file.num - 1;
+X    elist = &List_file.list[i];
+X
+X    /*
+X     * All the files at the end of the list should be closed.
+X     */
+X    for ( ; i >= MAX_OPEN ; --i, --elist ) {
+X	if ( (*elist)->fd > 0 ) {
+X	    (void) close( (*elist)->fd );
+X	    (*elist)->fd = 0;
+X	}
+X    }
+X
+X    /*
+X     * The first MAX_OPEN files in the list should be open.
+X     */
+X    for ( ; i >= 0 ; --i, --elist ) {
+X	if ( (*elist)->fd <= 0 )
+X	    (void) open_entry( &List_file, i );
+X    }
+X
+X}
+X
+X
+X/*
+X * Standard message interface.
+X *   There are two reasons for this message interface.  First, it provides
+X *   consistent diagnostics for all the messages.  Second, it manages the
+X *   filename banner display whenever we switch to a different file.
+X *   Warning - "errno" is used in some of the messages, so care must be
+X *   taken not to step on it before message() can be called.
+X */
+Xvoid message(sel,e)
+Xint sel;
+Xstruct entry_descrip *e;
+X{
+X    static char *ofile = NULL;
+X
+X    /*
+X     * Don't display the file banner if the file hasn't changed since last time.
+X     */
+X    if ( sel == MSSG_BANNER && ofile != NULL && strcmp(ofile,e->name) == 0 )
+X	return;
+X
+X    /*
+X     * Make sure the message selector is within range.
+X     */
+X    if ( sel < 0 || sel > MSSG_UNKNOWN )
+X	sel = MSSG_UNKNOWN;
+X
+X    /*
+X     * Display the message.
+X     */
+X    if ( mssg_list[sel] != NULL )
+X	(void) printf(mssg_list[sel], e->name, sys_errlist[errno]);
+X
+X    ofile = ( sel == MSSG_BANNER ? e->name : NULL );
+X}
+X
+X
+X/*
+X * Display currently opened files.
+X */
+Xvoid show_status()
+X{
+X    int i, n;
+X    struct tm *tp;
+X    static char *monname[] = {
+X	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+X	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+X    };
+X    extern struct tm *localtime();
+X
+X    (void) printf("\n*** recently changed files ***\n");
+X    for ( i = 0, n = 0 ; i < List_file.num ; ++i ) {
+X	if ( List_file.list[i]->fd > 0 ) {
+X	    tp = localtime(&List_file.list[i]->mtime);
+X	    (void) printf("%4d  %2d-%3s-%02d %02d:%02d:%02d  %s\n",
+X		++n,
+X		tp->tm_mday, monname[tp->tm_mon], tp->tm_year,
+X		tp->tm_hour, tp->tm_min, tp->tm_sec,
+X		List_file.list[i]->name
+X	    );
+X	}
+X    }
+X
+X    (void) printf( 
+X	"currently watching:  %d files  %d dirs  %d unknown entries\n",
+X	List_file.num, List_dir.num, List_zap.num);
+X
+X    message( MSSG_NONE, (struct entry_descrip *) NULL  );
+X
+X}
+X
+END_OF_FILE_miscfuncs.c
+    size="`wc -c < miscfuncs.c`"
+    if test 5423 -ne "$size" ; then
+	echo "miscfuncs.c: extraction error - got $size chars"
+    fi
+fi
+if test -f Makefile -a "$1" != "-c" ; then
+    echo "Makefile: file exists - will not be overwritten"
+else
+    echo "x - Makefile (file 6 of 7, 2046 chars)"
+    sed -e 's/^X//' << 'END_OF_FILE_Makefile' > Makefile
+X
+X# @(#) Makefile 2.1 89/07/26 19:15:39
+X# Makefile for "xtail" (generated by /local/bin/makemake version 1.00.07)
+X# Created by bin@vector on Wed Jul 26 17:36:37 CDT 1989
+X
+XSHELL = /bin/sh
+XCC = cc
+XDEFS = 
+XCOPTS = -O
+XLOPTS = 
+XLIBS = -lx
+XDEBUG = -g -DDEBUG 
+XLINTFLAGS = -DLINT
+X
+XTARG = xtail
+XOTHERS = 
+X
+XSRCS = xtail.c entryfuncs.c miscfuncs.c
+X
+XOBJS = xtail.o entryfuncs.o miscfuncs.o
+X
+X# Any edits below this line will be lost if "makemake" is rerun!
+X# Commands may be inserted after the '#%custom' line at the end of this file.
+X
+XCFLAGS = $(COPTS) $(DEFS) # $(DEBUG)
+XLFLAGS = $(LOPTS) # $(DEBUG)
+X
+Xall:		$(TARG) $(OTHERS)
+Xinstall:	all		; inst Install
+Xclean:				; rm -f $(TARG) $(OBJS) a.out core $(TARG).lint
+Xclobber:	clean		; inst -u Install
+Xlint:		$(TARG).lint
+X
+X$(TARG):		$(OBJS)
+X		$(CC) $(LFLAGS) -o $@ $(OBJS) $(LIBS)
+X
+X$(TARG).lint:	$(TARG)
+X		lint $(LINTFLAGS) $(DEFS) $(SRCS) $(LIBS) > $@
+X
+Xxtail.o: /usr/include/signal.h /usr/include/stdio.h /usr/include/sys/signal.h \
+X        /usr/include/sys/stat.h /usr/include/sys/types.h xtail.c \
+X        xtail.h
+Xentryfuncs.o: /usr/include/fcntl.h /usr/include/stdio.h \
+X        /usr/include/sys/errno.h /usr/include/sys/fcntl.h \
+X        /usr/include/sys/lockcmn.h /usr/include/sys/stat.h \
+X        /usr/include/sys/types.h entryfuncs.c xtail.h
+Xmiscfuncs.o: /usr/include/fcntl.h /usr/include/stdio.h \
+X        /usr/include/sys/fcntl.h /usr/include/sys/lockcmn.h \
+X        /usr/include/sys/ndir.h /usr/include/sys/stat.h \
+X        /usr/include/sys/types.h /usr/include/time.h miscfuncs.c \
+X        xtail.h
+X
+Xmake:		;
+X		/local/bin/makemake -i -v1.00.07 -aMakefile \
+X		    -DSHELL='$(SHELL)' -DCC='$(CC)' -DDEFS='$(DEFS)' \
+X		    -DCOPTS='$(COPTS)' -DLOPTS='$(LOPTS)' -DLIBS='$(LIBS)' \
+X		    -DDEBUG='$(DEBUG)' -DLINTFLAGS='$(LINTFLAGS)' \
+X		    -DOTHERS='$(OTHERS)' $(TARG) $(SRCS)
+X
+X#%custom - commands below this line will be maintained if 'makemake' is rerun
+X
+XARLIST = README xtail.h xtail.c entryfuncs.c miscfuncs.c Makefile xtail.man
+X
+Xshar:		xtail.shar
+Xxtail.shar:	$(ARLIST)	; shar $(ARLIST) > xtail.shar
+X
+END_OF_FILE_Makefile
+    size="`wc -c < Makefile`"
+    if test 2046 -ne "$size" ; then
+	echo "Makefile: extraction error - got $size chars"
+    fi
+fi
+if test -f xtail.man -a "$1" != "-c" ; then
+    echo "xtail.man: file exists - will not be overwritten"
+else
+    echo "x - xtail.man (file 7 of 7, 1300 chars)"
+    sed -e 's/^X//' << 'END_OF_FILE_xtail.man' > xtail.man
+X''' @(#) xtail.man 2.1 89/07/26 19:15:44
+X.TH XTAIL 1L
+X.SH NAME
+Xxtail - Watch the growth of files.
+X.SH SYNTAX
+X.B xtail
+Xentry ...
+X.SH DESCRIPTION
+X.I Xtail
+Xmonitors one or more files, and displays all data written to a file
+Xsince command invocation.  It is very useful for monitoring multiple
+Xlogfiles simultaneously.
+X.P
+XIf an
+X.I entry
+Xgiven on the command line is a directory, all files in that directory
+Xwill be monitored, including those created after the
+X.I xtail
+Xinvocation.  If an
+X.I entry
+Xgiven on the command line doesn't exist,
+X.I xtail
+Xwill watch for it and monitor it once created.  When switching files in
+Xthe display, a banner showing the pathname of the file is printed.
+X.P
+XAn interrupt character (usually CTRL/C or DEL) will display a list of the
+Xmost recently modified files being watched.  Send a quit signal
+X(usually CTRL/backslash) to stop
+X.IR xtail .
+X.SH SEE ALSO
+Xtail(1)
+X.SH NOTES
+X.I Xtail
+Xmay be easily confused.  For example, if a file is renamed,
+X.I xtail
+Xmay or may not continue to monitor it.  If you ask it to monitor a file
+Xmultiple times, it probably will.  If you misspell a filename,
+X.I xtail
+Xwill treat it as a nonexistent entry and happily wait for its creation.
+X.P
+XMy favorite use is "xtail /usr/spool/uucp/.Log/*".
+X.SH AUTHOR
+XChip Rosenthal <chip@vector.Dallas.TX.US>
+END_OF_FILE_xtail.man
+    size="`wc -c < xtail.man`"
+    if test 1300 -ne "$size" ; then
+	echo "xtail.man: extraction error - got $size chars"
+    fi
+fi
+echo "done - 7 files extracted"
+exit 0
+--- cut here -----------------------------------------------------------------
+-- 
+Chip Rosenthal / chip@vector.Dallas.TX.US / Dallas Semiconductor / 214-450-5337
+"I wish you'd put that starvation box down and go to bed" - Albert Collins' Mom
+

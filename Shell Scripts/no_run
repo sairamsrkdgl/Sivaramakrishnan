@@ -1,0 +1,7 @@
+#! /bin/sh
+# Deny permission to run a command by naming this script for that command
+# and storing this in a directory before that command in your PATH.
+# To stop other commands too, make links to this file with their names.
+
+echo "\007You can't run `basename $0` here.  Use FILL-IN-HOSTNAME." 1>&2
+exit 1

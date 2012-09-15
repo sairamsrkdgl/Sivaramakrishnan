@@ -1,0 +1,34 @@
+	
+		______________________________________________________
+	
+				IPL Graphics Utility
+	
+	
+			       Version 1.0, Jan. 1990
+
+				     USERS GUIDE
+		______________________________________________________
+	
+
+	
+			This guide contains the following:
+	
+
+		[] Manual pages for ipl and nicetab
+
+		[] Introduction paper
+	
+			I. 	Introduction
+			II. 	Control Files
+			III. 	The Graphics Environment
+			IV. 	Data Analysis Considerations
+			V.	Postscript and Sunview Drivers
+			VI.	Adding and Customizing
+			VII.	NT graphics primitives library
+	
+	
+		[] Template listings: Each IPL procedure has a template 
+		  which defines every implemented parameter, its data type, 
+		  and its default value if any.
+	
+		[] Example control files and graphic output.

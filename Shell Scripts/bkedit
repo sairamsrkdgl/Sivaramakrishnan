@@ -1,0 +1,9 @@
+#! /bin/sh
+if cp "$1" "$1.bak"
+then
+    vi "$1"
+    exit   # USE STATUS FROM vi
+else
+    echo "bkedit quitting: can't make backup?" 1>&2
+    exit 1
+fi

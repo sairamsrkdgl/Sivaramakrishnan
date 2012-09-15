@@ -1,0 +1,33 @@
+#! /bin/sh
+#
+###	whereiz - find full pathnames of command(s) in your $PATH
+###	Usage: whereiz command [commands...]
+##
+##  whereiz LOOKS IN EACH DIRECTORY IN YOUR $PATH (COMMAND SEARCH PATH)
+##  FOR EXECUTABLE FILE(S) WHOSE NAME(S) YOU SPECIFY.  IF IT FINDS THE
+##  FILE, IT RETURNS THE FILE'S FULL PATHNAME.  IF IT DOESN'T, whereiz
+##  RETURNS NOTHING.
+
+# COMMAND THAT TESTS FOR EXECUTABLE FILES... EITHER "test -x" or "testx":
+testx="test -x"
+
+# REPLACE NULL FIELD IN $PATH WITH A .:
+fixpath="`echo $PATH | sed \
+	-e 's/^:/.:/' \
+	-e 's/::/:.:/g' \
+	-e 's/:$/:./'`"
+
+IFS=": 	"		# SET $IFS (COLON, SPACE, TAB) FOR PARSING $PATH
+for command
+do
+	where=""			# ZERO OUT $where
+
+	# IF DIRECTORY HAS EXECUTABLE FILE, ADD IT TO LIST:	
+	for direc in $fixpath
+	do $testx $direc/$command && where="$where $direc/$command"	
+	done
+	
+	case "$where" in
+	?*)	echo $where	;;	# IF CONTAINS SOMETHING, OUTPUT IT
+	esac
+done

@@ -1,0 +1,9 @@
+# qcsh -- sh/ksh function to do curly brace operators by executing csh
+#         on a temporary file that contains the commands you wish to execute. 
+
+qcsh()
+{
+    echo "$@" > /tmp/q$$
+    csh -f /tmp/q$$
+    rm -f /tmp/q$$
+}

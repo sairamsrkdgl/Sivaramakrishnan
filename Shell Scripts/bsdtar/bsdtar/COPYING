@@ -1,0 +1,34 @@
+COPYRIGHT NOTICE FOR BSDTAR
+
+Copyright 1990 Summer Institute of Linguistics.  All rights reserved.
+
+Permission is granted to anyone to use bsdtar for any purpose on any computer
+system, and to alter it and redistribute it freely, subject to the following
+restrictions:
+
+ 1. The origin of bsdtar must not be misrepresented, either by explicit claim
+    or by omission.  Since few users ever read sources, credits must appear in
+    the documentation.
+
+ 2. Altered versions of bsdtar must be plainly marked as such, and must not be
+    misrepresented as being the original software.  Since few users ever read
+    sources, credits must appear in the documentation.
+
+ 3. bsdtar may not be sold as a commercial product.  However, a distribution
+    fee may be charged for bsdtar, provided that recipients are made aware of
+    their right to freely redistribute the program.
+
+ 4. Because it is licensed free of charge, there is no warranty for bsdtar, to
+    the extent permitted by applicable law.  The copyright holder provides
+    bsdtar ``as is'' without warranty of any kind, either expressed or
+    implied, including, but not limited to, the implied warranties of
+    merchantability and fitness for a particular purpose.  The entire risk as
+    to the quality and performance of bsdtar is with the user.  Should bsdtar
+    prove defective, the user assumes the cost of all necessary servicing,
+    repair or correction.  In no event, unless required by applicable law,
+    will the copyright holder be liable to the user for any damages arising
+    out of the use or inability to use bsdtar (including but not limited to
+    loss of data or data being rendered inaccurate), even if such holder has
+    been advised of the possibility of such damages.
+
+ 5. This notice may not be removed or altered.

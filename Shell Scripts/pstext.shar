@@ -1,0 +1,625 @@
+Newsgroups: comp.sources.misc
+subject: v11i101: pstext -a small ascii to postscript converter (1 of 1)
+from: danjudd@acc.stolaf.edu (Dan Judd)
+Sender: allbery@uunet.UU.NET (Brandon S. Allbery - comp.sources.misc)
+
+Posting-number: Volume 11, Issue 101
+Submitted-by: danjudd@acc.stolaf.edu (Dan Judd)
+Archive-name: pstext/part01
+
+Please accept this program for submission to comp.sources.misc.
+We (St Olaf College) have been using it as the generic laser printer
+filter for several months now without a hitch. It has been compiled
+on Next's, Sun's, an Ms-Dos machine, and vaxen 11/780 running Mt Xinu 4.3
+BSD and has worked on all of them.
+
+The shar file follows
+
+Dan Judd
+-------------cut here------------------
+#! /bin/sh
+# This is a shell archive, meaning:
+# 1. Remove everything above the #! /bin/sh line.
+# 2. Save the resulting text in a file.
+# 3. Execute the file with /bin/sh (not csh) to create the files:
+#	Readme
+#	Makefile
+#	pstext.1
+#	pstext.c
+# This archive created: Fri Apr  6 11:46:05 1990
+# By:	Dan Judd ()
+export PATH; PATH=/bin:$PATH
+if test -f 'Readme'
+then
+	echo shar: will not over-write existing file "'Readme'"
+else
+cat << \SHAR_EOF > 'Readme'
+
+This is yet another turn your postscript printer into a 
+line printer kind of program. I wrote this because I wanted a 
+plain text filter that would handle tabs and back spaces sanely,
+print 2 pages on 1, print lanscape or portrait, and no cutesy 
+page headers. It has an option to print x lines per page for those
+of you who do not wish to figure out what size of Times-Roman (or
+whatever font you like) is needed to get 66 lines per page.
+
+Feel free to do what you want with this program, except sell it.
+If you find bugs or add neat features that are not specific to
+any particular laser printer send me mail.
+
+Dan Judd
+St. Olaf College
+12/18/1989
+danjudd@thor.acc.stolaf.edu
+SHAR_EOF
+fi # end of overwriting check
+if test -f 'Makefile'
+then
+	echo shar: will not over-write existing file "'Makefile'"
+else
+cat << \SHAR_EOF > 'Makefile'
+CC= /bin/cc
+DEST= /usr/local/sto/pstext
+PSTEXT_SRC=	pstext.c
+PSTEXT_OBJ=	pstext.o
+
+all:	$(PSTEXT_OBJ)
+	$(CC) -o pstext $(PSTEXT_OBJ)
+
+pstext:	$(PSTEXT_OBJ)
+	$(CC) -o pstext $(PSTEXT_OBJ)
+
+install: 
+	install -c -m755 -o bin -g bin pstext $(DEST)
+clean:	
+	rm -f $(PSTEXT_OBJ) pstext a.out core
+SHAR_EOF
+fi # end of overwriting check
+if test -f 'pstext.1'
+then
+	echo shar: will not over-write existing file "'pstext.1'"
+else
+cat << \SHAR_EOF > 'pstext.1'
+.TH PSTEXT 1 "December 12, 1989"
+.UC 4
+.SH NAME
+pstext \- convert plain text to PostScript
+.SH SYNOPSIS
+.B pstext
+[
+.B \-l
+] [
+.B \-ld
+] [
+.B \-p
+] [
+.B \-d
+] [
+.B \-s pointsize
+] [
+.B \-f fontname
+] [
+.B \-n numberoflines
+] [
+.B \-t tabstring
+] [
+.B \-i pointoffset
+] [
+.B \-
+] [ file ... ]
+.br
+.SH DESCRIPTION
+.I Pstext
+reads each
+.I file
+in sequence converts it from plain text to PostScript and writes it to 
+the standard output, if no files are specified it reads from the standard 
+input. Backspaces move the current point back the width
+of the underscore (_) in the current font and pointsize. Form feeds cause
+text to begin printing on a new page, in the case of dual page mode the
+next page may actually be on the same piece of paper. Separate files always
+begin on a new page. Tabs are set every width of the current tabstring
+(see -t option below).
+.PP
+A reasonable amount of care has been taken to keep the PostScript generated
+as generic as possible.
+.PP
+The Apple LaserWriter, one of the more common PostScript printers,
+has the following fonts available: (note: the fonts must be specified
+exactly as shown.)
+.PP
+.nf
+.na
+.ta 3i
+AvantGarde-Book	AvantGarde-BookOblique
+AvantGarde-Demi	AvantGarde-DemiOblique
+Bookman-Demi	Bookman-DemiItalic
+Bookman-Light	Bookman-LightItalic
+Courier	Courier-Bold
+Courier-BoldOblique	Courier-Oblique
+Helvetica	Helvetica-Bold
+Helvetica-BoldOblique	Helvetica-Narrow
+Helvetica-Narrow-Bold	Helvetica-Narrow-BoldOblique
+Helvetica-Narrow-Oblique	Helvetica-Oblique
+NewCenturySchlbk-Bold	NewCenturySchlbk-BoldItalic
+NewCenturySchlbk-Italic	NewCenturySchlbk-Roman
+Palatino-Bold	Palatino-BoldItalic
+Palatino-Italic	Palatino-Roman
+Symbol	Times-Bold
+Times-BoldItalic	Times-Italic
+Times-Roman	ZapfChancery-MediumItalic
+ZapfDingbats
+.fi
+.ad
+.PP
+The options are:
+.TP
+.B \-l
+Text will be displayed in landscape mode.
+.TP
+.B \-ld
+Text will be displayed in landscape and dual page mode.
+.TP
+.B \-d
+Text will be displayed in portrait and dual page mode.
+.TP
+.B \-p
+Text will be displayed in portrait mode (default).
+.TP
+.BI \-s " pointsize"
+Text will be displayed in the given pointsize (12 default). Fractional
+pointsizes are acceptable.
+.TP
+.BI \-f " fontname"
+Text will be displayed in the give font if available (Courier default).
+Any font may be specified, if the printer (or whatever is displaying the
+PostScript) can not find the font Courier will be used anyway. Fonts
+commonly available are Courier-Bold, Helvetica, Helvetica-Bold, Times-Roman
+Times-Bold, Times-Italic and Symbol. There are obviously more depending
+on your output device.
+.TP
+.BI \-i " pointoffset"
+Text will be offset
+.I pointoffset
+points from where text normally starts. Note: this does not mean from
+the edge of the page, there is an offset from there already.
+.TP
+.BI \-n " numberoflines"
+Text will be displayed with 
+.I numberoflines 
+per page. This takes precedence
+over -s flag.
+.TP
+.BI \-t " tabstring"
+Tabs will be the width of 
+.I tabstring
+in the current pointsize and font.
+The default tabstring is NNNNNNNN, meaning that tabstops are placed every
+width of 8 N's. Tabs will go to the nearest forward tab stop.
+.PP
+.SH "SEE ALSO"
+PostScript Language Reference Manual by Adobe Systems Inc.
+.SH BUGS
+In some systems (Next for example) findfont will look for fonts in more places 
+than just those that FontDirectory gives. In these cases pstext output 
+may not print in the desired font and will print in Courier instead. There
+are a couple of options in dealing with this. Modify the C code so the 
+line containing the FontDirectory is not sent, or some other command is
+used (SharedFontDirectory in the case of a Next). Or you can comment out
+the line in the PostScript output before you send it to the printer. Be
+warned that omitting the line all together will mean that if you specify
+a font that can't be found the job will not print.
+
+The margins have been set to work for an Apple LaserWriter NTX these may
+need to be reset for devices whose margins differ.
+.SH AUTHOR
+Dan Judd, St. Olaf College.
+
+This program is freely redistributable, and is not to be sold.
+SHAR_EOF
+fi # end of overwriting check
+if test -f 'pstext.c'
+then
+	echo shar: will not over-write existing file "'pstext.c'"
+else
+cat << \SHAR_EOF > 'pstext.c'
+/* 
+  pstext
+  by Dan Judd
+     St. Olaf College
+     11/29/89
+  
+  This program takes plain ascii text and converts it to Postscript.
+  It takes a few options.
+  [-p ] prints portrait mode 1 page (default)
+  [-l ] prints landscape mode 1 page
+  [-ld ] dual landscape mode 2 pages per page
+  [-d ] dual portrait mode, prints 2 pages per page
+  [-n number] number of lines per page
+  [-t tabstring ] use a different tabstring size (NNNNNNNN default)
+  [-f fontname ] use a different font (Courier default)
+  [-s pointsize ] use a different point size (12 default)
+  [-i pointoffset ] offset pointoffset points from normal (0 default)
+
+  It handles tabs and backspaces in an intelligent way in any font.
+
+  Copyright Dan Judd 1989
+  This program is freely redistributable, but may not be sold.
+  send bug fixes to danjudd@thor.acc.stolaf.edu
+ */
+
+#include <stdio.h>
+#include <strings.h>
+#include <ctype.h>
+#define TRUE 1
+#define FALSE 0
+#define DFLT_PTSIZE 12
+#define DFLT_FONT "Courier"
+#define DFLT_TABSTRING "NNNNNNNN"
+#define INDENT 0
+#define DFLT_STYLE 1
+#define DFLT_LINES 0
+
+main(argc,argv)
+int argc;
+char *argv[];
+{
+ double ptsize=DFLT_PTSIZE;
+ char *font;
+ char *tabstring;
+ int style=DFLT_STYLE;
+ int numlines=DFLT_LINES;
+ int indent=INDENT;
+ FILE *fpout=stdout;
+ FILE *fpin=stdin;
+ short badflag=FALSE;
+ char ch;
+ char *progname;
+ double atof();
+
+ font=(char *) malloc(sizeof(DFLT_FONT));
+ strcpy(font,DFLT_FONT);
+ tabstring=(char *) malloc(sizeof(DFLT_TABSTRING));
+ strcpy(tabstring,DFLT_TABSTRING);
+ /* parse args */
+ progname=*argv++;
+
+ while ((--argc > 0)&&(*argv[0]=='-')) {
+   switch(*++argv[0]) {
+    
+    case 'l':	if(*++argv[0]=='d') {
+		  style=3;
+		  }
+		 else {
+		  style=4;
+		  };
+		break;
+    case 'p':	style=1;
+		break;
+    case 'd':	style=2;
+		break;
+    case 'f':	if (*++argv[0] !='\0'){
+		  font=*argv;
+		 }
+		else
+		 if (--argc) {
+		  font=*++argv;
+		  }
+		 else {
+		  badflag=TRUE;
+		  }
+		break;
+    case 't':	if (*++argv[0] !='\0'){
+		  tabstring=*argv;
+		 }
+		else
+		 if (--argc) {
+		  tabstring=*++argv;
+		  }
+		 else {
+		  badflag=TRUE;
+		  }
+		break;
+    case 'n':	if (*++argv[0] !='\0'){
+		  if((numlines=atof(*argv)) <= 0){
+		    fprintf(stderr,"specify a line number 1 or more\n");
+		    badflag=TRUE;
+		    }
+		}
+		else
+		if (--argc) {
+		  if((numlines=atof(*++argv)) <= 0){
+		    fprintf(stderr,"specify a line number 1 or more\n");
+		    badflag=TRUE;
+		    }
+		  }
+		 else {
+		  badflag=TRUE;
+		  }
+		break;
+    case 'i':	if (*++argv[0] !='\0'){
+		  if((indent=atof(*argv)) <= 0){
+		    fprintf(stderr,"specify a point offset of 1 or more\n");
+		    badflag=TRUE;
+		    }
+		}
+		else
+		if (--argc) {
+		  if((indent=atof(*++argv)) <= 0){
+		    fprintf(stderr,"specify a point offset of 1 or more\n");
+		    badflag=TRUE;
+		    }
+		  }
+		 else {
+		  badflag=TRUE;
+		  }
+		break;
+    case 's':	if (*++argv[0] !='\0'){
+		  if((ptsize=atof(*argv)) <= 0){
+		    fprintf(stderr,"specify a point size greater than 0\n");
+		    badflag=TRUE;
+		    }
+		}
+		else
+		if (--argc) {
+		  if((ptsize=atof(*++argv)) <= 0){
+		    fprintf(stderr,"specify a point size greater than 0\n");
+		    badflag=TRUE;
+		    }
+		  }
+		 else {
+		  badflag=TRUE;
+		  }
+		break;
+    default:	badflag=TRUE;
+		break;
+
+	}
+if(badflag) {
+ fprintf(stderr,"Usage: %s [-p] [-l] [-ld] [-d] [-n lines ] [-t ",progname);
+ fprintf(stderr,"tabstring] [-f fontname] [-s pointsize] [-i point offset]");
+ fprintf(stderr,"[file1 ... ]\n");
+ exit(1);
+  }
+    *argv++;
+    }
+
+ /* set up postscript header */
+
+ printhead(fpout,font,ptsize,style,numlines,tabstring,indent);
+ /* read files */
+ if (argc ==0) {
+   getfile(stdin,fpout);
+   }
+  else {
+   while(argc--!=0) {
+    if((fpin=fopen(*argv,"r"))!=NULL) {
+      getfile(fpin,fpout);
+      fclose(fpin);
+      *argv++;
+      }
+     else{
+      fprintf(stderr,"Unable to open file %s\n",*argv);
+      fprintf(fpout,"\nlp\n");
+      exit(1);
+      }
+    }
+  }
+ /* makesure showpage is done so last page prints */
+ fprintf(fpout,"\nlp\n");
+ exit(0);
+ }
+
+ /*
+   getfile(fpin,fpout)
+    FILE *fpin,fpout;
+   Read in text from a file and output appropriate postscript
+  */
+ getfile(fpin,fpout)
+  FILE *fpin,*fpout;
+  {
+   char ch;
+
+   fprintf(fpout,"(");
+   while ((ch=getc(fpin))!=EOF) {
+   if(isprint(ch)) {
+    switch (ch ) {
+     case '(':
+     case ')':
+     case '\\':
+		fprintf(fpout,"\\%c",ch);
+		break;
+     default:	fprintf(fpout,"%c",ch);
+		break;
+     }
+   }
+  else {
+    switch (ch ) {
+     case '\n':	fprintf(fpout,")s\n(");
+		break;
+     case '\t':	fprintf(fpout,")S\nht (");
+		break;
+     case '\b':	fprintf(fpout,")S\nbs(");
+		break;
+     case '\r':	fprintf(fpout,")S\ncr(");
+		break;
+     case '\f':	fprintf(fpout,")S\nnp(");
+		break;
+     default:
+		break;
+        }
+      }
+   }
+ /* send trailer */
+ fprintf(fpout,")s\nnp\n");
+ }
+printhead(fp,font,size,style,numlines,tabstring,indent)
+ FILE *fp;
+ char *font;
+ double size;
+ int style;
+ int numlines;
+ char *tabstring;
+ int indent;
+ {
+  fprintf(fp,"%%! PS - Adobe\n");
+  fprintf(fp,"%% Created by pstext by Dan Judd\n");
+  fprintf(fp,"/PAGE_STYLE %d def\n",style);
+  fprintf(fp,"/NUM_LINES %d def\n",numlines);
+  fprintf(fp,"/FONT (%s) cvn def\n",font);
+  fprintf(fp,"/FONT_SIZE %lf def\n",size);
+  fprintf(fp,"%%check if font exists\n");
+
+/* this is vaguely device depenent, FontDirectory is standard, but */
+/* the Next uses SharedFontDirectory instead. The program won't crash,*/
+/* but the only font you can use is Courier. Blech. */
+/* if this is a problem just comment out the next line */
+
+  fprintf(fp,"FontDirectory FONT known not { /FONT (Courier) cvn def} if\n");
+  fprintf(fp,"%%misc hardware defs\n");
+  if (style > 2) {
+    fprintf(fp,"/XLMARGIN 18 def\n");
+    }
+   else
+    {
+    fprintf(fp,"/XLMARGIN %d def\n",(indent+18));
+    }
+  fprintf(fp,"/XRMARGIN 14 def\n");
+  fprintf(fp,"/XPAGE 612 def\n");
+  fprintf(fp,"/YPAGE 792 def\n");
+  fprintf(fp,"/YTMARGIN 8 def\n");
+  if (style < 3) {
+    fprintf(fp,"/YBMARGIN 13 def\n");
+    }
+   else
+    {
+    fprintf(fp,"/YBMARGIN %d def\n",(indent+13));
+    }
+  fprintf(fp,"/PAGENUM 1 def\n");
+  fprintf(fp,"%%\n");
+  fprintf(fp,"%%short defs to save space\n");
+  fprintf(fp,"%%\n");
+  fprintf(fp,"/bd {bind def} bind def\n");
+  fprintf(fp,"/m {moveto} bd\n");
+  fprintf(fp,"/l {lineto}bd\n");
+  fprintf(fp,"/gs {gsave}bd\n");
+  fprintf(fp,"/gr {grestore}bd\n");
+  fprintf(fp,"/tr {translate} bd\n");
+  fprintf(fp,"/rt {rotate} bd\n");
+  fprintf(fp,"%%\n");
+  fprintf(fp,"%%Set up vars and np depending on PAGE_STYLE\n");
+  fprintf(fp,"%%\n");
+  fprintf(fp,"%% Style 1\n");
+  fprintf(fp,"1 PAGE_STYLE eq {\n");
+  fprintf(fp,"	/PAGES_PER_SHEET 1 def\n");
+  fprintf(fp,"	/sp {/SAVEOBJ save def} def\n");
+  fprintf(fp,"	/np { showpage SAVEOBJ restore sp bp } bd\n");
+  fprintf(fp,"	} if\n");
+  fprintf(fp,"%% Style 2\n");
+  fprintf(fp,"2 PAGE_STYLE eq {\n");
+  fprintf(fp,"	/PAGES_PER_SHEET 2 def\n");
+  fprintf(fp,"	/sp {/SAVEOBJ save def gs XPAGE 2 div dup 0 m YPAGE l stroke\n");
+  fprintf(fp,"		newpath 0 0 m 0 YPAGE l XPAGE 2 div XRMARGIN sub dup\n");
+  fprintf(fp,"		YPAGE l 0 l 0 0 l clip\n");
+  fprintf(fp,"		} bd\n");
+  fprintf(fp,"	/np { /PAGENUM 1 PAGENUM add def\n");
+  fprintf(fp,"		PAGENUM PAGES_PER_SHEET\n");
+  fprintf(fp,"		gt {gr showpage SAVEOBJ restore sp /PAGENUM 1 def }\n");
+  fprintf(fp,"		{gr gs XPAGE 2 div 0 tr} ifelse\n");
+  fprintf(fp,"		bp\n");
+  fprintf(fp,"		} bd\n");
+  fprintf(fp,"	} if\n");
+  fprintf(fp,"%% Style 3\n");
+  fprintf(fp,"3 PAGE_STYLE eq {\n");
+  /* define if you want double page landscape mode to have fonts */
+  /* proportional to single page portrait */
+#ifdef LANDPROP
+  fprintf(fp,"	/FONT_SIZE FONT_SIZE .642 mul def\n");
+#endif
+  fprintf(fp,"	/TMP XPAGE def\n");
+  fprintf(fp,"	/XPAGE YPAGE def\n");
+  fprintf(fp,"	/YPAGE TMP def\n");
+  fprintf(fp,"	/TMP XRMARGIN def\n");
+  fprintf(fp,"	/XRMARGIN YTMARGIN def\n");
+  fprintf(fp,"	/YTMARGIN TMP def\n");
+  fprintf(fp,"	/TMP XLMARGIN def\n");
+  fprintf(fp,"	/XLMARGIN YBMARGIN def\n");
+  fprintf(fp,"	/YBMARGIN TMP def\n");
+  fprintf(fp,"	/PAGES_PER_SHEET 2 def\n");
+  fprintf(fp,"	/sp {/SAVEOBJ save def gs 0 XPAGE tr -90 rt\n");
+  fprintf(fp,"		XPAGE 2 div dup 0 moveto YPAGE l stroke\n");
+  fprintf(fp,"		newpath 0 0 m 0 YPAGE l XPAGE 2 div XRMARGIN sub dup\n");
+  fprintf(fp,"		YPAGE l 0 l 0 0 l clip\n");
+  fprintf(fp,"		} bd\n");
+  fprintf(fp,"	/np { /PAGENUM 1 PAGENUM add def\n");
+  fprintf(fp,"		PAGENUM PAGES_PER_SHEET\n");
+  fprintf(fp,"		gt {gr showpage SAVEOBJ restore sp /PAGENUM 1 def }\n");
+  fprintf(fp,"		{gr gs 0 XPAGE 2 div tr -90 rt } ifelse\n");
+  fprintf(fp,"		bp\n");
+  fprintf(fp,"		} bd\n");
+  fprintf(fp,"	} if\n");
+  fprintf(fp,"%% Style 4\n");
+  fprintf(fp,"4 PAGE_STYLE eq {\n");
+  fprintf(fp,"	/TMP XPAGE def\n");
+  fprintf(fp,"	/XPAGE YPAGE def\n");
+  fprintf(fp,"	/YPAGE TMP def\n");
+  fprintf(fp,"	/TMP XRMARGIN def\n");
+  fprintf(fp,"	/XRMARGIN YTMARGIN def\n");
+  fprintf(fp,"	/YTMARGIN TMP def\n");
+  fprintf(fp,"	/TMP XLMARGIN def\n");
+  fprintf(fp,"	/XLMARGIN YBMARGIN def\n");
+  fprintf(fp,"	/YBMARGIN TMP def\n");
+  fprintf(fp,"	/PAGES_PER_SHEET 1 def\n");
+  fprintf(fp,"	/sp {/SAVEOBJ save def gs 0 XPAGE tr -90 rt\n");
+  fprintf(fp,"		} bd\n");
+  fprintf(fp,"	/np { gr showpage SAVEOBJ restore sp bp} bd\n");
+  fprintf(fp,"	} if\n");
+  fprintf(fp,"%%\n");
+  fprintf(fp,"%%set up fonts\n");
+  fprintf(fp,"%%\n");
+  fprintf(fp,"NUM_LINES 1 ge {FONT findfont 1 scalefont setfont\n");
+  fprintf(fp,"	/FONT_HT currentfont /FontBBox get 3 get 0 exch\n");
+  fprintf(fp,"		currentfont /FontMatrix get transform exch pop\n");
+  fprintf(fp,"		currentfont /FontBBox get 0 get 0 exch\n");
+  fprintf(fp,"		currentfont /FontMatrix get transform exch pop\n");
+  fprintf(fp,"		sub def\n");
+  fprintf(fp,"	/TMP FONT_HT 1 sub def\n");
+  fprintf(fp,"	/FONT_SIZE YPAGE YBMARGIN sub YTMARGIN sub 1 sub dup\n");
+  fprintf(fp,"	NUM_LINES div TMP mul sub NUM_LINES div def\n");
+  fprintf(fp,"	} if\n");
+  fprintf(fp,"FONT findfont FONT_SIZE scalefont setfont\n");
+  fprintf(fp,"%%get height of font set tolerances\n");
+  fprintf(fp,"/FONT_HT currentfont  /FontBBox get 3 get 0 exch\n");
+  fprintf(fp,"	currentfont  /FontMatrix get transform exch pop\n");
+  fprintf(fp,"	currentfont  /FontBBox  get 0 get 0 exch\n");
+  fprintf(fp,"	currentfont  /FontMatrix get transform exch pop\n");
+  fprintf(fp,"	sub  def\n");
+  fprintf(fp,"/FONT_TOL FONT_HT YBMARGIN add def\n");
+  fprintf(fp,"%%\n");
+  fprintf(fp,"%%Routines common to all page styles\n");
+  fprintf(fp,"%%\n");
+  fprintf(fp,"/bp { XLMARGIN YPAGE YTMARGIN sub FONT_SIZE sub m\n");
+  fprintf(fp,"	} bd\n");
+  fprintf(fp,"/s { show  currentpoint exch pop dup FONT_TOL\n");
+  fprintf(fp,"	gt {FONT_SIZE sub XLMARGIN  exch m} {np} ifelse}  bd\n");
+  fprintf(fp,"/S {show} bd\n");
+  fprintf(fp,"/OFFSET (_) stringwidth pop neg def\n");
+  fprintf(fp,"/bs { OFFSET 0 rmoveto } bd\n");
+  fprintf(fp,"/bs {XLMARGIN currentpoint pop OFFSET add lt {OFFSET 0 rmoveto}");
+  fprintf(fp,"{XLMARGIN currentpoint exch pop m}ifelse} bd");
+  fprintf(fp,"/TABLEN (%s) stringwidth pop def\n",tabstring);
+  fprintf(fp,"/ht {currentpoint exch XLMARGIN sub TABLEN div cvi 1 add TABLEN\n");
+  fprintf(fp,"	mul XLMARGIN add exch m}bd\n");
+  fprintf(fp,"/cr {currentpoint XLMARGIN exch m pop} bd\n");
+  fprintf(fp,"/lp {gr 1 PAGENUM ne {showpage}if} bd\n");
+  fprintf(fp,"%%\n");
+  fprintf(fp,"%%begin data et al\n");
+  fprintf(fp,"%%\n");
+  fprintf(fp,"sp\n");
+  fprintf(fp,"bp\n");
+ }
+SHAR_EOF
+fi # end of overwriting check
+#	End of shell archive
+exit 0
+

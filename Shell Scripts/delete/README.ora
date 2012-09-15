@@ -1,0 +1,156 @@
+These directories and files were created from a set of postings to
+USENET in the early 1990's.  Here are the first parts of those messages:
+
+
+From: jik@pit-manager.MIT.EDU (Jonathan I. Kamens)
+Newsgroups: comp.sources.misc
+Subject: v17i023:  delete - MIT Athena delete/undelete programs, Part01/04
+Message-ID: <1991Feb25.180641.4274@sparky.IMD.Sterling.COM>
+Date: 25 Feb 91 18:06:41 GMT
+Approved: kent@sparky.imd.sterling.com
+X-Checksum-Snefru: 586a844b 5d371414 c6c6d3d2 3b164777
+
+Submitted-by: Jonathan I. Kamens <jik@pit-manager.MIT.EDU>
+Posting-number: Volume 17, Issue 23
+Archive-name: delete/part01
+
+  The following four shar files containing the source code for
+the MIT Project Athena "delete" suite of utilities, at patchlevel 12
+patchlevel 12.  The package allows for the recovery of deleted files 
+by renaming them instead of actually removing them completely.  See 
+the README file for additional information.
+
+  Directly following the source code for delete will be three shar
+files containing the source code for the "com_err" error-handling
+library (at patchlevel 3), which you'll need to compile delete.  See
+com_err's README file for more information about it.  Note that this
+is NOT an official release of the com_err library by its authors (I
+don't think such a thing exists); I include it here only so people can
+compile delete.  Feel free to use the com_err library in your own
+programs, but be aware that it isn't necessarily going to be supported
+in any way.
+
+  See the files mit-copyright.h in the delete sources and
+mit-sipb-copyright.h in the com_err sources, for copyright
+restrictions (basically, freely redistributable as long as the
+copyright stays, and there are no guarantees from MIT, but don't take
+my word for it, read the files).
+
+Jonathan Kamens			              USnail:
+MIT Project Athena				11 Ashford Terrace
+jik@Athena.MIT.EDU				Allston, MA  02134
+Office: 617-253-8085			      Home: 617-782-0710
+---
+#! /bin/sh
+# This is a shell archive.  Remove anything before this line, then unpack
+	...
+
+
+From: jik@pit-manager.MIT.EDU (Jonathan I. Kamens)
+Newsgroups: comp.sources.misc
+Subject: v17i037:  delete - MIT Athena delete/undelete programs, Patch13
+Message-ID: <1991Mar12.033646.10195@sparky.IMD.Sterling.COM>
+Date: 12 Mar 91 03:36:46 GMT
+Approved: kent@sparky.imd.sterling.com
+X-Checksum-Snefru: fef9bfc8 d748132a 42a26c1e e8c3da13
+
+Submitted-by: Jonathan I. Kamens <jik@Athena.MIT.EDU>
+Posting-number: Volume 17, Issue 37
+Archive-name: delete/patch13
+Patch-To: delete: Volume 17, Issue 23-26
+
+  This patch brings the "delete" package from patchlevel 12 to
+patchlevel 13.  Use "patch -p0" in your delete source directory to
+apply it.  However, before applying it, you should rename the file
+"mit-copyright.h" in your source directory to "mit-copying.h"; this
+change is to accomodate systems that are restricted to 14-character
+filenames.
+
+  This patch accomplishes the following:
+
+1. I think I've finally got all of the RCS headers in sync, so after
+   this patch, I shouldn't have to send out any more patches that
+   change the RCS strings in files without changing anything else.
+
+2. I've added a new compile-time configuration option, USE_BLOCKS.
+   See the description in the Makefile and README files for more
+   information.  When this option is enabled, delete is a little bit
+   smarter about figuring out how much space files actually take up on
+   the disk.
+
+3. A new file, block-test.sh, is included to help determine whether or
+   not to enable USE_BLOCKS.  This file should be created
+   automatically by the patch.
+
+4. I've added BUGS, BETA-TESTERS and ARCHIVE SITE sections to the
+   README file  (please read them).
+
+Jonathan Kamens			              USnail:
+MIT Project Athena				11 Ashford Terrace
+jik@Athena.MIT.EDU				Allston, MA  02134
+Office: 617-253-8085			      Home: 617-782-0710
+----------------------------
+
+*** /tmp/delete/PATCHLEVEL	Mon Mar 11 19:03:41 1991
+--- PATCHLEVEL	Mon Mar 11 19:22:12 1991
+	...
+
+
+Newsgroups: comp.sources.misc
+From: Jonathan I. Kamens <jik@Athena.MIT.EDU>
+Subject:  v20i042:  MIT Athena delete/undelete programs, Patch14
+Message-ID: <1991Jun5.183821.15121@sparky.IMD.Sterling.COM>
+X-Md4-Signature: bb5910928d42ed87c9dab77e32c3325a
+Date: Wed, 5 Jun 1991 18:38:21 GMT
+Approved: kent@sparky.imd.sterling.com
+
+Submitted-by: Jonathan I. Kamens <jik@Athena.MIT.EDU>
+Posting-number: Volume 20, Issue 42
+Archive-name: delete/patch14
+Patch-To: delete: Volume 17, Issue 23-26,37
+
+This patch brings the "delete" package from patchlevel 13 to
+patchlevel 14.  Use "patch -p0" in your delete source directory to
+apply it.  Several files will change, and one new file (malloc-test.c)
+will be created.
+
+  This patch accomplishes the following:
+
+1. Lsdel now checks if stdout is a tty; if it is, then output is in
+   multi-column format, and if it is not, then output is in
+   single-column format.
+
+2. The "-1" and "-C" options have been added to lsdel to allow the
+   user to force single-column or multi-colun output, regardless of
+   whether or not stdout is a tty.
+
+3. Lsdel now sorts its output.
+
+4. There is better support for machines on which malloc(0) returns
+   NULL, and a Makefile rule to test if your machine falls in that
+   category.  See the Makefile for more information.
+
+5. There is some fledgling support for dirent instead of direct,
+   toggled by the POSIX preprocessor symbol.
+
+6. The Makefile now makes sure to run block-test.sh in the current
+   working directory, so "make block-test" will work even if you don't
+   have "." in your search path.
+
+7. A missing newline in a message printed by block-test.sh has been
+   inserted.
+
+8. Block-test will now do the right thing on machines that have
+   fundamental block sizes larger than 512 bytes but still record
+   st_blocks in 512 byte increments, as long as the fundamental block
+   size is smaller than 4096 bytes (if you work on machine with a
+   larger one, please let me know).
+
+Jonathan Kamens			              USnail:
+MIT Project Athena				11 Ashford Terrace
+jik@Athena.MIT.EDU				Allston, MA  02134
+Office: 617-253-8085			      Home: 617-782-0710
+
+*** /tmp/,RCSt1021382	Tue Jun  4 22:31:27 1991
+--- Makefile	Tue Jun  4 22:17:43 1991
+	...

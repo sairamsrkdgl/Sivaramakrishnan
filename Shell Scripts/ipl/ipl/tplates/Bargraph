@@ -1,0 +1,102 @@
+=============
+Proc Bargraph				
+=============
+
+The following is an alphabetical list of the Bargraph parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+-----------------------------------------------------------------------
+Field:	dfield (list8) (M)	: 				     **
+  Field in the data to be used for making the bars.  For single bars,
+  one field should be specified; for stacked or clustered bars, one
+  field for each part of the stack (or each sub-bar in a cluster)
+  should be given.
+-----------------------------------------------------------------------
+Format:	{single,cluster,stack}	: single	
+  Determines if we are doing single bars, clusters of bars, or bars 
+  stacked up.
+-----------------------------------------------------------------------
+Idfield:	dfield (list8)	: 		
+  Bars can be labeled from this field in the data.  If doing stacked
+  or clustered bars, multiple fields should be used.
+-----------------------------------------------------------------------
+Idfield.position: -1 to 1	: 0.02		
+  When bars are being labeled, this determines the distance of label 
+  above (or below if negative) top of bar (inches).
+-----------------------------------------------------------------------
+Idfield.size: 	charsize	: 6		
+  Char size of bar labels.
+-----------------------------------------------------------------------
+Killwild:	number		: 		
+  This is used to automatically terminate a bargraph when a data value 
+  exceeds this number.  This is desirable, say, for percentage 
+  distributions when N gets too low.
+-----------------------------------------------------------------------
+Outlinebars:	{y,n}		: y		
+  If y, surround each bar with a line.
+-----------------------------------------------------------------------
+Segment:	{y,n}		: n		
+  This is a stylistic parameter which segments bars at axis tics with
+  white lines.  You probably won't want to use it.
+-----------------------------------------------------------------------
+Separation:	-2 to 2		: 0.20		
+  This parameter specifies the amount of separation between bars (not
+  sub-bars in a cluster, though).
+-----------------------------------------------------------------------
+Separation.sub: -2 to 2		: 0.03		
+  This parameter specifies the amount of separation between sub-bars 
+  in a cluster.
+-----------------------------------------------------------------------
+Shade: 		color (list8)	: .2 .5 .8 1 0  		     **
+  This specifies the shading for the bars. For stacked or clustered
+  bars, several values should be given.  The defaults work well.
+-----------------------------------------------------------------------
+Xstart.0or1:	{0,1}		: 1		
+  Usually, bars look best when the first on is placed at X=1.  However,
+  it is possible to start them at X=0.
+-----------------------------------------------------------------------
+Xfield:		dfield		:		
+  X position of bars can be determined by this data field.  Usually,
+  they are done ordinally, that is with the first at X=1, the second
+  at X=2, and so on, in which case Xfield does not have to be supplied.  
+-----------------------------------------------------------------------
+Zeroat:		number		: 		
+  This allows formation of a "zero line" at some point other than Y=0.
+  Bars point up when above the zero line, and down at values less than 
+  the zero line.
+-----------------------------------------------------------------------
+#
+#   Bargraph - for producing single, clustered or stacked bar graphs.
+# Format parameter can be used to select which one.  If clustered or stacked
+# format is being done, data for each sub-bar must come from a different
+# field.  The Field parameter should contain the field or fields in the
+# order that they are to appear, from left to right. Each line of data 
+# produces one major bar (a bar or set of sub-bars).
+#
+#   Unless Xfield is specified, bars will be drawn starting at the left
+# and moving to the right, one per data unit.  For example, if the X axis
+# is scaled from 0 to 10, 9 bars will be produced at X=1 through X=9, assuming
+# there are 9 or more lines of data.  Xstart.0or1 can be set to 0 to have
+# the bars start at 0 instead of 1.
+#
+#   If Xfield is specified, that field will be used as the X location of
+# the center of the bar or sub-bars.
+#
+#   The Killwild parameter can be used to abort the bar graph if any values
+# exceed it.
+#
+#   The Zeroat parameter can be used to determine a point in Y at which
+# becomes the effective origin for the bars, meaning that any values less than
+# the Zeroat value will produce downward bars.
+#
+#   Bars can be outlined (using Outlinebars), shaded (using Shade), or labeled
+# (using Idfield).  Shading and labeling require one value for each sub-bar,
+# if doing clustered or stacked bars.  Labeling is done by specifying field(s)
+# from the data.
+#
+#   Note that the Percents option can be set in Proc Getdata to transform your
+# data into percentages for percentage distributions. 
+#
+#   Bugs: It should be possible to specify bar labels literally.

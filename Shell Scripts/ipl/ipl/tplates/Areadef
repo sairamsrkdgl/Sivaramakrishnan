@@ -1,0 +1,340 @@
+============
+Proc Areadef   
+============
+
+The following is an alphabetical list of the Areadef parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+---------------------------------------------------------------------
+Area:		token				: standard	  **
+  Preset graphics area name (see area.coords)
+---------------------------------------------------------------------
+Area.bottom:	0 to 12				: 		
+Area.left:	0 to 12				: 		
+Area.right:	0 to 12 			: 		
+Area.top:	0 to 12				: 		
+  Alternate way of specifying graphic area (all four must be
+  specified).  Used most often when cloning.
+---------------------------------------------------------------------
+Area.rectangle:	2coordpair			:		  **
+  Alternate way of specifying graphic area.  Consists of two 
+  coord-pairs (low left, up right) to form a rectangle
+---------------------------------------------------------------------
+Area.file:	token				: 		
+  File containing preset user defined areas, in case you want
+  to set up your own file of preset area.
+---------------------------------------------------------------------
+Font:		font				:        	
+  Font to be used on axis labels etc.
+---------------------------------------------------------------------
+Frame:		{single,double,none}		: none		
+  Specifies a frame of graphic area 
+---------------------------------------------------------------------
+Shade:		color				: 		
+  Shade of graphic area.  While usually white, graphic area
+  is sometimes also shaded light gray.
+---------------------------------------------------------------------
+Subtitle:	text				: 		  **
+  Title for the graphic area.  Note that this is not the page title
+(see Proc Page).
+---------------------------------------------------------------------
+Subtitle.above:	-12 to 12 (T)			: 0.02		
+  Distance of 1st subtitle line above window top in inches.
+---------------------------------------------------------------------
+Subtitle.font:	font				: 		
+  Font for area title.
+---------------------------------------------------------------------
+Subtitle.justify: {center,left,right}		: left		
+  Causes subtitle to be centered, or left or right justified.
+---------------------------------------------------------------------
+Subtitle.size:	charsize			: 10		
+  Char size of subtitle.
+---------------------------------------------------------------------
+Xaxis:		{bottom,top,both,none}		: bottom	
+  This specifies where the x axis is to be drawn.  While usually
+  drawn at the bottom of the graphics area, it can be drawn at
+  the top, or both, or not at all.
+---------------------------------------------------------------------
+Xinc:		number				: 1		  **
+  This is the increment between which stubs will be placed along
+  the X axis.  For example, a value of 5 would give: 0, 5, 10..
+---------------------------------------------------------------------
+Xlabel.position: -12 to 12 (X)			: 0.6		
+  Distance of X axis identifier text from window bottom, in inches.
+---------------------------------------------------------------------
+Xlabel.size: 	charsize			: 10		
+  Char size for x axis identifier text.
+---------------------------------------------------------------------
+Xlabel:		text				: 		  **
+  The actual X axis identifier text is given here.
+---------------------------------------------------------------------
+Xmax:		number 				: 		  **
+  This gives the maximum in the X direction.  When doing bar graphs,
+  this should be set to at least one greater than the number of bars
+  you plan to draw.
+---------------------------------------------------------------------
+Xmin:		number 				: 0 		  **
+  This gives the minimum in the X direction.  Often times it is zero.
+---------------------------------------------------------------------
+Xscaletype:	{linear,log,yymm}		: linear	
+  This allows the scaling mechanism for the X direction to be
+  specified.  It is usually "linear", but can be "log" (logarithmic), 
+  or yymm (month/year).
+---------------------------------------------------------------------
+Xstart.0or1:	0 to 10				: 0		
+  This is set to "1" when doing bar graphs, other times, it is "0".
+---------------------------------------------------------------------
+Xstub: 		text				: num		   **
+   This parameter determines the text for the X axis stubs.  It may
+  be the text itself (one line per stub); or it may be "num" 
+  which turns on numeric stubs; or it may be the name of a file 
+  which contains stub text; or it may indicate that the stub text
+  should come from a field in the data.  Also available are month/
+  year stubs, which are invoked by using Xstub: month.
+   When giving text, remember to use one line per stub.
+  Multi-line stubs are possible using '~' to symbolize newline,
+  for example "Ford~Motor~Company" would occupy three lines.  It
+  is also possible to do irregular tic placement by prefacing
+  numeric stubs with a '!', which will cause the stub to be placed
+  at the stub value.  For example "!3" will cause the stub "3" to
+  be placed at X=3.  It is also OK to use blank lines, which will
+  cause a tic to be produced, but no stub.
+   Numeric stubs will be placed from Xmin to Xmax, based on Xinc.  
+  Precision will be based on the Xstub.ticfmt parameter, which 
+  defaults to no digits to the right of the decimal point.
+   If stubs are to come from a data field, use '@' followed by
+  the field number.  For example, @4 would use the 4th field in
+  the data for stubs.  Of course, data must already have been read
+  using Proc Getdata.
+   If using month stubs with yymm scaling, Xmin and Xmax determine
+  the range in months.  Otherwise, Xstub.startmonth and Xstub.startyear
+  must be given.
+---------------------------------------------------------------------
+Xstub.fileline: number				: 0		
+  Line in a stub text file to start with.
+---------------------------------------------------------------------
+
+Xstub.grid:	{line,shade,none,wline}		: none		
+  This is a stylistic parameter which allows you to set up a grid of 
+  lines or shaded blocks.
+---------------------------------------------------------------------
+
+Xstub.minor:	0 to 100			: 0		
+  Create minor tics forming this many divisions between regular tics.
+  For example, a value of 2 will cause one minor tick between every 
+  major tick.
+---------------------------------------------------------------------
+
+Xstub.nolonetics: {y,n}				: y		
+  If y, no tics will be produced where there are no stubs. 
+---------------------------------------------------------------------
+
+Xstub.shade:	color				: 0.98		
+  Shade for the shaded blocks if Xstub.grid is set to "shade".
+---------------------------------------------------------------------
+
+Xstub.size: 	charsize			: 7		
+  Char size for stubs.
+---------------------------------------------------------------------
+
+Xstub.startmonth: 1 to 12			: 		
+  For month stubs, leftmost month.  (See Xstub).
+---------------------------------------------------------------------
+
+Xstub.startyear: 0 to 99			: 		
+  For month stubs, leftmost year.  (See Xstub). 
+---------------------------------------------------------------------
+
+Xstub.stubs:	{bottom,top,both,none}		: bottom	
+  This parameter controls the placement of stubs.  While usually
+  placed along the bottom, they can also be placed along the top,
+  or both, or none at all.
+---------------------------------------------------------------------
+
+Xstub.ticlen.minor: -2 to 2 (X)			: 0.035		
+  Length of minor tics in inches.  Positive values cause tics to point
+  away from the graphic area, while negative values cause tics to point 
+  into the graphic area. 
+---------------------------------------------------------------------
+
+Xstub.ticlen:	-2 to 2	(X)			: 0.08		
+  Length of minor tics in inches.  Positive values cause tics to point
+  away from the graphic area, while negative values cause tics to point 
+  into the graphic area. 
+---------------------------------------------------------------------
+
+Xstub.tics:	{bottom,top,both,none}		: bottom	
+  This parameter controls the placement of tics.  While usually
+  placed along the bottom, they can also be placed along the top,
+  or both, or none at all.
+---------------------------------------------------------------------
+
+Xstub.yofs:	-2 to 2	(X)			: 0.2		
+  Distance of stub text from x axis in inches.  Positive values cause
+  stubs to be placed away from the graphics area, while negative 
+  values cause stubs to be placed into the graphics area.
+---------------------------------------------------------------------
+
+Xticfmt:	token				: %4.0f		     **
+  This parameter controls the precision of numeric stubs in X, and any
+  other labels in X (such as lineplot labels).  It uses the convention
+  of the C printf(3) routines.  For example, %4.0f would give 10;
+  %4.1f would give 10.0; %4.2f would give 10.00, etc.
+---------------------------------------------------------------------
+Yaxis:		{left,right,both,none}		: left		
+  Where to draw Y axis. (See Xaxis, above)
+---------------------------------------------------------------------
+Yinc:		number				: 1		     **
+  Increment in Y. (See Xinc, above)
+---------------------------------------------------------------------
+Ylabel.position: -12 to 12 (Y)			: 0.6		
+  Position of Y identifying label text from Y axis.  Positive values
+  cause text to be placed away from graphic area; negative values 
+  cause it to be placed in the graphics area.
+---------------------------------------------------------------------
+Ylabel.size: 	charsize			: 10 		
+  Size of Y label identifying text. (See Xlabel.size)
+---------------------------------------------------------------------
+Ylabel: 	text				: 		     **
+  The Y label identifying text itself.  This text is rotated 90 
+  degrees, and for this reason does not show up on Sunview display.
+---------------------------------------------------------------------
+Ymax:		number				: 		     **
+  Maximum in Y.   For Vbargraph, this should be one greater than the
+  number of bars you plan to draw.
+---------------------------------------------------------------------
+Ymin:		number				: 0		     **
+  Minimum in y.
+---------------------------------------------------------------------
+Yscaletype:	{linear,log}			: linear	
+  Y scaling discipline  (see Xscaletype).
+---------------------------------------------------------------------
+Ystart.0or1:	0 to 10				: 0		
+  Should be set to "1" for Vbargraph; "0" otherwise.
+---------------------------------------------------------------------
+Ystub: 		text				: num 		     **
+  Stubs in Y.  (See Xstubs)  Same as Xstubs except that there are no
+  mont/year stubs, and there can be no multiple line stubs.  In the Y
+  direction, numeric stubs ("num") are by far the most often used.
+---------------------------------------------------------------------
+Ystub.fileline:	number				: 0		
+  Line in a stub text file to start at (See Xstub.fileline).
+---------------------------------------------------------------------
+Ystub.grid:	{line,shade,none,wline}		: none		
+  Style parameter.  (see Xstub.grid).
+---------------------------------------------------------------------
+Ystub.minor:	0 to 100			: 0		
+  Make minor stubs, creating this many divisions.  (See Xstub.minor)
+---------------------------------------------------------------------
+Ystub.nolonetics: {y,n}				: y		
+  If y, no tics will be produced where there are no stubs.
+---------------------------------------------------------------------
+Ystub.shade:	color 				: 0.98		
+  Shade for the shaded blocks if Ystub.grid is set to "shade".
+---------------------------------------------------------------------
+Ystub.size: 	charsize			: 7		
+  Char size for stubs.
+---------------------------------------------------------------------
+Ystub.stubs: 	{left,right,both,none}		: left		
+  Produce stubs on left, right, both or niether sides (see Xstub.stubs)
+---------------------------------------------------------------------
+Ystub.ticlen.minor: -2 to 2 (Y)			: 0.035		
+  Length of minor tics (See Xstub.ticlen.minor)
+---------------------------------------------------------------------
+Ystub.ticlen:	-2 to 2	(Y)			: 0.08		
+  Length of major tics (See Xstub.ticlen)
+---------------------------------------------------------------------
+Ystub.tics:	{left,right,both,none}		: left		
+  Which side(s) to put tics on. 
+---------------------------------------------------------------------
+Ystub.xofs:	-2 to 2	(Y)			: 0.1		
+  Distance from y axis to right side of y stub.  Positive values move
+  away from graphics area; negative values move into graphics area.
+---------------------------------------------------------------------
+Yticfmt:	token				: %4.0f		
+  Format for display of numbers in Y (See Xticfmt).
+---------------------------------------------------------------------
+#
+# AREADEF DESCRIPTION
+#   Areadef should be used every time a new graphics area is to be set up for
+# plotting.  Thus, it should be called once if there is to be one plot on
+# the page, twice if there are to be two plots, and so on.  There can only
+# be one graphics area defined at any one time.  Graphics procs will do their
+# work inside the most recently defined graphics area.
+#   Areadef could be used multiple times for a single plot, for example,
+# if two units (e.g. feet and meters) are being used simultaneously.  
+#   It will set scaling, draw axes, tics (the notches on the axes),
+# stubs (the number or identifier next to each tic), axis labels (the text
+# description of what quantity each axis is describing) and subtitles.
+# As a minimum, the user should specify Xmax and Ymax for scaling the area, and
+# Xinc and Yinc.  Xmin and Ymin default to 0 which is usually, but not always,
+# appropriate.
+#
+# CLONING
+#   The Saveas and Clone parameters can be used to let subsequent Areadefs
+# inherit parameters from a previous Areadef.  This saves typing.
+#
+# GRAPHICS AREA
+# Use a pre-defined graphics area from the area.coords table, or specify your
+# own coordinates. 
+#
+#
+# STUBS
+#
+# NUMBERED STUBS		Ystub: num
+#   Stubs can be specified in several ways.  The simplest is plain numbering,
+# which will take effect when num is specified.  For example, if Ystub is set
+# to num (the default), numbered tics from Ymin to Ymax, every Yinc units,
+# will be created.  This is used for the Y axis in bar graphs and line plots,
+# and for both axes in scatter distributions.
+#
+# STUBS FROM THE DATA		Xstub: @1
+#   A field from the data can become stubs, by specifying a field number 
+# preceded by @'.  For example, if field 1 in the data contains identifiers, 
+# specifying an Xstub of @1 will cause the contents of that field
+# to be used in order.  This is especially useful for the X axis in bar graphs.
+#      
+# STUBS SPECIEFIED LITERALLY	Xstub:	Case 1
+#					Case 2
+#					Case 3
+#   Stubs can be specified right in the parameter file, one line per stub.
+# Each token is placed on a new line. 
+#
+# STUBS CONTAINED IN AN EXTERNAL FILE	Ystub: Snellen.stubs
+#   Stubs can come from an external file, in which case just the file name
+# is given.  As above, each token is placed on a new line.  Xstub.startline
+# can be used to start in the middle of the file.
+#
+# MONTH AND YEAR STUBS			Xstub:	month
+#   Month and year stubs can be placed automatically.  Use Xstub.startyear
+# and Xstub.startmonth to set the starting month/year.  Years are expressed
+# in two digits, e.g. 89, and months are specified by integer (1 through 12 ).
+# Available for X axis only.
+#
+# MPS VISIT STUBS			Xstub: mps
+#   This provides the frequently used month sequence used in MPS follow-up
+# visits (0,3,6,12,18,24..).  Use Xinc: 3, and Xstub.tics: none.  X axis only.
+#
+# COMS VISIT STUBS			Xstub: coms
+#   This provides the month sequence used in COMS follow-up visits.  It is
+# (0,6,12,18,24..).  Available for X axis only.
+#
+#
+# START ON 0 OR 1?
+#   With bar graphs, you want the first x stub to happen one unit past the
+# origin, while with line plots and scatter distributions it should generally 
+# happen at the origin.  Use Xstub.0or1 to get that right.
+#
+#
+# AXES LABELS AND SUBTITLE
+#   Axes labels (Xlabel and Ylabel) can be multi-line.  The location paramter
+# determines where the *first* line will go.  The subtitle can be multi-line
+# and be centered, left, or right justified.
+#
+#
+# AXES CAN BE TURNED OFF
+#   Axes can be drawn on one side, both sides, or not at all.  Similiarly,
+# tics and stubs can be on either side, both sides, or not at all.
+

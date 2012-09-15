@@ -1,0 +1,22 @@
+==========
+Proc Arrow
+==========
+
+The following is an alphabetical list of the Arrow parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+--------------------------------------------------------------
+Clone:		token				:	
+  Used to clone a previous Proc Arrow.
+--------------------------------------------------------------
+Points: 	2coordpair			:	
+  Arrow will be drawn between these two points. x1, y1, x2, y2.  
+  Arrowhead will be at (x2, y2).  Absolute coordinates.
+--------------------------------------------------------------
+Saveas:		token				:	
+  Used to save parameters for later cloning.
+--------------------------------------------------------------
+# Draws one arrow connecting the two points.  Points in absolute 
+# coordinates.

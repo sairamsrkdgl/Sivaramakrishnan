@@ -1,0 +1,57 @@
+=============
+Proc Rangebar
+=============
+
+The following is an alphabetical list of the Rangebar parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+-------------------------------------------------------------------
+Ends:		{y,n}				: y		
+  Style parameter allowing little cross-bars to be added on ends.
+-------------------------------------------------------------------
+Field:		dfield (list5) (M)		: 		**
+  Data fields containing the values.  There should be from 1 to 5
+  values here, depending on the value of Nval. 
+-------------------------------------------------------------------
+Idfield:	dfield				: 		
+  Allows an identifying label to be produced from the data. 
+  Indicates the data field where this label can be found.
+-------------------------------------------------------------------
+Label.size:	charsize			: 6		
+  Char size for the identifying label.
+-------------------------------------------------------------------
+Label.position: number				: 1		
+  Position for N=.. label in Y data units.
+-------------------------------------------------------------------
+Linethick:	0 to 5				: 1		
+  Thickness of outline.
+-------------------------------------------------------------------
+Midlinewidth:	number				: 0		
+  Size of median line in data units.  Usually this is to be the
+  as the width of the bar, but you may want it to protrude.  If
+  set to 0 (the default) the width will be set to that of the
+  bar.
+-------------------------------------------------------------------
+Midlineright: 	{y,n}				: n		
+  This allows the creation of high-low-close bars as seen in the
+  stock market reports.
+-------------------------------------------------------------------
+Nval:		1 to 5				: 5		**
+  This controls the type of rangebar that will be produced.  See
+  the rangebar example.  To do boxplots, for example, use Nval: 5.
+-------------------------------------------------------------------
+Shade:		color				: 1.0		
+  Shade for inside of bar.  
+-------------------------------------------------------------------
+Width:		number				: 0.3		
+  Width of box, in data units.  
+-------------------------------------------------------------------
+Xfield:		dfield				: 		
+  Allows placement of bars in X.  This is optional-- if omitted,
+  bars will be placed ordinally in X (X=1, X=2, X=3..).
+-------------------------------------------------------------------
+#
+# Produces various distribution representations in Y.  Produces one 
+# rangebar for every row of data.  See also Boxplot.

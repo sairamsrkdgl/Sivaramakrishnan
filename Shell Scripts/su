@@ -1,0 +1,19 @@
+#!/bin/csh -f
+# su - fix incorrect $HOME and $USER with system 'su' command
+#
+# Some System V versions don't change the environment variable $HOME
+# ($LOGDIR) or $USER to the right value for the account you su to.
+# Also, a C shell you start on the other account won't read your .cshrc
+# file.  (Other shells may have the same problems.)  The best fix for
+# that is a shell script named su that sets the variables for you.
+
+foreach arg ($argv)
+        # find first non-option argument (username to su to)
+        if ("x$arg" !~ x-*) then
+                setenv HOME ~$arg
+		setenv USER $arg
+                exec /bin/su $argv:q   # End script; replace with su
+        endif
+end
+echo "$0 ERROR: can't find username."
+exit 1

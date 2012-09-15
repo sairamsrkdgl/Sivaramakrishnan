@@ -1,0 +1,33 @@
+=========
+Proc Draw
+=========
+
+The following is an alphabetical list of the Draw parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+----------------------------------------------------------------------
+Linetype:	0 to 8				: 0		
+  Line dash pattern
+----------------------------------------------------------------------
+Linetype.magnify: 0.1 to 10			: 1		
+  Magnification of patterns
+----------------------------------------------------------------------
+Linethick:	0.1 to 10			: 1		
+  Thickness of line
+----------------------------------------------------------------------
+Points:		text (M) (C)			:		   **	
+  Coord pairs, 2 per line (move+draw) or 1 per line (draw)
+----------------------------------------------------------------------
+System:		{data,absolute}			: absolute	   **
+  Which coord system points are in
+----------------------------------------------------------------------
+#
+# Draws a line or lines of the specified type and thickness.  Points 
+# should be specified as coordinate pairs.  Either on or two pairs 
+# should be used per line.  If two pairs are used, the point described 
+# by the first pair will be moved to, and a connecting line will be 
+# drawn to the point described by the other pair.  If one pair is given,
+# a line will be continued from the previous point to the point 
+# described by the pair. 

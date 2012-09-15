@@ -1,0 +1,30 @@
+===========
+Proc Vector
+===========
+
+The following is an alphabetical list of the Vector parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+-----------------------------------------------------------------
+Point1fields: dfield (list2) (M) 	: 	             **
+  Two fields in the data holding the x and y components of
+  the non-pointing end of the arrow.
+-----------------------------------------------------------------
+Point2fields: dfield (list2) (M) 	: 	             **
+  Two fields in the data holding the x and y components of
+  the pointing end of the arrow.
+-----------------------------------------------------------------
+Headlength:   0 to 2 			:	0.1     
+  Determines length of arrowhead, length in inches from point.
+-----------------------------------------------------------------
+Headwidth:    0 to 0.8 			: 	0.2     
+  Determines width of arrowhead, arc of half of arrow in radians.
+-----------------------------------------------------------------
+Headshade:    color : 		0.0     
+  Determines the color of arrowhead.
+-----------------------------------------------------------------
+#
+# Proc Vector generates a display of vectors, with or without 
+$ arrow tips.

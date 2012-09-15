@@ -1,0 +1,22 @@
+#!/bin/sh
+# Written by Tony Hansen of AT&T
+
+# Evaluate and output the iprog capability
+eval `tput iprog`
+
+# output the is1 and is2 initialization strings
+tput is1
+tput is2
+
+# if the terminal supports tabs, set them
+# otherwise, disable them
+if [ -n "`tput ht`" ]
+then stty tabs; tabs -8
+else stty -tabs
+fi
+
+# output contents of the initialization file, if present
+cat -s "`tput if`"
+
+# output the is3 initialization string
+tput is3

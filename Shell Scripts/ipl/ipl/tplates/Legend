@@ -1,0 +1,80 @@
+===========
+Proc Legend
+===========
+
+The following is an alphabetical list of the Legend parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+------------------------------------------------------------------
+Backshade:	color 				: 		
+  This allows a shade (usually white or light gray) to be 
+  specified for the legend background. 
+------------------------------------------------------------------
+Corner: 	{A,B,C,D}			: A		
+  Allows placement of legend assembly in one of the corners of
+  the graphic area.  A is upper-left, B upper-right, C lower-right,
+  and D lower-left.  Legend can also be placed using Location
+  parameter.
+------------------------------------------------------------------
+Entry:		text (M)			: 	       **
+  Text for legend entries, one per line 
+------------------------------------------------------------------
+Entry.size:	charsize			: 7		
+  Char size for legend entries
+------------------------------------------------------------------
+Entry.font:	font				: 		
+  Font for legend entries.
+------------------------------------------------------------------
+Linetype:	number (list10)			: 		
+  Line dash type.  One should be specified for each legend entry.
+------------------------------------------------------------------
+Linetype.magnify: number (list10)	: 3 3 3 3 3 3 3 3 3 3   
+  Mag. factor for dash pattern.  One should be specified for each
+  legend entry.
+------------------------------------------------------------------
+Linethick:	number (list10)		: 1 1 1 1 1 1 1 1 1 1   
+  Thickness of line.  One should be specified for each legend
+  entry.
+------------------------------------------------------------------
+Mark:		list (list10)			:		
+  Marks for legend entries (symNS or chars).  One should be
+  specified for each legend entry.
+------------------------------------------------------------------
+Mark.font:	font (list10)			: 		
+  Font(s) for marks.  One should be specified for each legend
+  entry, if they are to be different.  Otherwise, just one can
+  be specified.
+------------------------------------------------------------------
+Mark.size:	charsize			: 7		
+  Size for marks in points.
+------------------------------------------------------------------
+Location:	coordpair			:		
+  Location for upperleft of legend.  Can be in either absolute
+  or data units (see Location.system).
+------------------------------------------------------------------
+Location.system: {absolute,data}		: absolute	
+  Specifies which coordinate system should be used for Location.
+------------------------------------------------------------------
+Outlinebars:	{y,n}				: n		
+  To save a set of parms for cloning
+------------------------------------------------------------------
+Shade:		color (list10)			:		
+  If doing a legend for some type of bar graph, each entry should
+  have a shading value given here.
+------------------------------------------------------------------
+Title:		text				:		
+  Legend title text, which will be centered over the legend.
+------------------------------------------------------------------
+Title.size:	charsize			: 10		
+  Char size for legend title.
+------------------------------------------------------------------
+#
+# Produces a legend.  For lineplots, lines are usually shown, and
+# parameters such as Linetype should be specified.  For bargraphs,
+# little shaded squares are shown, and Shade should be specified.
+# For 2-way distributions, marks are usually shown, and Mark
+# should be specified.  Mark and Linetype can be combined.  Shaded
+# squares, lines, and marks can not be intermixed on different
+# lines.  Currently there is a maximum of 10 entries.

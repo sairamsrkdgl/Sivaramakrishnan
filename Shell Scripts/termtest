@@ -1,0 +1,21 @@
+#! /bin/sh
+#
+###	termtest - test terminal with repeated rows of characters or blanks
+###	Usage: termtest [b]
+##
+##	termtest PRINTS REPEATED ROWS OF CHARACTERS.  IT'S A GOOD
+##	WAY TO TEST FOR DATA ERRORS.  TO END termtest, USE CONTROL-C.
+##
+##	FOR A 79-CHARACTER LINE OF CHARACTERS, ASCII 050 TO 156 (OCTAL),
+##		% termtest
+##	FOR A BLANK SCREEN WITH AN ASTERISK IN THE 77th COLUMN,
+##		% termtest -b
+
+# USE yes PROGRAM TO PRINT CHARACTER STRINGS FOREVER:
+case "$1" in
+"")	exec yes '()*+,-./ 01234567 89:;<=>? @ABCDEFG HIJKLMNO PQRSTUVW XYZ[\]^_ `abcdefg hijklmn' ;;
+-b)	exec yes '                                                                            *' ;;
+*)	echo "Usage: `basename $0` [-b]" 1>&2
+	exit 1
+	;;
+esac

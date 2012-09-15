@@ -1,0 +1,42 @@
+============
+Proc Boxplot
+============
+
+The following is an alphabetical list of the Boxplot parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+-------------------------------------------------------------------
+Datarow:	number  			: 1		
+  The row in the# data that contains the required 6 values.
+-------------------------------------------------------------------
+Ends:		{y,n}				: y		
+  Draws little cross-bars on the ends.
+-------------------------------------------------------------------
+Fields:		dfield (list6) (M)		: 		
+  The 6 data fields (see below).
+-------------------------------------------------------------------
+Label.size:	charsize			: 7		
+  Size of N label in points.
+-------------------------------------------------------------------
+Linethick:	0 to 5				: 1		
+  Thickness of boxplot line.
+-------------------------------------------------------------------
+Printn:		{y,n}				: y		
+  Prints an N=... string at the bottom.
+-------------------------------------------------------------------
+Width:		number				: 0.5		
+  Width of box, in data units.
+-------------------------------------------------------------------
+Xloc:		number				: 0.5		
+  Where box will be centered in x, in data units.
+-------------------------------------------------------------------
+#
+# Produces the Tukey box distribution representations.  Six data fields 
+# must be specified, holding the values for N, the 5th percentile, the 
+# 25th percentile, the 50th percentile, the 75th percentile, and the 
+# 95th percentile, respectively.  These must be computed beforehand.  
+# See also Proc Rangebar, which supercedes Boxplot.
+
+

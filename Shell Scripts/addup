@@ -1,0 +1,29 @@
+#! /bin/sh
+#
+###	addup - add up all numbers in a certain column of file(s) or stdin
+###	Usage: addup colnum [files]
+##
+##	WHEN I HAVE A FILE LIKE THIS:
+##	sleep            tcomm    __         0.08 secs Thu Mar 27 10:23
+##	date             tcomm    __         0.08 secs Thu Mar 27 10:23
+##	tail             tcomm    __         0.09 secs Thu Mar 27 10:23
+##	pwho             tcomm    __         0.30 secs Thu Mar 27 10:23
+##		...
+##	I OFTEN WANT A TOTAL OF THE ENTRIES IN ONE OF THE COLUMNS.
+##	WITH THIS FILE, I MIGHT WANT A TOTAL OF ALL ENTRIES IN COLUMN 4.
+##
+##	IT'S EASY TO WRITE A LITTLE awk PROGRAM TO DO IT, BUT I DO IT
+##	SO OFTEN THAT I PUT THE awk PROGRAM HERE.
+##
+##	THE FIRST ARGUMENT SHOULD BE THE COLUMN NUMBER TO SUM.
+
+# GRAB colnum
+case "$1" in
+[1-9]*) colnum="$1"; shift;;
+*) echo "Usage: `basename $0` colnum [files]" 1>&2; exit 1;;
+esac
+
+# Use integer output, but switch to %.4f format if "." in input.
+# Get filenames from ${1+"$@"} (work around problems on old shells):
+awk '{sum += $col}
+END {print sum}' col=$colnum OFMT='%.4f' ${1+"$@"}

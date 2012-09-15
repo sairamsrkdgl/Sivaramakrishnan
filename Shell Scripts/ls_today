@@ -1,0 +1,12 @@
+#!/bin/sh
+# ls_today - find files you've made changes to (or created) today.
+
+# Store today's date in the shell's command line parameters.
+set `date`
+
+# Pipe the output of ls -l to an awk script.  In the awk script, put
+# the month into the string variable m, and the date into the integer
+# variable d.  Print any line where the two dates match.
+ls -l |
+awk "BEGIN { m = \"$2\"; d = $3 }
+\$5 == m && \$6 == d && \$7 ~ /:/ {print}"

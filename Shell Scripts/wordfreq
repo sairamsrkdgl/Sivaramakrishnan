@@ -1,0 +1,38 @@
+#! /bin/sh
+###	wordfreq - count number of occurrences of each word in input
+###	Usage: wordfreq [-i] [files]
+#
+# ** CONFIGURATION NOTE **: See comments above second "tr" command below
+#
+##	wordfreq counts the number of occurrences of each word in its input.
+##	If you give it files, it reads from them; otherwise it reads stdin.
+##	The -i option folds upper case into lower case (capitalized letters
+##	will count the same as lower-case).
+#
+# Adapted from "concordance", which Carl Brandauer posted to USENET.
+
+# Different versions are a pain... :-(
+case "$1" in
+-i)	shift
+	tr1="[a-z]"
+	tr2bsd="a-z'" tr2sys5="[a-z]'"
+	;;
+*)	# no case conversion
+	tr1="[A-Z]"
+	tr2bsd="A-Za-z'" tr2sys5="[A-Z][a-z]'"
+	;;
+esac
+
+cat ${1+"$@"} |			# Work around problem with "$@" in some shells
+tr "[A-Z]" "$tr1" |		# Convert upper case to lower if -i option
+#
+# NOTE: If you use Berkeley tr(1), comment out the second tr command and
+# uncomment the first tr command:
+#
+#tr -cs "$tr2bsd" "\012" |
+tr -cs "$tr2sys5" "[\012*]" |	# Replace all characters not a-z or ' with
+				# a new line. i.e. one word per line
+sort |				# uniq expects sorted input
+uniq -c |			# Count the number of times each word appears
+sort +0nr +1d			# Sort first from most to least frequent,
+				# then alphabetically

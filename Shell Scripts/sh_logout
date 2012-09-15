@@ -1,0 +1,29 @@
+# IF YOU USE bash, COPY THIS FILE INTO $HOME/.bash_logout .
+# FOR OTHER SHELLS WITHOUT A LOGOUT FILE, PUT THIS INTO $HOME/.sh_logout
+# AND ADD THE FOLLOWING LINE TO YOUR .profile:
+#     trap '. $HOME/.sh_logout; exit' 0
+
+# CLEAN FILES (IF ANY) OUT OF /tmp
+
+# look for temporary files
+tmpf="`ls -d $tf-* $TF-* 2>&1 | grep -v ' not found'`"
+
+# If any exist, echo their names, and ask for confirmation to delete them.
+if [ -n "$tmpf" ]
+then
+	# Some shells close standard input during logout.
+	# If your shell doesn't give you a chance to answer the prompt
+	# below, uncomment this "exec" command and the second one below:
+	#exec < /dev/tty
+
+	echo; echo "Your files in /tmp:"
+	ls -d $tmpf
+	echo "'rm -rf' them? [ny](n) \c"
+	read ans
+	case "$ans" in
+	y*) rm -rf $tmpf ;;
+	esac
+
+	# Close standard input (see comment above):
+	#exec <&-
+fi

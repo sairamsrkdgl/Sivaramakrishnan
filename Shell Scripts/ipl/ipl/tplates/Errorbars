@@ -1,0 +1,37 @@
+==============
+Proc Errorbars
+==============
+
+The following is an alphabetical list of the Errorbars parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+-----------------------------------------------------------------
+Double:		{y,n}				: y		
+: display 2 times the error amount?
+-----------------------------------------------------------------
+Errfield:	dfield (M)			:		
+: field containing error amount in y
+-----------------------------------------------------------------
+Linethick:	0 to 10				: 0.3		
+: line thickness for error bars
+-----------------------------------------------------------------
+Offset:		-1 to 1				: 0		
+: amount of offset in X, in inches
+-----------------------------------------------------------------
+Taillen:	0 to 1				: 0.04		
+: width of tails at the end of the bars
+-----------------------------------------------------------------
+Xfield:		dfield (M)			:		
+: field containing point x location
+-----------------------------------------------------------------
+Yfield:		dfield (M)			:		
+: field containing point y location
+-----------------------------------------------------------------
+#
+#  Errorbars produces bars around a point, given the (x,y) location 
+# of a point, as well as the error amount.  These come from the data,
+# in fields specified in the parameters Xfield, Yfield, and Errfieldm
+# respectively.  Offset can be used if multiple curves are close
+# together.

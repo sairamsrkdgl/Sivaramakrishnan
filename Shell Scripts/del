@@ -1,0 +1,21 @@
+#!/bin/sh 
+#
+# del - Asks if you would like to delete each file if there are three
+# files or less specified.  For more than three files, it displays
+# them and asks you once if you wish to delete them all:
+
+case $# in
+0)     echo "`basename $0`: you didn't say which file(s) to delete"; exit 1;;
+
+# If we're deleting only 1, 2, or 3 files, confirm for each one.
+[123]) /bin/rm -i "$@" ;;
+
+# If we're deleting more then 3 files, echo them all, and confirm once.
+*)     echo "$*"
+       echo do you want to delete these files\?
+       read a
+       case "$a" in
+       [yY]*) /bin/rm "$@" ;;
+       esac
+       ;;
+esac

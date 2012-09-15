@@ -1,0 +1,1051 @@
+# This is a shell archive.  Remove anything before this line, then
+# unpack it by saving it in a file and typing "sh file".  (Files
+# unpacked will be owned by you and have default permissions.)
+#
+# This archive contains:
+# makefile i.h ilib.h iblank.c iego.c ierror.c illistn.c imode.c iread.c twin.c
+
+echo x - makefile
+cat > "makefile" << '//E*O*F makefile//'
+#
+CC=/bin/cc
+
+# PC6300+ SysV
+# CFLAGS=-O -DREALUNIX -DPLUS6300
+# LIBS=-lcurses
+
+# generic BSD
+CFLAGS=-O
+LIBS=-lcurses -ltermcap
+
+#.SILENT:
+
+IFILES= iblank.o iego.o ierror.o illistn.o imode.o iread.o
+
+twin: twin.o ${IFILES}
+	$(CC) -o $@ twin.o ${IFILES} ${LIBS}
+
+twin.o: ilib.h
+${IFILES}: i.h
+//E*O*F makefile//
+
+echo x - i.h
+cat > "i.h" << '//E*O*F i.h//'
+/* i.h */
+/**************************************
+* local include file for ilib functions
+* Istvan Mohos, 1987
+**************************************/
+
+#ifdef pyr
+#include <sys/time.h>
+#else
+#include <time.h>
+#endif
+
+#include <stdio.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#ifndef X_OK
+#    ifdef REALUNIX
+#        define F_OK 0
+#        define X_OK 1
+#        define W_OK 2
+#        define R_OK 4
+#        include <fcntl.h>
+#    else
+#        include <sys/file.h>
+#    endif
+#endif
+
+#define MAXSTR       1892
+#define BIGBUFSIZ    4096
+#define SHORTSTR     256
+#define IFOURK       4096
+#define ITWOK        2048
+#define IONEK        1024
+#define IHALFK       512
+#define IQUARTK      256
+#define BADCHARP(p)  ((p) == (char *)NULL || *(p) == '\0')
+#define NULCHARP(p)  ((p) == (char *)NULL)
+#define WHITE(c)     ((c) < 33)
+#define BLACK(c)     ((c) > 32)
+#define SMALL(c)     ((c) < 32)
+
+#define INITOKF      1    /* setup forward parsing */
+#define INITOKR     -1    /* setup reverse parsing */
+#define ITOKF        2    /* forward parse */
+#define ITOKR       -2    /* reverse parse */
+
+int  fstat();
+int  stat();
+char *malloc();
+char *calloc();
+long lseek();
+long time();
+
+struct tm *_igetdate();
+
+char *ctime();
+char *iwhich();
+char *getenv();
+char *ilast();
+char *ianytok();
+char *ialntok();
+char *ictok();
+int  ierror();
+int  ifamily();
+int  ilongest();
+int  itexrect();
+int  iread();
+
+extern int errno, sys_nerr;
+extern char *sys_errlist[];
+
+#ifndef IAMIERROR
+extern char ierbuf[];
+extern int  ierflag;
+#endif
+//E*O*F i.h//
+
+echo x - ilib.h
+cat > "ilib.h" << '//E*O*F ilib.h//'
+/* ilib.h */
+/*********************************************************************
+ This is the client's #include file for accessing functions in ilib.a
+ Istvan Mohos, 1987
+**********************************************************************/
+
+/* functions archived in ilib.a: */
+char * ialntok();
+char * ianytok();
+int    ibcmp();
+void   ibcopy();
+void   iblank();
+int    ibreakl();
+char * ictok();
+char * icopy();
+int    icount();
+void   icue();
+int    idamage();
+char * idate();
+void   idump();
+int    iego();
+int    ierror();
+int    iexpect();
+int    ifamily();
+int    ifilter();
+int    igroup();
+int    ihash();
+int    ihasharg();
+char * ihms();
+int    iinput();
+char * ilast();
+int    iline();
+int    ilist();
+int    ilistn();
+int    illistn();
+int    ilongest();
+int    ilower();
+char * imatch();
+int    imode();
+int    imonth();
+int    imung();
+int    inest();
+char * inl();
+char * inull();
+int    inumsearch();
+void   inumsort();
+int    inumstrcmp();
+char * inextl();
+int    iopt();
+int    iread();
+int    irotate();
+int    iround();
+int    isearch();
+void   isort();
+char * istartl();
+int    istripcom();
+int    istripdq();
+int    istripsq();
+int    istripstr();
+int    itexrect();
+int    itoday();
+int    itohour();
+int    itok();
+int    itomin();
+int    itomonth();
+int    itosec();
+int    itoyear();
+int    itran();
+void   itwin();
+int    iuniq();
+int    iuniqa();
+int    iupper();
+char * iwhich();
+int    iwrite();
+int    iwritopn();
+char * ixmatch();
+int    ixmung();
+int    ixsearch();
+
+char * malloc();
+char * calloc();
+long   lseek();
+
+#include <stdio.h>
+#ifndef X_OK
+#    ifdef REALUNIX
+#        define F_OK 0
+#        define X_OK 1
+#        define W_OK 2
+#        define R_OK 4
+#        include <fcntl.h>
+#    else
+#        include <sys/file.h>
+#    endif
+#endif
+
+extern char ierbuf[];
+extern int  ierflag;
+
+#define INITOKF       1    /* setup forward parsing */
+#define INITOKR      -1    /* setup reverse parsing */
+#define ITOKF         2    /* forward parse */
+#define ITOKR        -2    /* reverse parse */
+
+#define DOUNCOUN(x,y) (y) = (x); --(y) >= 0
+#define BADCHARP(p)   ((p) == (char *)NULL || *(p) == '\0')
+#define NULCHARP(p)   ((p) == (char *)NULL)
+#define ZPT           (char *)NULL
+
+#define IANYTOK       0
+#define IALNTOK       1
+#define ICTOK         2
+
+#define SPACE_LINE   -1
+#define LINE_ONLY     0
+#define LINE_SPACE    1
+
+#define IROTR         1 /* rotate 90 deg. to right */
+#define IROTL        -1 /* rotate 90 deg. to left */
+#define IROTOR        3 /* rotate 180 deg. over and 90 deg. to right */
+#define IROTOL       -3 /* rotate 180 deg. over and 90 deg. to left */
+
+#define SHORTMO       0 /* idate format: Jun 23 1988 */
+#define SHORTUPMO     1 /* idate format: JUN 23 1988 */
+#define LONGMO        2 /* idate format: June 23, 1988 */
+#define LONGUPMO      3 /* idate format: JUNE 23, 1988 */
+
+#define WHITE(c)      ((c) < 33)
+#define BLACK(c)      ((c) > 32)
+#define TONEXWHITE(p) while (*(p) && (*(p)>32)) (p)++
+#define TONEXBLACK(p) while (*(p) && (*(p)<33)) (p)++
+
+#define IFOURK        4096
+#define ITWOK         2048
+#define IONEK         1024
+#define IHALFK        512
+#define IQUARTK       256
+//E*O*F ilib.h//
+
+echo x - iblank.c
+cat > "iblank.c" << '//E*O*F iblank.c//'
+/* iblank.c */
+/********************************************
+* clear with spaces between boundaries
+* Istvan Mohos, 1987 --- in the Public Domain
+********************************************/
+
+#include "i.h"
+
+void
+iblank (start, end)
+register char *start, *end;
+{
+    register char *off;
+
+    /* end is one byte past the rightmost byte cleared */
+    for(off = start; off < end; *off++ = ' ');
+}
+//E*O*F iblank.c//
+
+echo x - iego.c
+cat > "iego.c" << '//E*O*F iego.c//'
+/* iego.c */
+/*******************************************************
+* return file name in buf without path or .ext component
+* Istvan Mohos, 1987 --- in the Public Domain
+*******************************************************/
+
+#include "i.h"
+
+int
+iego (ptr, wbuf, delim, ext)
+char *ptr, *wbuf, delim, ext;
+{
+    char *fr, *to, *mark;
+
+    if (BADCHARP(ptr))
+        return (ierror ("iego: invalid name pointer"));
+    if (delim == 0)
+        delim = '/';
+
+    to = wbuf;
+    *to = '\0';
+    for (fr = ptr; *fr++;);
+    for (--fr; --fr > ptr;) {
+        if (*fr == delim) {
+            ++fr;
+            break;
+        }
+    }
+    if (*fr == delim)
+        ++fr;
+    
+    if (ext == 0)
+        for (mark = ptr; mark < fr; *to++ = *mark++);
+    else
+        for (;*fr && *fr != ext;)
+            *to++ = *fr++;
+    *to = '\0';
+
+    return (strlen (wbuf));
+}
+//E*O*F iego.c//
+
+echo x - ierror.c
+cat > "ierror.c" << '//E*O*F ierror.c//'
+/* ierror.c */
+/****************************************
+* report error via "ierbuf" and "ierflag"
+* Istvan Mohos, 1987 --- in the Public Domain
+****************************************/
+
+#define IAMIERROR
+#include "i.h"
+
+char ierbuf[IHALFK];
+int  ierflag;
+
+int
+ierror (ustr)
+char *ustr;
+{
+    if (errno > 0 && errno < sys_nerr) { /* system error */
+        ierflag = -errno;
+        if (NULCHARP (ustr))
+            strcpy(ierbuf, sys_errlist[errno]);
+        else
+            sprintf(ierbuf, "%s --- %.*s", sys_errlist[errno],
+                IHALFK - strlen (sys_errlist[errno]) - 6, ustr);
+        errno = 0;
+        return (ierflag);
+    }
+
+    ierflag = -sys_nerr; /* user error */
+    if (NULCHARP (ustr))
+        strcpy (ierbuf, "Error");
+    else
+        strncpy (ierbuf, ustr, IHALFK-1);
+    errno = 0;
+    return (ierflag);
+}
+//E*O*F ierror.c//
+
+echo x - illistn.c
+cat > "illistn.c" << '//E*O*F illistn.c//'
+/* illistn.c */
+/********************************************************************
+*    Function      : create array of pointers to lines in buffer
+*    Author        : Istvan Mohos, 1987 --- in the Public Domain
+*********************************************************************/
+
+#include "i.h"
+
+int
+illistn(start, end, ptrlist)
+register char *start;
+register char *end;
+char **ptrlist;
+{
+    register int ri;
+    register char *rp;
+    char *savp, **work;
+
+    *(end -1) = '\n'; /* just in case */
+    for (ri = 0, rp = end; --rp >= start;)
+        if (*rp == '\n')
+            ++ri;
+
+    if (NULCHARP(savp=malloc((unsigned int)(ri*sizeof(char *)))))
+        return(ierror("illistn: can't allocate pointer array"));
+
+    /* start one character to left of last byte in buffer */
+    *(end -1) = 0;
+    for (work=(char **)savp+ri, rp=end-1; --rp >= start;)
+        if (*rp == '\n')
+            *rp = 0, *--work = rp+1;
+
+    /* rp == start-1 */
+    *--work = ++rp;
+
+    *ptrlist = savp;
+    return(ri);
+}
+//E*O*F illistn.c//
+
+echo x - imode.c
+cat > "imode.c" << '//E*O*F imode.c//'
+/* imode.c */
+/********************************************************************
+*    Function      : give file name and permission; return true or false
+*    Author        : Istvan Mohos, 1987 --- in the Public Domain
+*********************************************************************/
+
+#include "i.h"
+
+int
+imode(fname, perm)
+char *fname, *perm;
+{
+    struct stat sbuf;
+    int realmode;
+    int pval = 0;
+    int mult = 1;
+    register char *pp;
+
+    if (BADCHARP(fname))
+        return(ierror("imode: invalid file name"));
+    if (BADCHARP(perm))
+        return(ierror("imode: invalid permission string"));
+
+    for (pp = perm; *pp++;);
+    for (--pp; --pp >= perm; mult <<= 3) {
+        switch(*pp) {
+        default:
+            return(ierror("imode: invalid permission string"));
+        case 48:
+            break;
+        case 49:
+        case 50:
+        case 51:
+        case 52:
+        case 53:
+        case 54:
+        case 55:
+            pval += (*pp - '0') * mult;
+            break;
+        }
+    }
+    if (!pval | pval > 0xffff)
+        return(ierror("imode: invalid permission value"));
+    if (stat(fname, &sbuf) == -1)
+        return(ierror("imode: stat"));
+
+    realmode = (int)sbuf.st_mode;
+    if ((realmode & pval) == pval)
+        return(1);  /* TRUE; perm OK */
+
+    return(0); /* FALSE; perm mismatch */
+}
+//E*O*F imode.c//
+
+echo x - iread.c
+cat > "iread.c" << '//E*O*F iread.c//'
+/* iread.c */
+/*************************************************
+* read file into malloc'd buffer, return file size
+* Istvan Mohos, 1987 --- in the Public Domain
+**************************************************/
+
+#include "i.h"
+
+int
+iread (fname, mallocp)
+char *fname;
+char **mallocp;
+{
+    struct stat sbuf;
+    int checkval, fd;
+    int count;
+
+    if (BADCHARP (fname))
+        return (ierror ("iread: invalid file name"));
+
+    if (mallocp == (char **) NULL) {
+        if (access (fname, R_OK) == -1)
+            return (-1); /* can't read it */
+        return (0);
+    }
+
+    if ((fd = open (fname, 0)) == -1)
+        return (ierror ("iread: no file access"));
+        
+    if ((checkval = fstat (fd, &sbuf)) == -1)
+        return (ierror ("iread: fstat read error"));
+
+    if ((count = (int)sbuf.st_size) == 0)
+        return (ierror ("iread: zero length file"));
+
+    if (NULCHARP (*mallocp = malloc ((unsigned int) count+1)))
+        return (ierror ("iread: can't allocate read buffer"));
+
+    if ((checkval = read (fd, *mallocp, count)) != count) {
+        sprintf (ierbuf+200,
+            "iread: expected: %d, read: %d", count, checkval);
+        return (ierror (ierbuf+200));
+    }
+    close (fd);
+    *(*mallocp + count) = 0;
+    return (checkval);
+}
+//E*O*F iread.c//
+
+echo x - twin.c
+cat > "twin.c" << '//E*O*F twin.c//'
+/* twin.c */
+/* Twin Aspect Display: compare 2 files */
+/* (c) Istvan Mohos, 1988 */
+
+#define MAIN
+#include "ilib.h"
+#include <curses.h>
+#include <signal.h>
+
+#define NSTRIP       4
+#define DIVI         1
+#define SO           standout()
+#define SE           standend()
+#define HIT          1
+#define YET          0
+#define OVR          -1
+#define A            0
+#define B            1
+#define T            2
+
+char *Mesg = "Insufficient terminal capabilities. Sorry...";
+int charsA;
+int charsB;
+int Lcount = 1;
+int chindxA = 1;
+int chindxB = 1;
+int Alines;
+int Blines;
+int oldLcount = 1;
+unsigned char *bigbufA;
+unsigned char *bigbufB;
+unsigned char *Alist;
+unsigned char *Blist;
+unsigned char **Ap;
+unsigned char **Bp;
+unsigned char **Aend;
+unsigned char **Bend;
+unsigned char **oldAp;
+unsigned char **oldBp;
+unsigned char *tpA;
+unsigned char *tpB;
+
+main (argc, argv)
+int argc;
+char *argv[];
+{
+    register int ri, rj;
+    register unsigned char *pr1, *pr2;
+    int startline = 1;
+    int endline = 0;
+    int x1, x2, ver, llen, redg_x;
+    int bugs, realc, is_hope;
+    int totchars;
+    int ucount = 0;
+    int newline = 1;
+    unsigned char c, *lstart, *rstart, *bufend;
+    unsigned char buf0[512], prcount[60];
+    char *cop = "(c)mohos1988";
+    int goaway();
+
+    if (argc != 3)
+        fprintf(stderr, "Usage: %s file1 file2\n", argv[0]), exit(1);
+
+    if (imode(argv[1], "40000") == 1)
+        fprintf(stderr, "%s is a directory\n", argv[1]), exit(1);
+    strcpy(buf0, argv[2]);
+    if (imode(buf0, "40000") == 1) {
+        pr1 = buf0 + strlen(buf0);
+        *pr1++ = '/';
+        iego(argv[1], pr1, '/', '/');
+    }
+
+    if ((charsA = iread(argv[1], &bigbufA)) < 1)
+        fprintf(stderr, "%s %s \n",ierbuf, argv[1]), exit(1);
+    if ((charsB = iread(buf0, &bigbufB)) < 1)
+        fprintf(stderr, "%s %s \n",ierbuf, buf0), exit(1);
+
+    if ((Alines = illistn(bigbufA, bigbufA+charsA, &Alist)) < 1)
+        fprintf(stderr, "%s %s \n",ierbuf, argv[1]), exit(1);
+    if ((Blines = illistn(bigbufB, bigbufB+charsB, &Blist)) < 1)
+        fprintf(stderr, "%s %s \n",ierbuf, buf0), exit(1);
+
+    initscr();
+    crmode();
+    noecho();
+
+    /* God knows why I had this here originally, maybe SysV needs it:
+    nonl();
+    */
+    signal(SIGINT, goaway);
+    if ((COLS < 60) || (LINES < 20))
+        goaway();
+
+    bufend = buf0 + COLS;
+    llen = (COLS - NSTRIP - DIVI -1) / 2;
+    redg_x = NSTRIP + llen + DIVI; /* x coordinate for curses */
+    lstart = buf0 + NSTRIP;
+    rstart = buf0 + NSTRIP + llen + DIVI;
+    Mesg = "user interrupt...exiting";
+
+    ri = 2;
+    mvaddstr(ri++, 1, argv[1]);
+    sprintf(prcount, "%4d lines, %5d characters ", Alines, charsA);
+    SO, mvaddstr(ri++, 5, prcount), SE;
+    ri++;
+
+    mvaddstr(ri++, 1, buf0);
+    sprintf(prcount, "%4d lines, %5d characters ", Blines, charsB);
+    SO, mvaddstr(ri++, 5, prcount), SE;
+    ri++;
+
+    mvaddstr(1, COLS-15, cop);
+
+    mvaddstr(ri++, 1, "[N]f  left text up    N lines");
+    mvaddstr(ri++, 1, "[N]d  left text down  N lines");
+    mvaddstr(ri++, 1, "[N]k  right text up   N lines");
+    mvaddstr(ri++, 1, "[N]j  right text down N lines");
+    mvaddstr(ri++, 1, "[N]u  both texts up   N lines");
+    mvaddstr(ri++, 1, "[N]v  both texts down N lines");
+    mvaddstr(ri++, 1, "   t  back to top of files");
+    mvaddstr(ri++, 1, "   n  show next difference");
+    mvaddstr(ri++, 1, "<TAB> page backward");
+    mvaddstr(ri++, 1, "<any> page forward");
+    mvaddstr(ri++, 1, "   q  quit");
+    refresh();
+
+    Ap = oldAp = (unsigned char **)Alist;
+    Bp = oldBp = (unsigned char **)Blist;
+    Aend = (unsigned char **)Alist + Alines -1; /* last line */
+    Bend = (unsigned char **)Blist + Blines -1;
+    tpA = *Ap;
+    tpB = *Bp;
+
+    totchars = charsA + charsB;
+    c = getchar();
+
+    for (;; ucount = 0) {
+number:
+        switch(c) {
+
+            default:
+                break;
+
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                ucount *= 10;
+                ucount += (c - 48);
+                c = getchar();
+                goto number;
+                break;
+
+            case 'k': /* bring text up on the right */
+                reset();
+                if (!ucount)
+                    ucount = 1;
+                mov(B, ucount);
+                break;
+
+            case 'j': /* bring text down on the right */
+                reset();
+                if (!ucount)
+                    ucount = 1;
+                mov(B, -ucount);
+                break;
+
+            case 'f': /* bring text up on the left */
+                reset();
+                if (!ucount)
+                    ucount = 1;
+                mov(A, ucount);
+                break;
+
+            case 'd': /* bring text down on the left */
+                reset();
+                if (!ucount)
+                    ucount = 1;
+                mov(A, -ucount);
+                break;
+
+            case 'u': /* both up N lines */
+                reset();
+                if (!ucount)
+                    ucount = 1;
+                mov(T, -ucount);
+                break;
+
+            case 'v': /* both down N lines */
+                reset();
+                if (!ucount)
+                    ucount = 1;
+                mov(T, ucount);
+                break;
+
+            case '\t': /* both up one window */
+                reset();
+                ucount = endline - startline +1;
+                mov(T, -ucount);
+                break;
+
+            case 't': /* back to top */
+                Ap = (unsigned char **)Alist;
+                Lcount = 1;
+                Bp = (unsigned char **)Blist;
+                tpA = *Ap;
+                chindxA = 1;
+                tpB = *Bp;
+                chindxB = 1;
+                break;
+
+            case 'q': /* quit */
+                Mesg = "";
+                goaway();
+
+            case 'n': /* proceed to next difference */
+                while (Bp <= Bend && Ap <= Aend) {
+                    tpA = *Ap;
+                    tpB = *Bp;
+
+                    /* quick test for size of next line */
+                    if (Ap[1] - tpA != Bp[1] - tpB)
+                        goto breakout;
+                    pr1 = tpA;
+                    pr2 = tpB;
+                    for (;*pr1; pr1++, pr2++)
+                        if (*pr1 != *pr2)
+                           goto breakout;
+                    if (++Ap <= Aend)
+                        ++Lcount;
+                    ++Bp;
+                }
+                reset(); /* no change found */
+                putchar(7);
+breakout:
+                chindxA = tpA - bigbufA +1;
+                chindxB = tpB - bigbufB +1;
+                break;
+        }
+
+        if (chindxA + chindxB >= totchars) {
+            Mesg = "";
+            goaway();
+        }
+
+        oldAp = Ap;
+        oldBp = Bp;
+        oldLcount = Lcount;
+        ver = 0;  /* new page starts at line 0 */
+
+        /* process one line in each iteration of the loop */
+        startline = Lcount;
+        while (ver < LINES) {
+            iblank(buf0, bufend);
+            if (newline && chindxA < charsA) {
+
+                sprintf(buf0, "%3d ", Lcount);
+                /* last 3 digits of linenum only, plus space */
+                pr1 = buf0 + strlen(buf0) - NSTRIP;
+                pr2 = buf0;
+                for (ri = NSTRIP; --ri >= 0; *pr2++ = *pr1++);
+                newline = 0;
+            }
+            else
+                sprintf(buf0, "    ");
+
+            pr1 = lstart;
+            pr2 = rstart;
+
+            for (ri = 0; ri < llen; ri++) {
+                *pr1 = *tpA;
+                *pr2 = *tpB;
+
+                /* end of both text lines */
+                if((*tpA == '\0') && (*tpB == '\0')) {
+                    newline = 1;
+                    if ((rj = inc(A)) == YET)
+                        ++Lcount, ++Ap, ++tpA;
+                    else if (rj == OVR)
+                        *pr1 = '~';
+                    if ((rj = inc(B)) == YET)
+                        ++Bp, ++tpB;
+                    else if (rj == OVR)
+                        *pr2 = '~';
+                    break;
+                }
+
+                /* string ends on left side */
+                else if (*tpA == '\0') {
+                    /* right side done already */
+                    if (chindxB == charsB) {
+                        newline = 1;
+                        if ((rj = inc(A)) == YET)
+                            ++Lcount, ++Ap, ++tpA;
+                        else if (rj == OVR)
+                            *pr1 = '~';
+                        break;
+                    }
+                    /* leave tpA on null while incrementing tpB */
+                    else {
+                        if ((rj = inc(B)) == YET || rj == HIT)
+                           ++pr2, ++tpB;
+                        if (rj == HIT)
+                           --chindxB;
+                    }
+                }
+
+                /* string ends on right side */
+                else if (*tpB == '\0') {
+                    /* left side is done already */
+                    if (chindxA == charsA) {
+                        if ((rj = inc(B)) == YET)
+                            ++Bp, ++tpB;
+                        else if (rj == OVR)
+                            *pr2 = '~';
+                        break;
+                    }
+                    /* leave tpB on null while incrementing tpA */
+                    else {
+                        if ((rj = inc(A)) == YET || rj == HIT)
+                           ++pr1, ++tpA;
+                        if (rj == HIT)
+                           --chindxA;
+                    }
+                }
+
+                /* add character from both texts */
+                else {
+                    if ((rj = inc(A)) == YET || rj == HIT)
+                       ++pr1, ++tpA;
+                    if (rj == HIT)
+                       --chindxA;
+                    if ((rj = inc(B)) == YET || rj == HIT)
+                       ++pr2, ++tpB;
+                    if (rj == HIT)
+                       --chindxB;
+                }
+            }
+            *(buf0 + COLS) = 0;
+            mvaddstr(ver, 0, buf0);
+
+/* leave text alone: analyze display line */
+            pr1 = lstart;
+            pr2 = rstart;
+            for (bugs = 0, realc = llen, ri = 0; ri < llen; ++ri) {
+                if (WHITE(*pr1) && WHITE(*pr2))
+                    --realc;
+                if (*pr1++ != *pr2++)
+                    ++bugs;
+            }
+
+/* at least half of the printing characters match */
+            is_hope = bugs <= (realc >> 1);
+            pr1 = lstart;
+            pr2 = rstart;
+            x1 = NSTRIP;
+            x2 = redg_x;
+            for (ri = 0; ri < llen; ++ri) {
+                if ((*pr1 == *pr2) && is_hope) {
+                    if (WHITE(*pr1))
+                        *pr1 = ' ', *pr2 = ' ';
+                    mvaddch(ver, x1++, *pr1);
+                    mvaddch(ver, x2++, *pr2);
+                }
+                else {
+                    if (WHITE(*pr1))
+                        *pr1 = ' ';
+                    if (WHITE(*pr2))
+                        *pr2 = ' ';
+
+                    standout();
+                    mvaddch(ver, x1++, *pr1);
+                    mvaddch(ver, x2++, *pr2);
+                    standend();
+                }
+                ++pr1;
+                ++pr2;
+            }
+            if (chindxA <= charsA)
+                mvaddstr(ver, x1, "|");
+            else
+                mvaddstr(ver, x1, " ");
+            ++ver;
+        }
+        endline = Lcount;
+        move(LINES -1, COLS -2);
+        refresh();
+        c = getchar();
+    }
+}
+
+goaway()    /* restore terminal in case of interrupt */
+{
+    signal(SIGINT, SIG_IGN);     /* ignore 2nd interrupt */
+    mvcur(0, COLS-1, LINES-1, 0);
+    endwin();
+    printf("%s\n", Mesg);
+    exit(0);
+}
+
+reset()
+{
+    Ap = oldAp;
+    Bp = oldBp;
+    tpA = *Ap;
+    tpB = *Bp;
+    chindxA = tpA - bigbufA +1;
+    chindxB = tpB - bigbufB +1;
+    Lcount = oldLcount;
+}
+
+mov(side, ucount)
+int side;
+register int ucount;
+{
+    switch (side) {
+        case A:
+            if (ucount > 0) {
+                if ((Ap += ucount) <= Aend)
+                    Lcount += ucount;
+                else {
+                    Ap = Aend;
+                    Lcount = Alines;
+                    putchar(7);
+                }
+            }
+            else {
+                if ((Ap += ucount) >= (unsigned char **)Alist)
+                    Lcount += ucount;
+                else {
+                    Ap = (unsigned char **)Alist;
+                    Lcount = 1;
+                    putchar(7);
+                }
+            }
+            tpA = *Ap;
+            chindxA = tpA - bigbufA +1;
+            break;
+
+        case B:
+            if (ucount > 0) {
+                if ((Bp += ucount) > Bend) {
+                    Bp = Bend;
+                    putchar(7);
+                }
+            }
+            else {
+                if ((Bp += ucount) < (unsigned char **)Blist) {
+                    Bp = (unsigned char **)Blist;
+                    putchar(7);
+                }
+            }
+            tpB = *Bp;
+            chindxB = tpB - bigbufB +1;
+            break;
+
+        case T:
+        default:
+            if (ucount > 0) {
+                if (Ap + ucount > Aend || Bp + ucount > Bend) {
+                    Ap = Aend;
+                    Lcount = Alines;
+                    Bp = Bend;
+                    putchar(7);
+                }
+                else {
+                    Ap += ucount;
+                    Bp += ucount;
+                    Lcount += ucount;
+                }
+            }
+            else {
+                if (Ap + ucount < (unsigned char **)Alist ||
+                    Bp + ucount < (unsigned char **)Blist) {
+                    Ap = (unsigned char **)Alist;
+                    Lcount = 1;
+                    Bp = (unsigned char **)Blist;
+                    putchar(7);
+                }
+                else {
+                    Ap += ucount;
+                    Bp += ucount;
+                    Lcount += ucount;
+                }
+            }
+            tpA = *Ap;
+            chindxA = tpA - bigbufA +1;
+            tpB = *Bp;
+            chindxB = tpB - bigbufB +1;
+            break;
+    }
+}
+
+inc(side)
+int side;
+{
+    if (side) {
+        if (chindxB < charsB) {
+            if (++chindxB == charsB) {
+                return(HIT);
+            }
+            return(YET);
+        }
+        return(OVR);
+    }
+    else {
+        if (chindxA < charsA) {
+            if (++chindxA == charsA) {
+                return(HIT);
+            }
+            return(YET);
+        }
+        return(OVR);
+    }
+}
+
+//E*O*F twin.c//
+
+echo Possible errors detected by \'wc\' [hopefully none]:
+temp=/tmp/shar$$
+trap "rm -f $temp; exit" 0 1 2 3 15
+cat > $temp <<\!!!
+      20      38     292 makefile
+      77     204    1546 i.h
+     137     432    3154 ilib.h
+      17      56     396 iblank.c
+      40     120     860 iego.c
+      35      99     837 ierror.c
+      38     130    1011 illistn.c
+      52     152    1340 imode.c
+      47     162    1266 iread.c
+     522    1693   14771 twin.c
+     985    3086   25473 total
+!!!
+wc  makefile i.h ilib.h iblank.c iego.c ierror.c illistn.c imode.c iread.c twin.c | sed 's=[^ ]*/==' | diff -b $temp -
+exit 0
+

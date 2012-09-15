@@ -1,0 +1,67 @@
+=================
+Proc Distribution		
+=================
+
+The following is an alphabetical list of the Distribution parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+---------------------------------------------------------------------------
+Axdist:		{y,n}				: n		
+  This parameter turns on axes distributions for scatterplots.  Axes
+  distributions are little bar distributions on each of the axes.
+---------------------------------------------------------------------------
+Axdist.length: 	-2 to 2				: 0.08		
+  If Axdist is turned on, this sets length of the little bars. 
+---------------------------------------------------------------------------
+Cluster:	{y,n}				: y			**
+  If y, overlapping points are slightly offset to show duplicity.
+---------------------------------------------------------------------------
+Idfield:	dfield				:		
+  Each dot can be identified with a label from the data.  This gives 
+  the field.
+---------------------------------------------------------------------------
+Mark:		token				: sym6e		
+  Symbol code (symNS) or character(s) for dots.
+---------------------------------------------------------------------------
+Mark.field:	dfield 				: 		
+  If specified, mark is contents of this field.  This is a handy way to
+  show multi-variate distributions.
+---------------------------------------------------------------------------
+Mark.font:	font 	 			: 		
+  Font for points, if using characters.
+---------------------------------------------------------------------------
+Mark.size:	charsize			: 6		
+  Size (in points) for dots.
+---------------------------------------------------------------------------
+Shadefield:	dfield 				:		
+  It is possible to display an additional variable as dot color.  To do
+  this, specify the data field number here, and specify a scaling factor in
+  Shadescale.
+---------------------------------------------------------------------------
+Shadescale:	number				:		
+  Factor for scaling data to acceptable shade range (0..1).
+---------------------------------------------------------------------------
+Sizefield:	dfield 				:		
+  It is possible to display an additional variable as dot diameter.  To do
+  this, specify the data field number here, and specify a scaling factor in
+  Sizescale.
+---------------------------------------------------------------------------
+Sizescale:	number				: 1		
+  Factor for scaling data to acceptable size (4..20).
+---------------------------------------------------------------------------
+Xfield:		dfield (M)			: 		        **
+  X data comes from this field. 
+---------------------------------------------------------------------------
+Yfield:		dfield				: 		        **
+  Y data field.  If Yfield ommitted, a bar distribution is done.
+---------------------------------------------------------------------------
+#
+#   Produces either scatter plots (2-way) or bar distributions (1-way).
+# For scatter plots, Xfield and Yfield must be specified.  For bar distributions,
+# only Xfield needs to be specified.  If Axdist is set to y, little bar
+# distributions will be put on each axis along with the scatter plot.
+# Idfield can be used to print identifiers from the data as the scatter points.
+#   The size, color, position, and dot marker can all be controlled from
+# various data fields, allowing a number of multi-variate views.

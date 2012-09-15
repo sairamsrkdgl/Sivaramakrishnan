@@ -1,0 +1,56 @@
+==============
+Proc Vrangebar
+==============
+
+The following is an alphabetical list of the Vrangebar parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+----------------------------------------------------------------
+Ends:		{y,n}				: y		
+  Allows little cross-bars to be drawn on ends.
+----------------------------------------------------------------
+Field:		dfield (list5) (M)		: 		
+  Fields in the data containing values.  The number is
+  determined by Nval.
+----------------------------------------------------------------
+Idfield:	dfield				: 		
+  It is possible to label bars with text.  Label comes
+  from this field, if specified.
+----------------------------------------------------------------
+Label.size:	charsize			: 6		
+  Size of the label in points.
+----------------------------------------------------------------
+Label.position: number				: 1		
+  Position for N=.. label in Y data units.
+----------------------------------------------------------------
+Linethick:	0 to 5				: 1		
+  Thickness of boxplot outline.
+----------------------------------------------------------------
+Midlinewidth:	number				: 0		
+  The median line is generally the same size as the width of
+  the bar, however, by changing this parameter it can be made
+  to protrude.
+----------------------------------------------------------------
+Midlineright: 	{y,n}				: n		
+  Allows median line to protrude in one direction only.
+----------------------------------------------------------------
+Nval:		1 to 5				: 5		
+  Number of values making up the box.  See the Vrangebar
+  example.  
+----------------------------------------------------------------
+Shade:		color				: 1.0		
+  Shade for inside of bar.
+----------------------------------------------------------------
+Width:		number				: 0.3		
+  Width of bar, in data units.
+----------------------------------------------------------------
+Yfield:		dfield				: 		
+  Allows placement of bars in Y.  It is optional-- if not
+  given, Y placement is done ordinally (Y=1, Y=2, Y=3..).
+----------------------------------------------------------------
+#
+# Same as Rangebar, but sideways.
+# Produces various distribution representations in X.  Produces 
+# one rangebar for every row of data.

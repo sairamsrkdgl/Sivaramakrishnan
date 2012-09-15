@@ -1,0 +1,89 @@
+#! /bin/csh -f
+#
+###	runtime - run program repetitively and output time-usage statistics
+###	Usage: runtime -n program_name [options_and_arguments] &
+##
+##  runtime RUNS A PROGRAM, OVER AND OVER AGAIN, COLLECTING
+##  DATA ABOUT THE TIME IT TAKES TO RUN.  runtime OUTPUTS
+##  A LIST OF THE INDIVIDUAL (C-SHELL) time RESULTS FOR EACH
+##  PROGRAM EXECUTION, PLUS A TOTAL AND AVERAGE.
+##
+##  THE -n OPTION IS REQUIRED; IT'S THE NUMBER OF TIMES TO RUN THE
+##  program_name.  FOR EXAMPLE,
+##	% runtime -25 testprog
+##  WILL RUN testprog 25 TIMES.
+##
+##  IF THE STRING TO EXECUTE HAS ANY SPECIAL CHARACTERS THAT THE SHELL
+##  SHOULDN'T INTERPRET UNTIL EXECUTION, QUOTE THE STRING OR USE BACKSLASHES.
+##  NOTE THAT THE QUOTED STRING CAN'T HAVE ANY REDIRECTION IN IT; THAT'S
+##  BECAUSE runtime DOES SOME REDIRECTION OF ITS OWN.
+
+set temp=/tmp/$$RUNTIME
+set stat=1	# EXIT STATUS ON ERROR (SET TO 0 BEFORE NORMAL EXIT)
+onintr cleanup
+
+set count=`expr "$1" : '-\([0-9]*\)'`	# REMOVE LEADING DASH
+
+# TEST FOR CORRECT SYNTAX OF $1 AND CORRECT NUMBER OF ARGUMENTS:
+if ( ("$count" !~ [0-9]*) || ($#argv < 2) ) then
+	echo "Usage: `basename $0` -number_of_times command_line_to_run"
+	exit 1
+endif
+
+# BUILD TEST FILE (/tmp/$$RUNTIME1):
+echo set time >! ${temp}1
+repeat $count echo "$argv[2-] >& /dev/null" >> ${temp}1
+
+# RUN TEST FILE AND STORE RESULTS IN /tmp/$$RUNTIME2:
+set starttime=`date`
+/bin/csh -f < ${temp}1 >& ${temp}2
+set endtime=`date`
+
+# CHOP FIELDS FROM /tmp/$$RUNTIME2 AND PUT INTO /tmp/$$RUNTIME3;
+# sed DOES CHOPPING AND tr CHANGES COLON IN FIELD 3 TO A SPACE.
+# (TYPICAL LINE IN FILE 2: "0.5u 1.7s 0:04 53% 12+7k 13+17io 20pf+0w")
+# (TYPICAL LINE IN FILE 3: "0.5 1.7 0 04 12 7 13 17 20 0")
+sed -e 's/\(.*\..\)u \(.*\..\)s \(.*:.*\) .*% \(.*\)+\(.*\)k \(.*\)+\(.*\)io \(.*\)pf+\(.*\)w/\1 \2 \3 \4 \5 \6 \7 \8 \9/' \
+-e 's/:/ /g' ${temp}2 > ${temp}3
+
+# PRINT HEADER AND INDIVIDUAL RESULTS:
+cat << ENDOFTHIS
+runtime summary -- $count runs of
+   % $argv[2-]
+(working directory = $cwd)
+
+First run started at: $starttime
+Last run finished at: $endtime
+-----------------------------------------------
+
+ RUN #      ***INDIVIDUAL RESULTS***
+`cat -n ${temp}2`
+
+ENDOFTHIS
+
+# PRINT AVERAGES (AND A BLANK LINE AFTER THEM):
+awk '{																	\
+	field[1] += $1														\
+	field[2] += $2														\
+	# CONVERT SECONDS ($4) TO DECIMAL MINUTES, THEN ADD TO MINUTES ($3):\
+	field[3] += ($3 + $4/60)											\
+	# ADD $5 TO field[4], $6 TO field[5], etc...						\
+	for (i = 5; i <= 10; i++)											\
+		field[i - 1] += $i												\
+}																		\
+END {																	\
+	print "AVERAGES:"													\
+	printf "%5.2fu ", field[1]/NR										\
+	printf "%5.2fs ", field[2]/NR										\
+	temp = int(field[3]/NR)												\
+	printf "%d:%02d ", temp, (field[3]/NR - temp) * 60					\
+	printf "%d+%dk ", field[4]/NR, field[5]/NR							\
+	printf "%d+%dio ", field[6]/NR, field[7]/NR							\
+	printf "%dpf+%dw ", field[8]/NR, field[9]/NR						\
+	printf "\n\n"														\
+}' ${temp}3
+set stat=0	# IF GET HERE, WE'RE ABOUT DONE; SET STATUS FOR NORMAL EXIT
+
+cleanup:
+rm -f "$temp"{1,2,3}
+exit $stat

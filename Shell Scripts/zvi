@@ -1,0 +1,116 @@
+#! /bin/sh
+#
+###	zvi, zex, zed - gunzip file(s), edit, re-gzip
+###	Usage: zvi/zex/zed file(s)-or-file(s)[.gz]
+##
+##	THESE PROGRAMS BOTH DO THE SAME THING: UNCOMPRESS ONE OR MORE
+##	FILE(S), RUN vi, ex OR ed ON THEM, THEN RECOMPRESS THEM IN THE
+##	BACKGROUND.
+##
+##	WHEN YOU GIVE IT MORE THAN ONE FILE TO EDIT, THE PROGRAM ONLY
+##	UNCOMPRESSES THE FIRST FILE BEFORE STARTING THE EDITOR.  IT DOES THE
+##	REST IN THE BACKGROUND WHILE YOU EDIT THE FIRST FILE.
+##
+##	ALL THE FILES YOU EDIT HAVE TO BE COMPRESSED BEFORE YOU START THE
+##	PROGRAM.  BUT YOU DON'T HAVE TO TYPE THE .gz EXTENSION(S) IF YOU
+##	DON'T WANT TO.  THAT MEANS YOU CAN USE WILDCARDS OR FILENAMES:
+##		zvi *.gz
+##	YOU CAN ALSO REDIRECT INPUT TO USE AN (UNCOMPRESSED!) EDITING SCRIPT:
+##		zex aprog.c < exscr
+##
+##	WHEN YOU QUIT THE EDITOR, THE RECOMPRESSION STARTS IN THE
+##	BACKGROUND.  IF THERE ARE ANY ERRORS, THE PROGRAM WILL SEND YOU
+##	MAIL WITH A COPY OF THE ERRORS.
+
+gzip=/usr/local/bin/gzip
+fmt=/usr/ucb/fmt
+mailer=/usr/ucb/mail
+gunzip=/usr/local/bin/gunzip
+
+# UNCOMMENT THE RIGHT LINE FOR YOUR UNIX:
+# echo="echo -n" nnl= 	# BSD
+# echo=echo      nnl="\c"	# SYSV
+echo="echo -n" nnl= 	PATH=/usr/bin:$PATH; export PATH	# SunOS
+
+# SHOULD HAVE A trap THAT ASKS ABOUT RECOMPRESSING
+# AND CHECKS STATUS OF BACKGROUND gunzip JOBS.... SIGH.
+
+case "$0" in
+*zed) prog=ed  myname=zed ;;
+*zex) prog=ex  myname=zex ;;
+*zvi) prog=vi  myname=zvi ;;
+*)	echo "$0: quitting: I don't know how to run myself!" 1>&2; exit 1 ;;
+esac
+
+t=/tmp/CMPRS$$	# TEMP FILE (REMOVED BY BACKGROUND JOB AT END)
+
+# NOTE: need to understand two-word options like "-c command"
+# and pass those to the editor.
+for arg
+do
+	case "$arg" in
+	-*)	echo "$myname: I don't understand options (yet)..." 1>&2; exit 1 ;;
+	*)	# ASSUME IT'S A FILE...
+		case "$arg" in
+		*.gz) file="`expr $arg : '\(.*\).gz'`" ;;	# $arg WITHOUT THE .gz
+		*) file="$arg" ;;	# ASSUME FILE HAS A .gz EXTENSION...
+		esac
+
+		if [ ! -r "${file}.gz" ]
+		then
+			echo "$myname: can't read '${file}.gz'." 1>&2
+			$echo "Do you want to quit [yn](y)? $nnl"
+			read ans
+			case "$ans" in
+			""|[yY]*)	exit 1 ;;
+			*)	echo "$myname: I'll skip '$file.gz'..." 1>&2
+				continue	# DON'T ADD $file TO LISTS
+				;;
+			esac
+		fi
+		
+		# UNCOMPRESS FIRST FILE IN FOREGROUND (LATER, IF ALL ARGS OK):
+		case "$files" in
+		"")	fgfile="$file" ;;
+		*)	bgfiles="$bgfiles $file" ;;
+		esac
+		# $files SHOULD HOLD *UNCOMPRESSED* NAMES.
+		files="$files $file"
+	esac
+done
+
+case "$fgfile" in
+"")	echo "Usage: $myname file [files]
+	You didn't give me any file names." 1>&2
+	exit 1
+	;;
+*)	$gunzip $fgfile || {
+		echo "$myname quitting: 'gunzip $fgfile' bombed." 1>&2
+		exit 1
+	}
+	;;
+esac
+
+# IF gunzip BOMBS, WE'LL ALREADY BE IN THE EDITOR.
+# sort-of FIX: SAVE ERRORS AND SHOW THEM WHEN EDITOR EXITS.
+# IF NO $bgfiles, DON'T DO ANYTHING:
+test -n "$bgfiles" && $gunzip $bgfiles >$t 2>&1 &
+
+$prog $files
+if [ -s $t ]
+then
+	echo "$myname: 'gunzip $bgfiles' bombed:" 1>&2
+	cat $t 1>&2
+	$echo "Should I try to gzip all files [ny](n)? $nnl"
+	read ans
+	case "$ans" in
+	""|[nN]*) echo "$myname: warning: not gzipping $files" 1>&2; exit 1 ;;
+	esac
+else
+	s="$myname gzipping ERROR in `pwd`"	# MAIL MESSAGE SUBJECT
+	# USE trap TO ACT LIKE nohup WITHOUT THE nice: 
+	sh -c "trap '' 1 15; $gzip $files >$t 2>&1;
+	test -s $t && $mailer -s '$s' ${USER-$LOGNAME} <$t; rm -f $t" &
+
+	echo $myname: re-gzipping $files in the background... | $fmt 1>&2
+fi

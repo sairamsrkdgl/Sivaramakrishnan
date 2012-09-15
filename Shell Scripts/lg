@@ -1,0 +1,31 @@
+#! /bin/sh
+##	ll, lf, and lr ARE REPLACEMENTS FOR THE (4.1 BSD) ENTRY POINTS
+##	TO THOSE COMMANDS.  (ON 4.2BSD, THOSE ENTRY POINTS DON'T EXIST;
+##	SO, I WROTE THIS SHELL SCRIPT.)  THE lg COMMAND DIDN'T EXIST ON
+##	4.1; lg DOES AN ls -lg TO SHOW BOTH FILE OWNER AND GROUP.
+##	THE lm COMMAND DIDN'T EXIST IN 4.2 OR AFTER; IT MAKES A
+##	COMMA-SEPARATED LIST OF NAMES (ON SYSTEM V, IT BREAKS NAMES ONTO
+##	LINES INSTEAD OF PRINTING ONE LONG LINE; THIS SCRIPT DOES THAT TOO).
+
+case $0 in
+*lf)	exec ls -F "$@";;
+*lg)	exec ls -lg "$@";;
+*ll)	exec ls -l "$@";;
+*lm)	ls "$@" |
+	awk '{
+		if ((length($0) + 2 + length(inline)) > 79) {
+			print inline ","
+			inline = $0
+		}
+		else if (length(inline) != 0)
+			inline = inline ", " $0
+		else # this is the first filename
+			inline = $0
+	}
+	END {
+		print inline
+	}'
+	;;
+*lr)	exec ls -lR "$@";;
+*)	echo "$0: Help!  Shouldn't get here!" 1>&2; exit 1;;
+esac

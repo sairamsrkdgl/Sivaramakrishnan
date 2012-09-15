@@ -1,0 +1,70 @@
+============
+Proc Nicetab	
+============
+
+The following is an alphabetical list of the Nicetab parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+-----------------------------------------------------------------
+Area:		token				:nicetab	
+  A pre-defined area name, (see Proc Areadef) into which the
+  table will be scaled.
+-----------------------------------------------------------------
+Area.rectangle:	2coordpair			:		
+  An alternate way of defining the area into which the table
+  will be scaled, consisting of two coord pairs containing
+  the lower-left and upper-right of the area rectangle.
+-----------------------------------------------------------------
+Body.only:	{y,n}				: n		
+  Indicates that no title present, process all as table body.
+-----------------------------------------------------------------
+Body.font:	font				:		
+  Font to be used for the body of the table.
+-----------------------------------------------------------------
+Body.size:	token				: 8		
+  Char size to be used for the body of the table.
+-----------------------------------------------------------------
+File:		token (M)			: 	      **	
+  File containing the table text.
+-----------------------------------------------------------------
+Title.font:	font				:	 	
+  Font to be used for the title matter.
+-----------------------------------------------------------------
+Title.size:	charsize			: 11		
+  Char size to be used for the title matter.
+-----------------------------------------------------------------
+#
+
+Nicetab -  Table nice-i-fier.  Takes a table made of ordinary text
+(such as program output or something composed in a text editor),
+centers it, sets it up in a nice font, and allows certain special
+effects.  Shaded blocks can be added for emphasis or to improve
+readability.  To do this, embed some of the special operators below 
+into the source table text:
+	@shadeblocks-on		start shading blocks of 3 lines
+	@shadeblocks-off	stop
+	@shade-on		start shading until turned off
+	@shade-off		turns the above off
+
+
+Nicetab uses several rules to do the conversion:  
+
+[] The title, which is handled separately, should be separated from 
+the table body (rest of the table) by two or more blank lines.  
+
+[] A series of tokens separated by ONE space are handled as one unit 
+and is called a phrase; watch out for two-space gaps (e.g. at the 
+beginning of a new sentence)-- these may cause undesired results.
+
+[] The first phrase on a line is left justified; after that, numbers 
+are right-justified.  Character strings are left-justified, except 
+in the first few lines of the table body, where they are presumed to 
+be header stubs, and centered.  
+
+[] Nicetab places phrases by scaling their row/column position to the 
+x/y graphics area, so it will tend to expand smaller tables and 
+compress larger ones.  You may want to adjust title.size and body.size 
+if things don't look right.
+

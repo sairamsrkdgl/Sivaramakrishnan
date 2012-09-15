@@ -1,0 +1,26 @@
+#! /bin/sh
+#
+###	behead - remove header line(s) from news article(s)
+###	Usage: behead [files]
+##
+##	behead REMOVES HEADER LINES FROM THE NEWS ARTICLE(S) NAMED ON THE
+##	COMMAND LINE (OR FROM THE STANDARD INPUT IF THERE ARE NO ARGUMENTS).
+##
+##	TYPICAL USE FROM rn, WHEN YOU'RE SAVING AN ARTICLE INTO A FILE:
+##		End of article 234 -- what next? [npq] | behead > ~/filename
+##	OR, FROM readnews:
+##		What now? [ynq] s- | behead > filename
+##	OR AT A SHELL PROMPT:
+##		% behead savecopy | mail freds -subject "Did you see this?"
+##
+##	TAKEN FROM USENET; WRITTEN BY ado@elsie.UUCP (Arthur David Olson),
+##	..decvax!seismo!elsie!ado    ARPA: elsie!ado@seismo.ARPA
+
+case $# in
+0)	exec sed '1,/^$/d' ;;
+*)	for i
+	do
+		sed '1,/^$/d' "$i"
+	done
+	;;
+esac

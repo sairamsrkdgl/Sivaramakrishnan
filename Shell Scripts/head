@@ -1,0 +1,47 @@
+#! /bin/sh
+# SET NUMBER OF LINES TO SHOW:
+case "$1" in
+-[0-9]*)
+    show="`expr $1 : '-\([0-9]*\)'`"
+    shift
+    ;;
+-*) echo "Usage: `basename $0` [-n] [files...]" 1>&2
+    exit 1
+    ;;
+*) show=10 ;;
+esac
+
+case $# in
+0|1)    # READ STDIN OR SINGLE FILE, NO TITLES:
+    sed -n "1,${show}p
+    ${show}q" $1
+    ;;
+*)  # STEP THROUGH FILENAMES, SHOW TITLES FIRST:
+    while :
+    do
+        case $# in
+        0) break ;;
+        esac
+
+        if [ ! -r "$1" -o ! -f "$1" ]
+        then
+            echo "`basename $0`: can't read $1... skipping..." 1>&2
+        else
+            # SHOW TITLE BEFORE FILE:
+            sed "
+            1i\\
+==> $1 <==
+            ${show}q" $1
+
+            # SHOW BLANK LINE AFTER ALL EXCEPT LAST FILE:
+            case $# in
+            1) ;;
+            *) echo ;;
+            esac
+        fi
+
+        shift
+    done
+    ;;
+esac
+exit

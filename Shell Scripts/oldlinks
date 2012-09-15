@@ -1,0 +1,7 @@
+#!/bin/sh
+###	oldlinks - print pathnames of outdated (un-connected) symbolic links
+###	Usage: oldlinks directory [directories...]
+#
+# written by Tom Christiansen
+#
+find . -type l -print | perl -nle '-e || print'

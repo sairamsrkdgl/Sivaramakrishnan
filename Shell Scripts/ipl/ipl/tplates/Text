@@ -1,0 +1,40 @@
+=========
+Proc Text
+=========
+
+The following is an alphabetical list of the Text parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+-----------------------------------------------------------------
+Direction:	0 to 359			: 0 		
+  Direction of text in degrees counterclockwise.  Remember that
+  while it will always show in Postscript, any text not in the
+  normal (0) direction will not display on Sunview.
+-----------------------------------------------------------------
+File:		token				:		
+  Text can come from a file.  This specifies the file name.
+-----------------------------------------------------------------
+Embeddedcoords: {y,n}				: n		
+  Allows each line of text to contain placement information for
+  that line.  This is done by prefixing the line a coordinates
+  pair, and setting this option.
+-----------------------------------------------------------------
+Font:		font				: 		
+  Font to use for text.
+-----------------------------------------------------------------
+Position:	coordpair 			: 		
+  Location of text.  The first line of text will begin here.
+-----------------------------------------------------------------
+Size:		charsize			: 10		
+  Char size of text.
+-----------------------------------------------------------------
+System:		{data,absolute}			: absolute	
+  Allows Position to be specified in data or absolute coordinates.
+-----------------------------------------------------------------
+Text:		text				:		
+  The text iteself, if not coming from a file.
+-----------------------------------------------------------------
+# 
+# For producing labels and blocks of text.

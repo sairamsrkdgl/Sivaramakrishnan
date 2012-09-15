@@ -1,0 +1,2166 @@
+Newsgroups: comp.sources.misc
+From: dws@cs.wisc.edu (DaviD W. Sanderson)
+Subject:  v23i102:  smiley - smiley server, version 4, Part01/01
+Message-ID: <1991Oct22.033215.1939@sparky.imd.sterling.com>
+X-Md4-Signature: 30ae782918b11808204e363618389090
+Date: Tue, 22 Oct 1991 03:32:15 GMT
+Approved: kent@sparky.imd.sterling.com
+
+Submitted-by: dws@cs.wisc.edu (DaviD W. Sanderson)
+Posting-number: Volume 23, Issue 102
+Archive-name: smiley/part01
+Environment: UNIX
+Supersedes: smiley: Volume 20, Issue 73
+
+smiley(1) is a "smiley server" I wrote for my own pleasure.
+Its list of smileys is more comprehensive than any other I have seen;
+it subsumes all the smiley lists I have ever seen posted to the net.
+
+This version has about fifty more smileys than version 3,
+(589 faces, 818 definitions) and a better README file.
+Keep those smileys coming!
+
+DaviD W. Sanderson (dws@cs.wisc.edu)
+
+#! /bin/sh
+# This is a shell archive.  Remove anything before this line, then unpack
+# it by saving it into a file and typing "sh file".  To overwrite existing
+# files, type "sh file -c".  You can also feed this as standard input via
+# unshar, or by typing "sh <file", e.g..  If this archive is complete, you
+# will see the following message at the end:
+#		"End of shell archive."
+# Contents:  README Makefile faces.in smiley.1 other.uu bsearch.c
+#   getopt.c ltoa.c smiley.c mkfaces.c patchlevel.h smiley.h
+# Wrapped by dws@margay on Wed Oct 16 14:23:54 1991
+PATH=/bin:/usr/bin:/usr/ucb ; export PATH
+if test -f 'README' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'README'\"
+else
+echo shar: Extracting \"'README'\" \(4067 characters\)
+sed "s/^X//" >'README' <<'END_OF_FILE'
+Xsmiley server, version 4
+X
+XThis version has about fifty more smileys than version 3.
+XThe file "other" is now shipped in uuencoded form since it
+Xcontains control characters for a few animated smileys.
+X
+XDESCRIPTION
+X
+Xsmiley(1) is a "smiley server" I wrote for my own pleasure.  It can
+Xexplain any smiley it knows, or print one it knows at random.  I use
+Xit to generate a random prompt when there is a status line available
+Xto hold the information I would otherwise put into my prompt.  Hence
+Xsmiley(1) does not contain the invisible smiley or any multi-line
+Xsmileys.
+X
+XThe list of smileys in faces.in is more comprehensive than I have seen
+Xanywhere else, largely because it is a superset of all the smiley lists
+XI have ever seen posted on the net.  I have lost some of the original
+Xattributions; the articles whose headers I have retained are these:
+X
+X	Message-ID: <76@icus.UUCP>
+X	Message-ID: <1990Sep11.102411.8537@diku.dk>
+X	Message-ID: <39917@cci632.UUCP>
+X	Message-ID: <1990Sep14.122955.558@diku.dk>
+X	Message-ID: <9366@uhccux.uhcc.Hawaii.Edu>
+X	Message-ID: <2005@unsvax.NEVADA.EDU>
+X	Message-ID: <1991Mar18.212208.27911@odin.corp.sgi.com>
+X
+X	From: csh068@uk.ac.cov.cck (Smiley)
+X	Message-ID: <$V5&&|$@cck.cov.ac.uk>
+X	Date: 17 Apr 91 08:45:26 GMT
+X
+X	From: raymond@cosc.canterbury.ac.nz (cantva)
+X	Message-ID: <1991May18.150401.771@csc.canterbury.ac.nz>
+X	Date: 18 May 91 03:03:59 GMT
+X
+XIn the interest of completeness and to the best of my knowledge (I
+Xstarted this collection several years ago) I have not "censored" the
+Xsmileys, so there may be smileys you find offensive.  I certainly find
+Xsome of them offensive!
+X
+XThe smileys are processed by mkfaces and deliberately embedded in the
+Xexecutable - it does not have to locate and parse an external data
+Xfile.  In order to minimize the size of the executable, smiley.c does
+Xnot use standard I/O.  I will ignore complaints about this; I do not
+Xanticipate ever using this program on a non-UNIX system.
+X
+XI happened to take the included getopt.c from the rkive sources; it was
+Xoriginally posted to comp.sources.unix in volume3.  It is preferable to
+Xthe getopt() provided on some systems as it does not use standard I/O.
+X
+XThe bsearch.c is from emx.utexas.edu:pub/mnt/src/lib/libposix, obtained
+XTue Mar 19 14:18:28 CST 1991
+X
+XTERMS
+X
+XThis package (excluding getopt.c and bsearch.c) is
+X
+X(C) Copyright 1991 by DaviD W. Sanderson.
+X
+XYou may copy it and use it for your own enjoyment.
+XYou may not represent it as your own work or sell it.
+X
+XAUTHOR
+X
+XDaviD W. Sanderson (dws@cs.wisc.edu)
+X
+XDOCUMENTATION
+X
+XThis section is mainly intended for novices (more experienced people
+Xwill already know all this).
+X
+XBesides this file, there are two sources of information about what
+Xoptions smiley(1) takes.
+X
+X1) The file smiley.1 is the nroff/troff source for the man page for
+Xsmiley(1).  The exact command to format it on your system may vary,
+Xbut will typically be something like this:
+X
+X	# format for viewing at the terminal
+X	$ nroff -man smiley.1 | more
+Xor
+X	# typeset and send to the printer named "lps1"
+X	$ ditroff -Plps1 -man smiley.1
+X
+X2) The program itself prints a help message when you give it an illegal
+Xoption.  Since it uses getopt(3) to process its options, the "-?" option
+Xis always illegal.  (All programs using getopt(3) to process their
+Xoptions really *ought* to print some sort of help message when given -?,
+Xthough not all of them do.)  For example:
+X
+X	$ smiley -?	# sh-like shells
+X	% smiley -\?	# csh-like shells force you to quote the ?
+X
+XAs it happens, the -h flag is not a legal argument to smiley(1), and
+Xrequires no quoting even in poor csh, so you can use that instead:
+X
+X	% smiley -h
+X
+XNow, since smiley(1) uses getopt(3), you can end the options with
+Xthe special option "--".  This allows you to give smileys on the
+Xcommand line that would otherwise be interpreted as options.  For
+Xexample, to get smiley(1) to explain the smiley "-=": 
+X
+X	$ smiley -=	# here "-=" is interpreted as an illegal option
+X	smiley: illegal option -- =
+X	[rest of help message deleted]
+X	$ smiley -- -=	# this works fine.
+X	-=	a doused candle (to end a flame)
+X	$
+END_OF_FILE
+if test 4067 -ne `wc -c <'README'`; then
+    echo shar: \"'README'\" unpacked with wrong size!
+fi
+# end of 'README'
+fi
+if test -f 'Makefile' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'Makefile'\"
+else
+echo shar: Extracting \"'Makefile'\" \(1205 characters\)
+sed "s/^X//" >'Makefile' <<'END_OF_FILE'
+X#-------
+X# M a k e f i l e
+X#
+X# DaviD W. Sanderson
+X#-------
+X
+X# some versions of make(1) care about this
+XSHELL	      = /bin/sh
+X
+XMISC	      = README		\
+X		Makefile	\
+X		faces.in
+X
+XMANUAL	      = smiley.1
+X
+XGEN	      = other.uu
+X
+XSOURCES	      = bsearch.c	\
+X		getopt.c	\
+X		ltoa.c		\
+X		smiley.c	\
+X		mkfaces.c
+X
+XHEADERS	      =	patchlevel.h	\
+X		smiley.h
+X
+XTARGET	      =	smiley
+X
+XOBJECTS	      =	bsearch.o	\
+X		faces.o		\
+X		getopt.o	\
+X		ltoa.o		\
+X		smiley.o
+X
+XCFLAGS	      = -O
+X
+XLDFLAGS       = -s
+X
+Xall:		$(TARGET)
+X
+X$(TARGET):	$(OBJECTS)
+X		$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJECTS)
+X
+Xsmiley.o:	smiley.c smiley.h patchlevel.h
+X		$(CC) $(CFLAGS) -c smiley.c
+X
+Xfaces.o:	faces.c smiley.h
+X		$(CC) $(CFLAGS) -c faces.c
+X
+X#OLD		./mkfaces < faces.in > faces.c
+X#		play it safe and make sure the list is sorted,
+X#		since it is searched by bsearch(3):
+Xfaces.c:	mkfaces faces.in
+X		< faces.in sort | ./mkfaces > faces.c
+X
+Xmkfaces:	mkfaces.c
+X		$(CC) $(CFLAGS) -o mkfaces mkfaces.c
+X
+Xclean:
+X		rm -f $(OBJECTS) mkfaces faces.c smiley.shar $(GEN)
+X
+Xclobber:	clean
+X		rm -f $(TARGET)
+X
+Xother.uu:	other
+X		uuencode $? < $? > $@
+X
+Xsmiley.shar:	$(MISC) $(MANUAL) $(GEN) $(SOURCES) $(HEADERS)
+X		shar $(MISC) $(MANUAL) $(GEN) $(SOURCES) $(HEADERS) > $@
+END_OF_FILE
+if test 1205 -ne `wc -c <'Makefile'`; then
+    echo shar: \"'Makefile'\" unpacked with wrong size!
+fi
+# end of 'Makefile'
+fi
+if test -f 'faces.in' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'faces.in'\"
+else
+echo shar: Extracting \"'faces.in'\" \(23975 characters\)
+sed "s/^X//" >'faces.in' <<'END_OF_FILE'
+X    :-)	Willie Shoemaker
+X -(	always should wear safety glasses, especially in the laser burn-in room [entropy@fluke.UUCP]
+X!-(	black eye
+X!-|	"I-am-a-Cylon-Centurian-with-one-red-eye-bouncing-back-and-forth." [The Grey Wolf, greywolf@unisoft.com]
+X!.'v	(profile) flat top
+X#-)	partied all night
+X#:-)	for people whose hair is in a mess, like mine [Richard Treitel, <CSL.VER.RJT at SU-SCORE>]
+X#:-)	smiley done by someone with matted hair [figmo@lll-crg.ARpA]
+X#:-o	"Oh, nooooooo!" (a la Mr. Bill) [Lynn Gold, figmo@lll-crg]
+X#:-o	smiley done by someone with matted hair
+X#:o+=	Betty Boop
+X$$	for academic jobs [Richard Treitel, <CSL.VER.RJT at SU-SCORE>]
+X$$$	for industrial jobs [Richard Treitel, <CSL.VER.RJT at SU-SCORE>]
+X$$$$	for people starting up their own company [Richard Treitel, <CSL.VER.RJT at SU-SCORE>]
+X$-)	Alex P. Keaton (from "Family Ties")
+X$-)	won big at Las Vegas
+X$-)	won the lottery
+X$-)	yuppie
+X%	for bike accidents (a bit far-fetched, I suppose) [Richard Treitel, <CSL.VER.RJT at SU-SCORE>]
+X%')	after drinking a fifth for lunch
+X%*@:-(	hung over
+X%*}	very drunk [jeanette@randvax]
+X%+{	lost a fight
+X%-(I)	laughing out loud
+X%-)	Elephant man
+X%-)	after staring at the terminal for 36 hours
+X%-)	broken glasses
+X%-)	cross-eyed
+X%-)	drunk with laughter
+X%-)	long bangs
+X%-6	braindead
+X%-<I>	drunk with laughter
+X%-\	hungover
+X%-^	Picasso
+X%-{	sad variation
+X%-|	been working all night
+X%-}	humor variation
+X%-~	Picasso
+X%\v	Picasso
+X&-|	tearful
+X&.(..	crying
+X&:-)	curly hair
+X'-)	one eyed man
+X'-)	only has a left eye, which is closed
+X'-)	wink
+X':-)	accidentally shaved off one of his eyebrows this morning
+X':-)	one eyebrow
+X'~;E	unspecified 4-legged critter
+X( o ) ( o )	hooters
+X(-)	needing a haircut
+X(-)	needs a haircut
+X(-:	Australian
+X(-:	Don Ellis from Tektronix
+X(-:	left-handed
+X(-::-)	Siamese twins
+X(-:|:-)	Siamese twins
+X(-E:	wearing bifocals [jeanette@randvax]
+X(-_-)	secret smile
+X(-o-)	Imperial Tie Fighter ("Star Wars")
+X(00)	mooning you
+X(8-)	wears glasses
+X(8-o	Mr. Bill
+X(8-{)}	glasses, moustache and a beard
+X(:  (=|	wearing a ghost costume
+X(:)-)	likes to scuba dive
+X(:)-)	scuba diving
+X(:+)	big nose
+X(:-	unsmiley frowning
+X(:-#	I am smiling and I have braces (watch out for the glare!)
+X(:-#	said something he shouldn't have
+X(:-$	ill
+X(:-&	angry
+X(:-(	frowning
+X(:-(	unsmiley frowning
+X(:-)	big-face
+X(:-)	no hair
+X(:-)	smiley big-face
+X(:-)	surprised
+X(:-)	wearing bicycle helmet
+X(:-*	kissing
+X(:-...	heart-broken
+X(:-D	blabber mouth
+X(:-I	egghead
+X(:-\	VERY sad
+X(:-{~	bearded
+X(:-|K-	formally attired
+X(:<)	blabber mouth
+X(:=)	TWO noses (?)
+X(:>-<	thief: hands up!
+X(:I	egghead
+X(:^(	broken nose
+X(@ @)	You're kidding!
+X(O--<	fishy
+X(V)=|	pacman champion
+X([(	Robocop
+X(}-8]	left-handed bearded smiley with glasses and headphones [Dave Straker, daves@hpopd.pwd.hp.com]
+X)	Cheshire cat
+X)8-)	scuba smiley big-face
+X):-(	unsmiley big-face
+X):-)	smiley big-face
+X*!#*!^*&:-)	a schizophrenic
+X**	for winter sports generally [Richard Treitel, <CSL.VER.RJT at SU-SCORE>]
+X*-(	Cyclops got poked in the eye
+X*-)	shot dead
+X*8-)	Beaker (the Muppet lab assistant) [James Cameron]
+X*:*	fuzzy
+X*:**	fuzzy with a fuzzy mustache
+X*:o)	Bozo the Clown
+X*<.'v	(profile) wearing snow cap
+X*<8-)X	party outfit with hat and bow-tie [Andrew Williams, awilliam@qucis.queensu.ca]
+X*<:-)	Santa Claus
+X*<|:-)	Santa Claus (Ho Ho Ho)
+X*<|:-))	Santa Claus
+X*L*	blotto
+X*|	for oh what a beautiful sunset [Richard Treitel, <CSL.VER.RJT at SU-SCORE>]
+X+-(:-)	Religious leader
+X+-(:-)	the Pope
+X+-:-)	priest
+X+:-)	priest
+X+:-)	smiley priest
+X+<.'v	(profile) knight
+X+<:-)	"Peace be upon you, my children..." [Ben Cranston, zben@umd2]
+X+<:-|	monk/nun
+X+<||-)	knight
+X+O:-)	the Pope
+X,-)	one eye ... and winking
+X,-)	other eyed man
+X,-}	wry and winking
+X,.'v	(profile) has short hair
+X,:-)	shaved his left eyebrow off this morning
+X-	Helen Keller
+X-  @=	messages about nuclear war
+X- -:-(	punk rocker (real punk rockers don't smile) (alternate version)
+X- -:-)	punk rocker (alternate version)
+X-)	Jose Feliciano
+X---...	SOS (variant)
+X---...---	SOS (really OSO, but retained anyway)
+X-:-(	punk rocker (real punk rockers don't smile)
+X-:-)	has mohawk
+X-:-)	punk rocker
+X-=	a doused candle (to end a flame)
+X-=#:-)	wizard
+X->-	for airline tickets going cheap [Richard Treitel, <CSL.VER.RJT at SU-SCORE>]
+X->=:-)X	Zippy the Pinhead [Dyon Anniballi, dyon@batcomputer]
+X.'!	(profile) grim
+X.'"	(profile) pursing lips
+X.'J	(profile) smiling
+X.'P	(profile) sticking tongue out
+X.'T	(profile) keeping a straight face
+X.'U	(profile) yawning
+X.'V	(profile) shouting
+X.'Y	(profile) whistling
+X.'\	(profile) frowning
+X.'r	(profile) sticking tongue out
+X.'v	(profile) talking
+X.'w	(profile) speaking with forked tongue
+X.-(	always should wear safety glasses [Terrence Mason, entropy@fluke]
+X.-)	Sammy Davis, Jr.
+X.-)	one eye
+X.-]	one eye
+X...---...	SOS
+X.\/	duck variation
+X.^v	(profile) pointy nose
+X._)	suffering from Lorentz contraction (they're coming every ten minutes now)
+X._)	suffering from Lorentz contractions
+X/8^{~	hair line, glasses, moustache, and goatee [James Revell]
+X/:-|	Mr. Spock
+X/;-)	has one big thick cockeyed eyebrow [jeanette@randvax]
+X/\	for camping and backpacking [Richard Treitel, <CSL.VER.RJT at SU-SCORE>]
+X0-(	scuba diver with a broken mask
+X0-)	Cyclops
+X0-)	arc-welder
+X0-)	scuba diver
+X0-)	smiley cyclops (scuba diver?)
+X0:-)	angel [ins_ajpo@jhunix.UUCP]
+X2B|^2B	message about Shakespeare
+X3   :-)	Bart Simpson [Liron Lightwood, r.lightwood@trl.oz.au]
+X3:*>	Rudolph the reindeer
+X3:-o	cow
+X3:[	mean pet smiley
+X3:]	pet smiley
+X3:o[	net.pets
+X4:-)	George Washington
+X5:-)	Elvis Presley
+X6\/)	elephant
+X7:)	Ronald Reagan
+X7:-)	Fred Flintstone
+X7:^]	Ronald Reagan
+X8	infinity
+X8 :-)	wizard
+X8 :-I	net.unix-wizards
+X8(:-)	Mousketeer
+X8(:-)	Walt Disney
+X8)	frog
+X8*)	glasses and a moustache [ins_ajpo@jhunix.UUCP]
+X8-#	death
+X8-)	excited
+X8-)	glasses
+X8-)	sunglasses
+X8-)	swimmer
+X8-)	wide-eyed look [figmo@lll-crg.ARpA]
+X8-*	just ate a hot pepper
+X8-O	"Omigod!!" (done after "rm -rf *" ?)
+X8-O	took too many nodoz to work on thesis
+X8-O  --*	just before doubling over with pain [David Gundlach, david@marie.stat.uga.edu]
+X8-P	reaction to College Cafeteria Coffee [The Grey Wolf, greywolf@unisoft.com]
+X8-]	"wow, maaan"
+X8-o	Mr. Bill
+X8-|	eyes wide with surprise
+X8-|	suspense
+X8:)	pig [The Grey Wolf, greywolf@unisoft.com]
+X8:-)	glasses on forehead
+X8:-)	little girl
+X8:]	gorilla
+X8=:-)	Galloping Gourmet
+X8=:-)	chef
+X8===>	dickhead
+X8P	bullfrog in mating season
+X8^	chicken [jeanette@randvax]
+X8_)	don't get your nose out of joint [Andrew Williams, awilliam@qucis.queensu.ca]
+X8b	bullfrog in mating season
+X: )	leper
+X:###)	Jimmy Durante
+X:$)	Donald Trump
+X:%)	an accountant
+X:%)%	has acne
+X:'-(	crying
+X:'-)	crying with happiness
+X:'O	Bob Hope [Charles J. Lord, cjl@ecsvax.uncecs.edu]
+X:'}	Richard Nixon [Charles J. Lord, cjl@ecsvax.uncecs.edu]
+X:(	sad
+X:)	cheshire cat smile
+X:)	happy
+X:)	midget smiley
+X:)	salamander
+X:*	kisses
+X:*)	Ed McMahon
+X:*)	drunk
+X:*)	drunk smiling face, for those of us who like get intoxicated before or while reading netnews
+X:*)	everyman
+X:*)	smile with moustache [ins_ajpo@jhunix.UUCP]
+X:+(	punched nose, hurt
+X:+)	Carl Friedrich Gauss 
+X:,(	crying
+X:-	male
+X:-	prolog programmer [Jeff Winslow, jeffw@midas.UUCP]
+X:-!	bland face
+X:-!	smiley bland face
+X:-"	heavy smoker
+X:-"	pursing lips
+X:-#	braces
+X:-#	mouth zipped
+X:-#	my lips are sealed
+X:-#	punched in the mouth
+X:-#|	bushy mustache
+X:-#|	smiley face with bushy mustache
+X:-$	mouth wired shut
+X:-$	smiley face with it's mouth wired shut
+X:-$	uncertainty
+X:-%	banker
+X:-%	bearded
+X:-%	smiley banker
+X:-%	talking out of both sides of mouth
+X:-&	tongue-tied
+X:-'	smoker
+X:-'|	has a cold
+X:-(	Drama
+X:-(	boo hoo
+X:-(	frowning
+X:-(	has read too many 'smiley' articles
+X:-(	mad
+X:-(	sad
+X:-(	sad face, 'that comment makes me sad (mad)'
+X:-(	un-smiley
+X:-(  )	You backed your car over my toe
+X:-(  :-	impotent (or let down) [David Gundlach, david@marie.stat.uga.edu]
+X:-( )	You stepped on my toe
+X:-()	I stubbed my toe
+X:-(*)	sick of netnews articles, about to vomit
+X:-(0)	yelling
+X:-(=)	big teeth
+X:-(O)	yelling
+X:-)	Comedy
+X:-)	Your basic smiley. This smiley is used to inflect a sarcastic or joking statement since we can't hear voice inflection over Unix.
+X:-)	ha ha
+X:-)	happy
+X:-)	humorous
+X:-)	smiley standard
+X:-)	smiling
+X:-)	the normal smiling face, appended to a sentence or an article means 'this is a joke' or 'this is supposed to make you laugh'
+X:-)   ,	outie belly button
+X:-)   .	innie belly button
+X:-)   8	Dolly Parton
+X:-)   <	slut
+X:-)   <  ...  :-)   <  ...  :-)   <  ...	nymphomaniac
+X:-)   >	celibate
+X:-)  -8	blue balls [David Gundlach, david@marie.stat.uga.edu]
+X:-)  -:	smiley with an erection [David Gundlach, david@marie.stat.uga.edu]
+X:-)  -^-:	in need of some corrective surgery [David Gundlach, david@marie.stat.uga.edu]
+X:-)  :-...	taking a leak [David Gundlach, david@marie.stat.uga.edu]
+X:-) )-:	masking theatrical comments
+X:-) ---	John Holmes
+X:-) ... :-( ... :-) ... :-( ...	manic depressive
+X:-) 8  -	female [David Gundlach, david@marie.stat.uga.edu]
+X:-) :-) :-)	loud guffaw
+X:-)!!!	Sam Kinnison
+X:-)'	drooling
+X:-))	double chin
+X:-)))	William Conrad
+X:-)))	very overweight
+X:-)--	98-pound weakling
+X:-)-8	big girl
+X:-)-O	smiling doctor with stethoscope
+X:-)-{8	big girl
+X:-)-}8	big girl
+X:-)8	man with bowtie
+X:-)8	well dressed
+X:-)==	Arnold Schwarzenegger
+X:-)X	wearing a bowtie
+X:-)}	has goatee/beard
+X:-)~	drooling
+X:-*	Oops!
+X:-*	Oops! (covering mouth with hand)
+X:-*	after eating something bitter or sour
+X:-,	"Hmmmm."
+X:-,	smirking
+X:--)	Jamie Farr (Klinger from M*A*S*H)
+X:------------)	big liar
+X:-/	lefty undecided smiley
+X:-/	skeptical
+X:-0	No Yelling! (Quiet Lab)
+X:-0	orator
+X:-0	smiley orator
+X:-0	user can't find shift key
+X:-1	bland face
+X:-1	smiley bland face
+X:-6	after eating something sour
+X:-6	smiley after eating something sour
+X:-7	smiley after a wry statement
+X:-7	smokes a pipe
+X:-7	talking out of side of mouth
+X:-7	wry face
+X:-8	talking out both sides of your mouth
+X:-8(	condescending stare
+X:-9	licking its lips
+X:-9	smiley licking it's lips
+X:-:	mutant
+X:-:	mutant smiley
+X:-:	toothless
+X:-<	frowning
+X:-<	moustache
+X:-<	real sad
+X:-<	real sad smiley
+X:-=)	Adolph Hitler
+X:-=)	older smiley with mustache
+X:->	biting sarcastic face
+X:->	deformed lips
+X:->	happy
+X:->	hey hey
+X:->	yet another smiley
+X:->X==|	smiley formalware [Peter da Silva, peter@ficc.ferranti.com]
+X:-?	smiley smoking a pipe
+X:-?	smoking a pipe
+X:-@	"I swear"
+X:-@	beard has permanent wave *or* was drawn by Picasso.
+X:-@	extremely angry
+X:-@	screaming
+X:-@	smiley face screaming
+X:-@	swearing
+X:-B	drooling
+X:-C	just totally unbelieving
+X:-C	really bummed out
+X:-D	big smile
+X:-D	laughing (at you!)
+X:-D	said with a smile
+X:-D	talking too much
+X:-D	wider happy face [figmo@lll-crg.ARpA]
+X:-E	bucktoothed vampire
+X:-E	has major dental problems
+X:-F	bucktoothed vampire with one tooth missing
+X:-G-	smoking cigarettes
+X:-I	hmm
+X:-I	indifferent
+X:-I	thinking
+X:-J	tongue-in-cheek comments
+X:-M	speaking no evil
+X:-O	Mr. Bill
+X:-O	Wow!
+X:-O	birth
+X:-O	ohh, big mouth, Mick Jagger
+X:-O	uh oh
+X:-O>-o	smiley American tourist (note big mouth and camera)
+X:-P	Nyahhhh!
+X:-P	has a secret to tell you
+X:-P	nyah nyah
+X:-P	sticking out tongue
+X:-P	telling secrets
+X:-P	tongue hanging out in anticipation
+X:-Q	smoker
+X:-Q~	smoking
+X:-R	has the flu
+X:-S	just made an incoherent statement
+X:-T	keeping a straight face
+X:-T	keeping a straight face (tight-lipped)
+X:-V	shouting
+X:-W	speak with forked tongue
+X:-X	A big wet kiss!
+X:-X	bow tie
+X:-X	my lips are sealed
+X:-Y	a quiet aside
+X:-[	biting criticism
+X:-[	biting criticism smiling face, ditto for criticism
+X:-[	blockhead
+X:-[	pouting
+X:-[	sarcastic
+X:-[	un-smiley blockhead
+X:-[	vampire
+X:-\	Popeye
+X:-\	undecided smiley
+X:-\  8o	after a cold shower [David Gundlach, david@marie.stat.uga.edu]
+X:-]	biting sarcasm
+X:-]	biting sarcasm smiling face, used when sarcasm is intended, since we cannot inflect our voice over the net
+X:-]	blockhead
+X:-]	sarcastic
+X:-]	smiley blockhead
+X:-`	smiley spitting out its chewing tobacco
+X:-`	spitting out chewing tobacco
+X:-a	lefty smiley touching tongue to nose
+X:-b	left-pointing tongue
+X:-b	left-pointing tongue smiley
+X:-c	bummed out
+X:-c	real unhappy
+X:-d	lefty smiley razzing you
+X:-d~	smokes heavily
+X:-e	disappointed
+X:-e	disappointed smiley
+X:-f	sticking tongue out
+X:-i	semi-smiley
+X:-j	left smiling
+X:-j	left smiling smiley
+X:-k	beats me, looks like something, tho
+X:-k	beats me, looks like something, though
+X:-l	y.a.s.
+X:-l	yet another smiley
+X:-o	"Oh, nooooooo!" (a la Mr. Bill) [figmo@lll-crg.ARpA]
+X:-o	Mr. Bill
+X:-o	Uh oh!
+X:-o	Wow!
+X:-o	shocked
+X:-o	singing national anthem
+X:-o	smiley singing national anthem
+X:-o	surprise
+X:-o	yawn
+X:-o  ^^^^:	after zipping up fly too fast [David Gundlach, david@marie.stat.uga.edu]
+X:-p	smiley sticking its tongue out (at you!)
+X:-p~	smokes heavily
+X:-q	smiley trying to touch its tongue to its nose
+X:-q	trying to touch tongue to nose
+X:-r	sticking tongue out
+X:-s	after a BIZARRE comment
+X:-s	smiley after a BIZARRE comment
+X:-t	cross smiley
+X:-v	speaking
+X:-v	talking head smiley
+X:-w	speak with forked tongue
+X:-x	"my lips are sealed"
+X:-x	"my lips are sealed" smiley
+X:-x	kiss kiss
+X:-x	not telling any secrets
+X:-y	said with a smile
+X:-z	y.a.s.
+X:-z	yet another cross smiley
+X:-{	mustache
+X:-{	smiley variation on a theme
+X:-{  -__-:	after slamming the toilet seat [David Gundlach, david@marie.stat.uga.edu]
+X:-{#}	messages teasing people about their braces
+X:-{)	moustache
+X:-{)	normal smiling face with a moustache
+X:-{}	heavy lipstick
+X:-{~	has read too many of the toilet paper articles previous to lunch
+X:-|	"have an ordinary day"
+X:-|	"have an ordinary day" smiley
+X:-|	grim
+X:-|	no expression
+X:-|	no expression face, 'that comment doesn't phase me'
+X:-| 8( )-	pregnant female [David Gundlach, david@marie.stat.uga.edu]
+X:-||	angry
+X:-}	"Thish wine tashted pretty good"
+X:-}	beard
+X:-}	lipstick
+X:-}	normal smiling face with pretty lips
+X:-}	pretty lips
+X:-}	wears lipstick or some other lip appearance improving device
+X:-}  -oo-:	taking matters into hand [David Gundlach, david@marie.stat.uga.edu]
+X:-~)	has a cold
+X:/)	not funny
+X:/7)	Cyrano de Bergerac
+X:/i	no smoking
+X:3-<	dog
+X:8)	pig
+X::-)	wears glasses
+X:<	midget unsmiley
+X:<	what pretences!
+X:<()	African tribesman
+X:<)	from an Ivy League School
+X:<)=	for those with beards too
+X:<=	walrus
+X:<|	attends an Ivy League school
+X:= |	Baboon
+X:= |	baboon
+X:=)	has two noses
+X:=8)	baboon
+X:>	hmm, let me think...
+X:>	midget smiley
+X:>)	big nose
+X:?)	philosopher
+X:@	what?
+X:@)	pig
+X:C	what?
+X:D	laughter
+X:I	Hmmm, not funny!
+X:O	yelling
+X:Q	what?
+X:Q)	John Q. Public
+X:Ui	smoking
+X:Uj	smoking (and smiling)
+X:V	woodpecker
+X:V)	woodpecker
+X:X)	hearing no evil
+X:[	real downer
+X:]	Gleep...a friendly midget smiley who will gladly be your friend
+X:^(	has had his nose put out of joint; useful for replying to flames
+X:^)	3/4 view of person with elf-type sharp nose [The Grey Wolf, greywolf@unisoft.com]
+X:^)	broken nose
+X:^)	smiley with pointy nose (righty)
+X:^D	"Great! I like it!"
+X:^{	for those with moustaches
+X:^{)>	moustache and beard
+X:_)	nose sliding off face
+X:c)	big nose variant [Po-Jen J. Yang, pyang@rice.edu]
+X:c<	big nose variant [Po-Jen J. Yang, pyang@rice.edu]
+X:n)	funny-looking right nose
+X:q	vi user saying, "How do I get out of this damn emacs editor?" [Mark Baranowski, markb@giga.slc.unisys.com]
+X:u)	funny-looking left nose
+X:v)	left-pointing broken nose
+X:v)	left-pointing nose
+X:{	oh boy, the headmaster!...
+X:}	What should we call these? (what?)
+X:~(	nose put out of joint
+X:~)	Peter Ubberoth
+X:~)	needs a nosejob
+X:~)	pointy nose (righty)
+X:~)	smiling face needs a nosejob, no explanation necessary
+X:~)	ugly nose
+X:~-(	crying
+X:~-)	so happy, s/he is crying
+X:~/	really mixed up
+X;(	crying
+X;-(	'that makes me so mad that if I ever see you I'll punch your lights out'
+X;-(	beaten up
+X;-(	crying
+X;-(	sad face gets his lights punched out
+X;-(	sad or mad and got beat up
+X;-)	a practical joker who played one too many and got beat up
+X;-)	beaten up
+X;-)	could be pirate smiling face??
+X;-)	crying with happiness
+X;-)	getting fresh
+X;-)	sardonic incredulity
+X;-)	smiling face gets his lights punched out
+X;-)	winking
+X;-)  ===8	circumcised [David Gundlach, david@marie.stat.uga.edu]
+X;-)  o===8	braggart [David Gundlach, david@marie.stat.uga.edu]
+X;-D	a friendly, winking, laughing smile [pardo@cs.washington.edu]
+X;-\	Popeye beaten up
+X;-\	Popeye gets his lights punched out
+X;-|	beaten up but silent
+X;-|	no expression face gets his lights punched out
+X;-|	says nothing but still gets beat up
+X;-}	leer? (terminal dependent)
+X;^?	punched out
+X<&&>	message concerning rubber chickens
+X<*:oDX	clown with bowtie and dunce
+X<:-(	disappointed
+X<:-(	dunce
+X<:-)	Vietnamese peasant
+X<:-)	dumb questions
+X<:-)<<|	in a space rocket
+X<:-I	dunce
+X<:-O	Eeek!
+X<:>==	a turkey emoticon
+X<:I	dunce
+X<<<<(:-)	hat salesman
+X<=	for messages about housing in the Snow Belt [Richard Treitel, <CSL.VER.RJT at SU-SCORE>]
+X<I==I)	on four wheels
+X<{:-)}	in a bottle
+X<|-(	Chinese and doesn't like these kind of jokes
+X<|-(=	Chinese and doesn't like this article
+X<|-(=	Chinese and unhappy
+X<|-)	Chinese
+X<|-)=	Chinese
+X=)	variation on a theme...
+X=):-)	Uncle Sam
+X=.'v	(profile) has mohawk
+X=0==	Mexican on a railroad!
+X=:-#}	punk rocker with a mustache
+X=:-#}	smiley punk with a mustache....
+X=:-(	punk rocker (real punk rockers don't smile)
+X=:-(	smiley punk-rocker (real punk rockers don't smile)
+X=:-)	hosehead
+X=:-)	punk rocker
+X=:-)	smiley punk-rocker
+X=:-H	football player
+X==#==	railroad crossings [Kenneth P. Brooks, <CSD.BROOKS at SU-SCORE>]
+X===:[OO']>:===	has been railroaded
+X=====:}	snake
+X=t==	Mexican run over by train
+X=|:-)	Abe Lincoln
+X=|:-)=	Abe Lincoln
+X>-	female
+X>-<	absolutely livid!!
+X>->	china man
+X>-^);>	fish
+X>:)	a little devil
+X>:*)	Bozo the Clown
+X>:-(	mad, annoyed
+X>:-(	sick and tired of reading this nonsense
+X>:-( 8  *>-	for disparaging opinions on feminists [Phil Barth, <ICL.BARTH at SU-SCORE>]
+X>:-)	devil [ins_ajpo@jhunix.UUCP]
+X>:-<	mad
+X>:->	devilish
+X>:-I	net.startrek
+X>:-b	left-pointing tongue smiley
+X>:^(	headhunter (Amazon style)
+X>;-)	devilish wink [ins_ajpo@jhunix.UUCP]
+X>;->	winky and devil combined. A very lewd remark was just made.
+X>< ><	about/to someone wearing argyle socks
+X>>-O->	General Custer
+X>>>>>:============	an asparagus [David J. Rood, rooddj@crtvax.vanderbilt.edu]
+X>[I	Television
+X>w	nose-thumbing gesture [jeffw@midas.UUCP]
+X>|(	Robocop: "Thank you for your co-operation." [Craig P McLaughlin, cpm00@duts.ccc.amdahl.com]
+X>|->	Chinese
+X?-(	about people with a black eye
+X?-(	has black eye
+X@%&$%&	You know what that means...
+X@%&$%&$\&*@%$#@	you know what that means...
+X@-(	"Ulysses!  Bring me Ulysses!" [Ben Cranston, zben@umd2]
+X@-)	Cyclops
+X@.'v	(profile) has curly hair
+X@:-)	Indian (East)
+X@:-)	wavy hair
+X@:-)	wearing a turban
+X@:I	turban
+X@=	flame about nuclear war, power or weapons follows (mushroom cloud) [figmo@lll-crg.ARpA]
+X@=	pro-nuclear war
+X@>--->----	a rose
+X@O=E<=	woman in skirt wearing turtleneck sweater [DJ Delorie, dj@ctron.com]
+X@l@	too many hours at terminal
+XB)	frog wearing sunglasses
+XB-(8	Sir Robin Day (a British BBC TV presenter, famed for his grumpy countenance, and who wears glasses and a bow tie)
+XB-)	"Let's do the beach, man!" [The Grey Wolf, greywolf@unisoft.com]
+XB-)	Batman
+XB-)	glasses
+XB-)	horn-rimmed glasses
+XB-)	horn-rims
+XB-)	sunglasses
+XB-)-[<	sunglasses and swimming trunk
+XB-D	"Serves you right, dummy!!"
+XB-|	cheap sunglasses
+XB:-)	sunglasses on head
+XB^)	hornrimmed glasses
+XC:#	football player
+XC:-)	large brain capacity
+XC=:-)	Galloping Gourmet
+XC=:-)	chef [ins_ajpo@jhunix.UUCP]
+XC=>8*)	devilish chef with glasses and a moustache [ins_ajpo@jhunix.UUCP]
+XC=}>;*{))	mega-smiley... a drunk, devilish chef with a toupee in an updraft, a mustache, and a double chin
+XC=}>;*{O)	mega-smiley... a drunk, devilish chef with a toupee in an updraft, a mustache, and a double chin
+XC|:-=	Charlie Chaplin
+XE-:-)	ham radio operator
+XE-:-I	net.ham-radio
+XEK(	Frankenstien
+XHonk!  oo---oo-Bo	semi-truck moving right [Michael Cook, mlc%gva.decnet@consrt.rockwell.com]
+XK:P	a little kid with a propeller beanie
+XL:-)	just graduated
+XM-)	sees no evil
+XM-),:X),:-M	sees no evil, hears no evil, speaks no evil
+XM:-)	saluting
+XO 8-)	the angelic halo look [Andrew Williams, awilliam@qucis.queensu.ca]
+XO :-)	an angel (at heart, at least)
+XO |-)	net.religion
+XO+	appropriate for women's messages, surely? [Richard Treitel, <CSL.VER.RJT at SU-SCORE>]
+XO-&-<	doing nothing
+XO-(==<	chastised and/or chagrined, or is merely asleep.
+XO-)	Megaton Man, on patrol! [Matthew P. Wiener, weemba@brahms.BERKELEY.EDU]
+XO-)	cyclops
+XO-)	scuba diver
+XO-G-<	pointing to self
+XO-S-<	in a hurry
+XO-Z-<	in a big hurry
+XO:-)	acting very innocent (halo)
+XO:-)	with halo
+XO>-<|=	of interest to women
+XOO	headlights on msg
+XP-)	Colonel Klink (Hogan's Heroes)
+XP-)	getting fresh
+XQ:-)	new graduate
+XR-)	broken glasses
+XX-(	just died
+XX-(	net.suicide
+X[8-{)	bearded smiley with glasses and headphones [Dave Straker, daves@hpopd.pwd.hp.com]
+X[:-)	listening to walkman
+X[:-)	wearing a walkman
+X[:-]	square head
+X[:]	robot
+X[:|]	robot (or other AI project)
+X[=	for messages about housing in Arizona [Richard Treitel, <CSL.VER.RJT at SU-SCORE>]
+X[]	hugs
+X\/\/\/\,8-O	really should fix frayed line cord on terminal
+X\:-)	french hat
+X\:^)	gumby smiley
+X\o/	PTL (praise the lord, or pass the loot?)
+X]:-)	The Devil
+X]:->	The Devil
+X^(^	happy variation
+X^)^  ^(^	two people talking
+X^L^	happy
+X^v^v^	mountains [Kenneth P. Brooks, <CSD.BROOKS at SU-SCORE>]
+X_:^)	American Indian
+X_\\//	Vulcan salute
+X__.	properly chastised and/or chagrined, or is merely asleep
+X__/~`-'~\_/	line of thought isn't quite a line
+X__Q~`__	cat
+X`:-)	shaved his right eyebrow off this morning
+Xd :-o	hats off to your great idea
+Xd.'v	(profile) wearing hard hat
+Xd8=	Your pet beaver is wearing goggles and a hard hat
+Xd:-)	baseball player
+Xg-)	wearing pince-nez glasses
+Xi-=<*** __.	CAUTION: has flame thrower and uses it!
+Xi-=<****** o-(==<	CAUTION: has flame thrower and uses it!
+Xi-=<***i	CAUTION: has flame thrower
+Xo-)	Cyclops
+Xo-<:-{{{	santa [rayan@utai.uucp]
+Xo/	raised hand
+Xo=	a burning candle (for flames)
+Xo>-<|=	of interest only to women
+Xo>8<|=	messages about interesting women
+XoF-oo---oo	semi-truck moving left [Michael Cook, mlc%gva.decnet@consrt.rockwell.com]
+Xoo	somebody's head-lights are on
+Xoo-	puzzled, confused
+Xouch... O>--<	dead driver/passenger on pavement [Michael Cook, mlc%gva.decnet@consrt.rockwell.com]
+Xpp#	cow
+Xpq`#'	bull
+Xq:-)	wearing baseball cap backwards
+X{	Alfred Hitchcock
+X{        :-)	Marge Simpson (Homer's wife) [Liron Lightwood, r.lightwood@trl.oz.au]
+X{(:-)	wearing toupee
+X{0-)	Cyclops
+X{:-)	hair parted in the middle
+X{:-)	new hair style
+X{:-)	smiley with its hair parted in the middle
+X{:-)	wearing a toupee
+X{:-{)}	new hair style, mustache and beard
+X{:\/	sounds like a duck
+X{:^=(	Adolph Hitler
+X{=	for messages about housing [Richard Treitel, <CSL.VER.RJT at SU-SCORE>]
+X{{-}}}	refugee from the '60's
+X{}	'no comment'
+X|	for bike fleet messages [Richard Treitel, <CSL.VER.RJT at SU-SCORE>]
+X|)	salamander
+X|-(	asleep with nightmares [ins_ajpo@jhunix.UUCP]
+X|-(	late at night
+X|-)	Chinese
+X|-)	Same as :-) but poster is Oriental [figmo@lll-crg.ARpA]
+X|-)	asleep (boredom)
+X|-)	hee hee
+X|-<>	kissy face
+X|-D	ho ho
+X|-I	sleeping
+X|-O	birth
+X|-O	bored
+X|-O	yawning/snoring
+X|-P	reaction to unusually ugly C code [The Grey Wolf, greywolf@unisoft.com]
+X|-P	yuk
+X|-{	"Good Grief!"  (Charlie Brown?)
+X|:-)	heavy eyebrows
+X|:-O	(no explanation given)
+X|:-|	excessively rigid
+X|:['	Groucho Marx
+X|I	asleep
+X|^o	snoring
+X||	for messages about cars or other four-wheeled vehicles [Richard Treitel, <CSL.VER.RJT at SU-SCORE>]
+X||*(	handshake offered
+X||*)	handshake accepted
+X|~(	"Someone just busted my nose".
+X}(:-(	wearing toupee in wind
+X}:-(	bull headed
+X}:-(	toupee in an updraft
+X}:-)	hair parted in the middle in an updraft
+X}:-)	wearing toupee in an updraft
+X}:-<	cat
+X}:^#})	mega-smiley: updrafted bushy-mustached pointy nosed smiley with a double-chin
+X}:~#})	mega-smiley: updrafted bushy-mustached pointy nosed smiley with a double-chin
+X}}\/=oo---oo  Crash!	semi-truck after collision [Michael Cook, mlc%gva.decnet@consrt.rockwell.com]
+X~ :-(	particularly angry
+X~'v	(profile) has long bangs
+X~:-(	net.flame
+X~=	a candle, to annotate flaming messages
+X~==	flame follows (picture of a lit match or candle) [figmo@lll-crg.ARpA]
+X~M`'~	camel
+X~~:-(	net.flame
+X~~\8-O	needs to fix frayed cord on terminal
+X~~~\8-O	zapped by frayed cord on terminal
+X~~~c___	beach [Kenneth P. Brooks, <CSD.BROOKS at SU-SCORE>]
+X~~~~8}	snake
+X~~~~~8}	snake
+END_OF_FILE
+if test 23975 -ne `wc -c <'faces.in'`; then
+    echo shar: \"'faces.in'\" unpacked with wrong size!
+fi
+# end of 'faces.in'
+fi
+if test -f 'smiley.1' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'smiley.1'\"
+else
+echo shar: Extracting \"'smiley.1'\" \(2302 characters\)
+sed "s/^X//" >'smiley.1' <<'END_OF_FILE'
+X.\"-------
+X.\" s m i l e y . 1
+X.\"
+X.\" DaviD W. Sanderson
+X.\"-------
+X.hy 0
+X.TH SMILEY 1 "April 1, 1991"
+X.SH NAME
+Xsmiley \- print or explain smileys
+X.SH SYNOPSIS
+X.B smiley
+X.RB [ \-V ]
+X.RB [ \-e ]
+X.RB [ \-l ]
+X.RB [ \-f ]
+X.RI [ smiley... ]
+X.br
+X.SH DESCRIPTION
+X.I Smiley
+Xis a program for smiley junkies
+Xwho like to have all the smileys at their fingertips.
+X.PP
+XThe options have the following meaning:
+X.TP 
+X.B \-V
+XPrint the version of the program
+Xand the number of faces and definitions.
+X.TP 
+X.B \-e
+XExplain the face found in the environment variable
+X.BR SMILEY .
+X.TP
+X.B \-l
+XPrint a listing of all the known smileys, with explanations.
+X.TP
+X.B \-f
+XPrint a random smiley, face only.
+X.TP
+X.I smiley
+XExplain the given smiley.
+X.PP
+XWhen invoked with no arguments,
+X.I smiley
+Xprints a random smiley with an explanation.
+X.SH EXAMPLE
+XHere are some
+X.IR ksh (1)
+Xfunctions that put a smiley into your prompt.
+X.TP
+X.BR ps1sed (\|)
+XTransform the standard input so that it will display properly
+Xwhen it is made part of
+X.B PS1
+Xin
+X.IR ksh .
+X(That is, quote \0!\0$\0\e\0 if they appear.)
+XThese are the transformations:
+X.sp
+X.\"	!	\(->	\e\|!\|\e\|!
+X	!	\(->	!\|!
+X.br
+X	$	\(->	\e\|$
+X.br
+X	\e	\(->	\e\|\e
+X.br
+X.IP
+XNote that a \0!\0
+Xmust be doubled instead of quoted with \0\e\0
+Xin order to display.
+X.RS
+X.nf
+X.ta .5i +\w'sed \''u
+X.sp
+X.ne 5
+Xps1sed\|(\|)
+X{
+X.\"	sed 's/!/&&/g
+X.\"#		s/\\/&&/g
+X.\"#		s/[!$]/\\&/g'
+X.\"		s/[!$\\]/\\&/g'
+X.\"
+X.\"	sed \'s/\^!/&&/g
+X.\"		s/[!$\|\e\|\e\|]/\|\e\|\e\|&/g\'
+X.\"
+X	sed \'s/\^!/&&/g
+X		s/[$\|\e\|\e\|]/\|\e\|\e\|&/g\'
+X}
+X.sp
+X.DT
+X.fi
+X.RE
+X.TP
+X.BR ps1 (\|)
+XPut a new smiley into
+X.BR PS1 .
+XUse
+X.I ps1sed
+Xto make sure
+Xany characters in the smiley
+Xthat are special to the shell
+Xare quoted appropriately.
+X.RS
+X.nf
+X.sp
+X.ne 5
+Xps1\|(\|)
+X{
+X.\"	export SMILEY="`smiley -f`"
+X.\"	PS1=`print -r - "$SMILEY" | ps1sed`" "
+X	export SMILEY="`smiley \-f\|`"
+X	PS1=`print \-r \- "$SMILEY" | ps1sed\|`" "
+X}
+X.fi
+X.RE
+X.SH CAVEATS
+XThe list of smileys is the personal collection of the author,
+Xso there are bound to be some missing.
+X.PP
+XMultiline smileys and the ``invisible smiley'' are absent from
+X.I smiley
+Xbecause the author does not want a multiline or invisible prompt.
+X.SH AUTHOR
+XDaviD W. Sanderson	(dws\|@cs.wisc.edu)
+X.SH COPYRIGHT
+X\&
+X.br
+X.if n (C)
+X.if t \s+8\v'+2p'\fB\(co\fR\v'-2p'\s0
+X\s+2Copyright 1991 by DaviD W. Sanderson\s0
+END_OF_FILE
+if test 2302 -ne `wc -c <'smiley.1'`; then
+    echo shar: \"'smiley.1'\" unpacked with wrong size!
+fi
+# end of 'smiley.1'
+fi
+if test -f 'other.uu' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'other.uu'\"
+else
+echo shar: Extracting \"'other.uu'\" \(3730 characters\)
+sed "s/^X//" >'other.uu' <<'END_OF_FILE'
+Xbegin 600 other
+XM(RTM+2TM+2T*(R!4:&5S92!A<F4@<VUI;&5Y<R!T:&%T($D@9&\@;F]T(&-O
+XM;G-I9&5R('-U:71A8FQE(&9O<B!U<V4@87,@82!P<F]M<'0N"B,@16ET:&5R
+XM('1H97D@9&]N)W0@<VAO=R!U<"!O<B!A<F4@;75L=&EL:6YE('!I8W1U<F5S
+XM("T@<W1R971C:&EN9PHC('1H92!B;W5N9&%R:65S(&]F('-M:6QE>7,N"B,*
+XM(R!$879I1"!7+B!386YD97)S;VX*(RTM+2TM+2T*"@D)"7-M:6QE>2!I;G9I
+XM<VEB;&4@;6%N"@H\7%P)"0EC870*.B`J/@H\+R\*"B,C(PD)"4)O;B!*;W9I
+XM"B,Z+2D*(R,C"@HC"0D)160@2V]C:`HZ+2D*(PH*(R,C"0D)0F]Z;R!T:&4@
+XM0VQO=VX*.F\I"B,C(PH*("!?7U\*("\@("!<"GP@4DE0('P*?%]?7U]??`D)
+XM"7)E8V5N=&QY(&1E8V5A<V5D"@H]/3T]3PI<.BTH"0D)4V-O='1I<V@@2&EG
+XM:&QA;F0@0F%G<&EP97(A(%MB:6QL0'-I9VUA+G5U8W!="@H@+PHX(%T@("`@
+XM(`D)4&EN;V-C:&EO(%MJ96%N971T94!R86YD=F%X+E550U`@*$IE86YE='1E
+XM($AA<FET86XI70H*?2X)"0EE;&5P:&%N=`H@8%P*"D,I.BU/"0D)8F%R8F5R
+XM<VAO<"!Q=6%R=&5T"D,I.BU/"D,I.BU/"D,I.BU/"@HN("X)"0EL>6EN9R!D
+XM;W=N"B!\"@I?7U]?7PD)"6-O;7!U=&5R"GQ/+4]\"GPZ.CI\"@H*/7P[*"DJ
+XM*BH\/3T]/3U\"0D\+2TM;&%U9VAI;F<@;6]N;V-L960@;6%N(&EN('1U>"!A
+XM;F0@8W5M;65R8G5N9`H)"0ES:61E=V%Y<R`M+2!T:&ES(&ES('1H92!B87-I
+XM8R!F:6=U<F4*"CU].R@I*BHJ*CP]/3T]/7P);&%U9VAI;F<@;6]N;V-L960@
+XM;6%N(&EN('1U>"!A;F0@8W5M;65R8G5N9"P*("`@("!&"0D):&]L9&EN9R!A
+XM(&=U;@H*/7T[*"DJ*BHJ/#T]/3U\"0EL875G:&EN9R!M;VYO8VQE9"!M86X@
+XM:6X@='5X(&%N9"!C=6UM97)B=6YD+`H@("`@/5T)"0EC87)R>6EN9R!B961T
+XM<F%Y('<O(&=L87-S(&]F(&UI;&L*"CU].R@I*BHJ*CQ>/3T]?`D);&%U9VEN
+XM9R!M;VYO8VQE9"!M86X@:6X@='5X(&%N9"!C=6UM97)B=6YD+`H)"0EW+R!E
+XM<F5C=&EO;@H*/7T[*"DJ*BHJ/#T]/3U\"0EL875G:&EN9R!M;VYO8VQE9"!M
+XM86X@:6X@='5X(&%N9"!C=6UM97)B=6YD+`H@("`@("!0"0D)8V%R<GEI;F<@
+XM:VQA>&]N(&]R('!O<W1H;W)N"@H@("`@("`@+U\*("`@("`O"CU]."@I*BHJ
+XM*CP]/3T]/7P);&%U9VAI;F<@;6]N;V-L960@;6%N(&EN('1U>"!A;F0@8W5M
+XM;65R8G5N9"P*("`@("!<("!?"0EA;F0@;W!E<F$@8V%P92!A;F0@;6%S:PH@
+XM("`@("`@7`H*/7T[*"DJ*BHJ/#T]/3T]?`EL875G:&EN9R!M;VYO8VQE9"!M
+XM86X@:6X@='5X(&%N9"!C=6UM97)B=6YD+`H@("`@;S`)"0EC87)R>6EN9R!A
+XM(&QA<F=E('!U9F9I;@H@("`@=@H*/7T[*"DJ*BHJ/#T]/3T]?`EL875G:&EN
+XM9R!M;VYO8VQE9"!M86X@:6X@='5X(&%N9"!C=6UM97)B=6YD+`H@("`@/"E?
+XM7U\I/2!O;V]O"6%N9"!*971S;VX@:F5T+7!A8VL*"CU].R@I*BHJ*CP]/3T]
+XM/7P);&%U9VAI;F<@;6]N;V-L960@;6%N(&EN('1U>"!A;F0@8W5M;65R8G5N
+XM9"P*("`@("`@+2T@+2`M($\)"61R;W!P:6YG(&$@8F]W;&EN9R!B86QL(&]R
+XM('!U;7!K:6X*"CU].R@I*BHJ*CP]/3T]/7P);&%U9VAI;F<@;6]N;V-L960@
+XM;6%N(&EN('1U>"!A;F0@8W5M;65R8G5N9"P*("`@("`@("`@("`@("`];PEA
+XM;F0@<&5T(')A8F)I="P@;F]T:6-E86)L>2!F871I9W5E9`H)("`@("`@($<*
+XM"B`@=@H@('P*/7T[*"DJ*BHJ/#T]/3T]?`EL875G:&EN9R!M;VYO8VQE9"!M
+XM86X@:6X@='5X(&%N9"!C=6UM97)B=6YD+`H@('P)"0EA;F0@=6YU<W5A;&QY
+XM(&QO;F<@4W1E=F4@36%R=&EN"B`@5@D)"6%R<F]W+71H<F]U9V@M:&5A9"!T
+XM<FEC:PH*5&AE<V4@87)E(&%N:6UA=&5D('-M:6QE>7,L(&EN=&5N9&5D(&9O
+XM<B!V:65W:6YG(&]N(&QO=RUS<&5E9"!T97)M:6YA;',N"@I&<F]M.B!#:'5C
+XM:R!';W1L:65B(#Q)0TPN1T]43$E%0B!A="!352U30T]213X*"F9O<B!C=71E
+XM(&1E;G1A;"!A<W-I<W1A;G1S+V1E;G1I<W1S(&UE<W-A9V5S.@H*("`@("`Z
+XM+7P-("`@("`Z+7P-("`@("`Z+7P-("`@("`Z+7P-("`@("`Z+7P-("`@("`Z
+XM+7P-("`@("`Z+7P-("`@("`Z+7P-("`@("`Z+7P-("`@("`Z+7P-("`@("`Z
+XM+7P-("`@("`X+7P-("`@("`Z+7P-("`@("`X+7P-("`@("`Z+7P-("`@("`X
+XM+7P-("`@("`Z+7P-("`@("`X+7P-("`@("`Z+7P-("`@("`X+7P-("`@("`Z
+XM+7P-("`@("`X+7P-("`@("`Z+7P-("`@("`X+7P-("`@("`Z+7P-("`@("`X
+XM+7P-("`@("`Z+7P-("`@("`X+7P-("`@("`Z+7P-("`@("`X+7P-("`@("`Z
+XM+7P-("`@("`X+7P-("`@("`Z+7P-("`@("`X+7P-("`@("`Z+5`*"D9R;VTZ
+XM($1A=FED($4N(%-M:71H(#Q#4T0N4TU)5$@@870@4U4M4T-/4D4^"@IW86=G
+XM:6YG('1O;F=U93H*"B`@/#HM4`T@(#PZ+5`-("`\.BU0#2`@/#HM8@T@(#PZ
+XM+6(-("`\.BUB#2`@/#HM4`T@(#PZ+5`-("`\.BU0#2`@/#HM8@T@(#PZ+6(-
+XM("`\.BUB#2`@/#HM4`T@(#PZ+5`-("`\.BU0#2`@/#HM8@T@(#PZ+6(-("`\
+XM.BUB#2`@/#HM4`T@(#PZ+5`-("`\.BU0#2`@/#HM8@T@(#PZ+6(-("`\.BUB
+XM#2`@/#HM4`T@(#PZ+5`-("`\.BU0#2`@/#HM8@T@(#PZ+6(-("`\.BUB#2`@
+XM/#HM4`T@(#PZ+5`-("`\.BU0#2`@/#HM8@T@(#PZ+6(-("`\.BUB#2`@/#HM
+XM4`T@(#PZ+5`-("`\.BU0#2`@/#HM8@T@(#PZ+6(-("`\.BUB#2`@/#HM4`T@
+XB(#PZ+5`-("`\.BU0#2`@/#HM8@T@(#PZ+6(-("`\.BUB"BUB
+X`
+Xend
+END_OF_FILE
+if test 3730 -ne `wc -c <'other.uu'`; then
+    echo shar: \"'other.uu'\" unpacked with wrong size!
+fi
+# end of 'other.uu'
+fi
+if test -f 'bsearch.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'bsearch.c'\"
+else
+echo shar: Extracting \"'bsearch.c'\" \(897 characters\)
+sed "s/^X//" >'bsearch.c' <<'END_OF_FILE'
+X/*
+X * A binary search generalized from Knuth (6.2.1) Algorithm B just
+X * like the AT&T man page says...
+X *
+X * Written by reading the System V Interface Definition, not the code.
+X *
+X * Totally public domain.
+X */
+X/*LINTLIBRARY*/
+X
+Xchar *bsearch(key, base, nel, width, compar)
+Xchar	*key;			/* Key to be located */
+Xchar	*base;			/* Beginning of table */
+Xunsigned nel;			/* Number of elements in the table */
+Xunsigned width;			/* Width of an element (bytes) */
+Xint	(*compar)();		/* Comparison function */
+X{
+X    int doublewidth = width + width;
+X
+X    char *last = base + width * (nel - 1);
+X
+X    while (last >= base)
+X    {
+X	register char *p = base + width * ((last - base)/doublewidth);
+X	register int cmp = (*compar)(key, p);
+X
+X	if (cmp == 0)
+X	    return (p);			/* aha, we found it! */
+X	if (cmp < 0)
+X	    last = p - width;
+X	else
+X	    base = p + width;
+X    }
+X    return ((char *) 0);		/* didn't find it */
+X}
+END_OF_FILE
+if test 897 -ne `wc -c <'bsearch.c'`; then
+    echo shar: \"'bsearch.c'\" unpacked with wrong size!
+fi
+# end of 'bsearch.c'
+fi
+if test -f 'getopt.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'getopt.c'\"
+else
+echo shar: Extracting \"'getopt.c'\" \(1883 characters\)
+sed "s/^X//" >'getopt.c' <<'END_OF_FILE'
+X#define ERR(s, c)       if(opterr){\
+X        extern int strlen(), write();\
+X        char errbuf[2];\
+X        errbuf[0] = c; errbuf[1] = '\n';\
+X        (void) write(2, argv[0], (unsigned)strlen(argv[0]));\
+X        (void) write(2, s, (unsigned)strlen(s));\
+X        (void) write(2, errbuf, 2);}
+X
+Xextern int strcmp();
+Xextern char *strchr();
+X
+Xint     opterr = 1;
+Xint     optind = 1;
+Xint     optopt;
+Xchar    *optarg;
+X 
+Xint
+Xgetopt(argc, argv, opts)
+Xint     argc;
+Xchar    **argv, *opts;
+X{
+X        static int sp = 1;
+X        register int c;
+X        register char *cp;
+X
+X	if(optind == 0)	/* DWS: reset getopt() for reuse */
+X	{
+X		optind = 1;
+X		sp = 1;
+X	}
+X 
+X        if(sp == 1)
+X                if(optind >= argc ||
+X                   argv[optind][0] != '-' || argv[optind][1] == '\0')
+X                        return(-1);
+X                else if(strcmp(argv[optind], "--") == 0) {
+X                        optind++;
+X                        return(-1);
+X                }
+X        optopt = c = argv[optind][sp];
+X        if(c == ':' || (cp=strchr(opts, c)) == 0) {
+X                ERR(": illegal option -- ", c);
+X                if(argv[optind][++sp] == '\0') {
+X                        optind++;
+X                        sp = 1;
+X                }
+X                return('?');
+X        }
+X        if(*++cp == ':') {
+X                if(argv[optind][sp+1] != '\0')
+X                        optarg = &argv[optind++][sp+1];
+X                else if(++optind >= argc) {
+X                        ERR(": option requires an argument -- ", c);
+X                        sp = 1;
+X                        return('?');
+X                } else
+X                        optarg = argv[optind++];
+X                sp = 1;
+X        } else {
+X                if(argv[optind][++sp] == '\0') {
+X                        sp = 1;
+X                        optind++;
+X                }
+X                optarg = 0;
+X        }
+X        return(c);
+X}
+END_OF_FILE
+if test 1883 -ne `wc -c <'getopt.c'`; then
+    echo shar: \"'getopt.c'\" unpacked with wrong size!
+fi
+# end of 'getopt.c'
+fi
+if test -f 'ltoa.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'ltoa.c'\"
+else
+echo shar: Extracting \"'ltoa.c'\" \(2397 characters\)
+sed "s/^X//" >'ltoa.c' <<'END_OF_FILE'
+X/*
+X * ltoa(num, base) - return string form of the given number in the
+X * given base.
+X * 
+X * If the base has magnitude greater than 10, the sign of the base
+X * determines which case of letters will be used to represent digits
+X * larger than 9.  A positive base will use upper-case letters, while
+X * a negative base will use lower-case letters.
+X * 
+X * If the base has magnitude 10, the sign of the base determines whether
+X * the number is to be considered signed or unsigned.  A base of +10
+X * is considered to be signed, while a base of -10 is considered to
+X * be unsigned.  Odd, huh?
+X * 
+X * Only base 10 is potentially signed; all other bases are unsigned.
+X * 
+X * For performance reasons there is no check for an invalid base (a base
+X * of magnitude less than 1 or greater than 36).
+X * 
+X * The return value is a pointer to a static buffer that is overwritten
+X * with every call.
+X *
+X * DaviD W. Sanderson
+X */
+X
+Xchar           *
+Xltoa(num, obase)
+X	unsigned long   num;
+X	int             obase;
+X{
+X	unsigned long   base;
+X	int             neg = 0;/* 1 if num is negative */
+X	char            a = 'A';
+X
+X	/*
+X	 * buf[] is big enough for the longest binary string together
+X	 * with terminal NUL and possible minus sign.
+X	 * 
+X	 * Note that there does not need to be a separate byte allocated
+X	 * for the minus sign. The minus sign is present only for
+X	 * numbers to be represented in decimal. Since the base 10
+X	 * representation of numbers larger than 1 is shorter than
+X	 * the base 2 representation, there will always be room for
+X	 * the minus sign in the base 10 string.
+X	 */
+X	static char     buf[sizeof(unsigned long) * 8 + 1];
+X
+X	/* p points to the last char in buf */
+X	char           *p = buf + (sizeof buf - 1);
+X
+X	*p = '\0';		/* terminate the string */
+X
+X	/*
+X	 * The only signed-ness occurs when obase == +10.
+X	 * 
+X	 * If obase == -10, the decimal number is unsigned.
+X	 */
+X	if (obase == 10 && (long) num < 0)
+X	{
+X		neg = 1;
+X		num = -(long) num;
+X	}
+X
+X	if (obase < 0)
+X	{
+X		a = 'a';
+X		obase = -obase;
+X	}
+X
+X	/*
+X	 * now that obase is nonnegative, assign it to base
+X	 */
+X	base = (unsigned long) obase;
+X
+X	/*
+X	 * subtract 10 from the code for the letter 'a' since rem
+X	 * will be 10 more than the offset from a
+X	 */
+X	a -= 10;
+X
+X	do
+X	{
+X		long            rem;
+X
+X		rem = num % base;	/* obtain value of digit */
+X
+X		*--p = ((rem < 10) ? '0' : a) + rem;
+X	}
+X	while ((num /= base) != 0);
+X
+X	if (neg)
+X		*--p = '-';
+X
+X	return p;
+X}
+END_OF_FILE
+if test 2397 -ne `wc -c <'ltoa.c'`; then
+    echo shar: \"'ltoa.c'\" unpacked with wrong size!
+fi
+# end of 'ltoa.c'
+fi
+if test -f 'smiley.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'smiley.c'\"
+else
+echo shar: Extracting \"'smiley.c'\" \(5903 characters\)
+sed "s/^X//" >'smiley.c' <<'END_OF_FILE'
+X/*
+X * s m i l e y . c
+X * 
+X * DaviD W. Sanderson is to blame for this.
+X */
+X
+X#include "smiley.h"
+X#include "patchlevel.h"
+X
+X/*
+X * macros
+X */
+X
+X/*
+X * swrite() - write() a "string variable" (char *)
+X */
+X
+X#define	swrite(fd, s)	(void) write((fd), (s), strlen(s))
+X
+X/*
+X * lwrite() - write() a "string literal" (char [])
+X */
+X
+X#define	lwrite(fd, lit)	(void) write((fd), (lit), sizeof(lit)-1)
+X
+X/*
+X * PUTFACE() - write() a smiley and its description
+X */
+X
+X#define	PUTFACE(fd, i)	swrite((fd), faces[i].face);	\
+X			lwrite((fd), tab);		\
+X			swrite((fd), faces[i].desc);	\
+X			lwrite((fd), newline)
+X
+X/*
+X * FD - file descriptor to which to write the output
+X */
+X
+X#define FD	1
+X
+X/*
+X * declarations
+X */
+X
+Xextern int      write();
+Xextern int      strlen();
+Xextern char    *bsearch();
+X
+X/*
+X * definitions
+X */
+X
+Xstatic char     ENVAR[] = "SMILEY";
+Xstatic char     tab[] = "\t";
+Xstatic char     newline[] = "\n";
+X
+X/*
+X * facecmp() - comparison routine for using bsearch()
+X */
+Xint
+Xfacecmp(f1, f2)
+X	struct smiley  *f1;
+X	struct smiley  *f2;
+X{
+X	return strcmp(f1->face, f2->face);
+X}
+X
+X/*
+X * fsearch() - return index of face, or -1 on failure
+X * 
+X * Note that this assumes that there will be at most one entry in
+X * faces[] for a particular smiley.  It also assumes that faces[] is
+X * sorted in ascending order.
+X */
+Xint
+Xfsearch(s)
+X	char           *s;
+X{
+X	struct smiley   f;
+X	struct smiley  *ans;
+X
+X	f.face = s;
+X	ans = (struct smiley *) bsearch(
+X		(char *) &f,
+X		(char *) faces, (unsigned) nfaces, sizeof faces[0],
+X		facecmp);
+X
+X	if (ans)
+X		return ans - faces;
+X	else
+X		return -1;
+X}
+X
+X/*
+X * explain() - look through the list of smileys for the given face.
+X * 
+X * If it is found, then print out the description.
+X * 
+X * The return value is zero if the face is not found, nonzero otherwise.
+X */
+Xstatic int
+Xexplain(s)
+X	char           *s;
+X{
+X	int             i;
+X
+X	if((i = fsearch(s)) == -1)
+X		return 0;
+X
+X	PUTFACE(FD, i);
+X	return 1;
+X#if 0
+X	int		found = 0;
+X
+X	for (i = 0; i < nfaces; i++)
+X	{
+X		extern int      strcmp();
+X
+X		if (strcmp(s, faces[i].face) == 0)
+X		{
+X			found = 1;
+X			PUTFACE(FD, i);
+X		}
+X	}
+X	return found;
+X#endif
+X}
+X
+X/*
+X * main() - main program
+X */
+X
+Xmain(ac, av)
+X	int             ac;
+X	char          **av;
+X{
+X	extern char    *optarg;
+X	extern int      optind;
+X	extern int      opterr;
+X
+X	char           *args = "Velf";
+X	int             Vflag = 0;
+X	int             eflag = 0;
+X	int             lflag = 0;
+X	int             fflag = 0;
+X	int             errflag = 0;
+X	int             c;
+X
+X	/*
+X	 * process command-line options
+X	 */
+X	while ((c = getopt(ac, av, args)) != -1)
+X	{
+X		switch (c)
+X		{
+X		case 'V':	/* version */
+X			Vflag = 1;
+X			break;
+X		case 'e':	/* environment */
+X			eflag = 1;
+X			break;
+X		case 'l':	/* list */
+X			lflag = 1;
+X			break;
+X		case 'f':	/* face only */
+X			fflag = 1;
+X			break;
+X		case '?':
+X			errflag = 1;
+X			break;
+X		}
+X	}
+X	if (errflag)
+X	{
+X		static char     msg0[] = "usage: ";
+X		static char    *msg1[] =
+X		{
+X			" [-V] [-e] [-l] [-f] [smiley ...]\n",
+X			"where:\t-V\tprint program version\n",
+X			"\t-e\texplain the face in $",
+X			(char *) 0
+X		};
+X		static char    *msg2[] =
+X		{
+X			"\n",
+X			"\t-l\tlist all the smileys\n",
+X			"\t-f\tprint a random smiley, face only\n",
+X			"\tsmiley\texplain the given smileys\n",
+X			"(no args)\tprint a random smiley\n",
+X			(char *) 0
+X		};
+X
+X		char           **p;
+X
+X		lwrite(FD, msg0);
+X		swrite(FD, av[0]);
+X
+X		for (p = msg1; *p; p++)
+X			swrite(FD, *p);
+X
+X		lwrite(FD, ENVAR);
+X
+X		for (p = msg2; *p; p++)
+X			swrite(FD, *p);
+X
+X		return 1;
+X	}
+X
+X	/*
+X	 * perform command-line options
+X	 */
+X
+X	/*
+X	 * Vflag - print version information
+X	 */
+X	if (Vflag)
+X	{
+X		static char     stat0[] = " faces, ";
+X		static char     stat1[] = " definitions\n";
+X		char *num;
+X		int i;
+X		unsigned long ndefs;
+X		extern char *ltoa();
+X
+X		swrite(FD, av[0]);
+X		lwrite(FD, version);
+X
+X		/*
+X		 * Print counts of the smiley faces and definitions
+X		 * The definitions for a smiley are separated by
+X		 * newlines, but not terminated by newlines.
+X		 */
+X		num = ltoa((unsigned long)nfaces, 10);
+X		swrite(FD, num);
+X		lwrite(FD, stat0);
+X
+X		ndefs = nfaces;
+X		for (i=0; i<nfaces; i++)
+X		{
+X			char *def;
+X
+X			for (def = faces[i].desc; *def; def++)
+X			{
+X				if (*def == '\n')
+X					ndefs++;
+X			}
+X		}
+X		num = ltoa(ndefs, 10);
+X		swrite(FD, num);
+X		lwrite(FD, stat1);
+X
+X#ifdef __DATE__
+X#ifdef __TIME__
+X		{
+X			static char     when0[] = "last compiled ";
+X			static char     when1[] = __TIME__;
+X			static char     when2[] = " ";
+X			static char     when3[] = __DATE__;
+X			static char     when4[] = "\n";
+X
+X			lwrite(FD, when0);
+X			lwrite(FD, when1);
+X			lwrite(FD, when2);
+X			lwrite(FD, when3);
+X			lwrite(FD, when4);
+X		}
+X#endif
+X#endif
+X
+X		return 0;
+X	}
+X
+X	/*
+X	 * eflag - explain $SMILEY
+X	 */
+X	if (eflag)
+X	{
+X		extern char    *getenv();
+X		int	        unknown = 1;
+X		char           *str;
+X
+X		if ((str = getenv(ENVAR)) != (char *)0)
+X		{
+X			if(explain(str) != 0)
+X				unknown = 0;
+X		}
+X		else
+X		{
+X			static char     notset[] = " not set\n";
+X
+X			lwrite(FD, ENVAR);
+X			lwrite(FD, notset);
+X		}
+X		return unknown;
+X	}
+X
+X	/*
+X	 * lflag - list smileys
+X	 */
+X	if (lflag)
+X	{
+X		int             i;
+X
+X		for (i = 0; i < nfaces; i++)
+X		{
+X			PUTFACE(FD, i);
+X		}
+X		return 0;
+X	}
+X
+X	/*
+X	 * literal smileys - try to explain them
+X	 *
+X	 * In this case the exit status is the number of smileys
+X	 * that were not found.
+X	 */
+X	if (optind < ac)
+X	{
+X		int	unknown = 0;
+X
+X		for (; optind < ac; optind++)
+X		{
+X			if(!explain(av[optind]))
+X				unknown++;
+X		}
+X
+X		return unknown;
+X	}
+X
+X	/*
+X	 * otherwise - generate a random smiley
+X	 */
+X	{
+X		extern int      rand();
+X		extern void     srand();
+X		extern long     time();
+X		extern int      getpid();
+X
+X		char           *f;
+X
+X		/*
+X		 * seed with the current time + the pid. (The pid
+X		 * prevents smileys started at identical times from
+X		 * getting the same random seed)
+X		 */
+X		srand((unsigned) time((long *)0) + (unsigned) getpid());
+X		f = faces[rand() % nfaces].face;
+X
+X		if (fflag)
+X		{
+X			swrite(FD, f);
+X			lwrite(FD, newline);
+X		}
+X		else
+X		{
+X			(void) explain(f);
+X		}
+X	}
+X	return 0;
+X}
+END_OF_FILE
+if test 5903 -ne `wc -c <'smiley.c'`; then
+    echo shar: \"'smiley.c'\" unpacked with wrong size!
+fi
+# end of 'smiley.c'
+fi
+if test -f 'mkfaces.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'mkfaces.c'\"
+else
+echo shar: Extracting \"'mkfaces.c'\" \(2156 characters\)
+sed "s/^X//" >'mkfaces.c' <<'END_OF_FILE'
+X/*
+X * m k f a c e s . c
+X *
+X * This program reads the file with the list of smileys and writes
+X * out an initialized data structure containing the smileys.
+X * 
+X * It assumes the smileys are each on one line, followed by a tab,
+X * followed by some description.
+X *
+X * DaviD W. Sanderson
+X */
+X
+X#include <stdio.h>
+X
+X/* avoid the possible <string.h> vs <strings.h> dilemma */
+X
+Xextern int
+X	strcmp();
+Xextern char *
+X	strcpy();
+X
+X/* turn string into C string initialization */
+X
+Xstatic char    *
+Xenquote(s)
+X	char           *s;
+X{
+X	static char     ar[1024];
+X	char           *t = ar;
+X
+X	for (; *s; s++)
+X	{
+X		switch (*s)
+X		{
+X		case '\\':
+X		case '\"':
+X			*t++ = '\\';
+X		}
+X		*t++ = *s;
+X	}
+X	*t = '\0';
+X	return ar;
+X}
+X
+Xint
+Xmain()
+X{
+X	char            prev[1024];	/* previous face */
+X	char            face[1024];	/* current face */
+X	char            desc[1024];	/* current description */
+X	char		nl[2];		/* for newline at end-of-line */
+X	int             lineno = 0;	/* number of current line */
+X
+X	/* prologue */
+X
+X	(void) printf("#include \"smiley.h\"\n");
+X	(void) printf("struct smiley faces[] = {\n");
+X
+X	/* process each smiley line */
+X
+X	prev[0] = 0;		/* initialize prev to null string */
+X
+X	/*
+X	 * If simply matched literal \n at the end of the string, scanf
+X	 * would skip leading white space on the next line.
+X	 * This is not what I want.
+X	 */
+X	while (scanf("%[^\t]\t%[^\n]%[\n]", face, desc, nl) == 3)
+X	{
+X		if (strcmp(prev, face))
+X		{
+X
+X			/*
+X			 * Since this face differs from the last one,
+X			 * prepare to start a new entry.
+X			 * 
+X			 * Complete the previous entry if there was one.
+X			 */
+X			if (lineno > 0)
+X			{
+X				(void) fputs("\"},\n", stdout);
+X			}
+X
+X			(void) printf("{\"%s\",\"", enquote(face));
+X		}
+X		else
+X		{
+X
+X			/*
+X			 * Since this face is the same as the last
+X			 * one, simply continue the description.
+X			 */
+X			(void) fputs("\\n\\t", stdout);
+X		}
+X
+X		/* write the current description line */
+X		(void) fputs(enquote(desc), stdout);
+X
+X		lineno++;
+X		(void) strcpy(prev, face);
+X	}
+X
+X	(void) fputs("\"}\n", stdout);	/* complete the last entry */
+X
+X	/* epilogue */
+X
+X	(void) printf("};\n");
+X	(void) printf("int nfaces = sizeof(faces)/sizeof(struct smiley);\n");
+X
+X	return 0;
+X}
+END_OF_FILE
+if test 2156 -ne `wc -c <'mkfaces.c'`; then
+    echo shar: \"'mkfaces.c'\" unpacked with wrong size!
+fi
+# end of 'mkfaces.c'
+fi
+if test -f 'patchlevel.h' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'patchlevel.h'\"
+else
+echo shar: Extracting \"'patchlevel.h'\" \(3851 characters\)
+sed "s/^X//" >'patchlevel.h' <<'END_OF_FILE'
+X/*
+X * p a t c h l e v e l . h
+X *
+X * This header is included in only one place, so it causes no problems
+X * to allocate storage for the version string here.
+X *
+X * DaviD W. Sanderson
+X *
+X * 16 Oct 91	version 4@0 sent to comp.sources.misc.
+X *
+X * 16 Oct 91	Added 1 from David J. Rood [rooddj@crtvax.vanderbilt.edu]
+X *		via David Gundlach.
+X *
+X * 15 Oct 91	Added 14 from David Gundlach [david@marie.stat.uga.edu]
+X *		from alt.sex.
+X *
+X * 29 Aug 91	Added 3 from Andrew Williams [awilliam@qucis.queensu.ca]
+X *
+X * 27 Aug 91	Added 1 from DJ Delorie [dj@ctron.com]
+X *		Added 2 from Dave Straker [daves@hpopd.pwd.hp.com]
+X *
+X * 15 Jul 91	Added 1 from Craig P McLaughlin [cpm00@duts.ccc.amdahl.com]
+X *
+X * 12 Jul 91	Added 6 from The Grey Wolf [greywolf@unisoft.com]
+X *
+X * 11 Jul 91	Added 4 from Michael Cook [mlc%gva.decnet@consrt.rockwell.com]
+X *
+X * 10 Jul 91	Added 2 new faces to faces.in from Po-Jen J. Yang
+X *		[pyang@rice.edu].  Improved README for the benefit of
+X *		UNIX novices to describe how to format the man page and
+X *		how to get smiley(1) to print a summary of its options.
+X *		Added 1 from Peter da Silva [peter@ficc.ferranti.com].
+X *		Added 2 from Charles J. Lord [cjl@ecsvax.uncecs.edu].
+X *		Added 2 from Liron Lightwood [r.lightwood@trl.oz.au].
+X *
+X * 09 Jul 91	Added 19 new faces to faces.in from a 1984 collection
+X *		mailed to me by Scott Bolte [scott@craycos.com].
+X *		This collection also included two animated smileys;
+X *		I saved them in "other".
+X *
+X * 08 Jul 91	version 3@0 sent to comp.sources.misc.
+X *
+X * 19 May 91	New smileys from lists recently posted to the net
+X *
+X * 27 Apr 91	Added new faces and definitions to faces.in from a
+X *		collection mailed to me by Karl A. Nyberg
+X *		[karl@grebyn.com].  This collection included some
+X *		attributions, so I went through more carefully and
+X *		incorporated not only the new faces but also new
+X *		definitions for existing faces.  I should really go
+X *		back and see whether some of the other lists also have
+X *		definitions I have not yet incorporated...
+X *
+X *		Added count of smileys and definitions to output of -V.
+X *		(Added ltoa() to generate string form of integer.
+X *		smiley(1) still doesn't need stdio.)
+X *
+X * 23 Apr 91	version 2@0 sent to comp.sources.misc
+X *
+X * 23 Apr 91	Added about thirty (!) new smileys to faces.in from
+X *		a new smiley list I found in rec.humor.d.
+X *
+X * 05 Apr 91	Used archie to locate ftp-able smiley lists;
+X *		found these:
+X *
+X *		tolsun.oulu.fi
+X *			/pub/misc/smiley.lzh	(unable to access)
+X *		mrcnext.cso.uiuc.edu
+X *			/ux1/doc/misc/smiley
+X *		lut.fi
+X *			/misc/smileys
+X *		ux1.cso.uiuc.edu
+X *			/doc/misc/smiley
+X *		fionavar.mit.edu
+X *			/pub/jokes/smiley_face
+X *		sachiko.acc.stolaf.edu
+X *			/home/sachiko/cdr/Doc/Fun/ai-humor/smiley_face.Z
+X *		vax.ftp.com
+X *			/hobbit/flamage/silly/smiley.faces
+X *		mc.lcs.mit.edu
+X *			/its/ai/humor/smiley.face.Z
+X *
+X *		There was a lot of redundancy (as I expected) but there
+X *		were two new smileys for faces.in.
+X *		Corrected some spelling errors in faces.in.
+X *
+X * 19 Mar 91	Eliminated a couple of duplicate smileys from faces.in.
+X *		Updated faces.in and "others" with smileys from a recent
+X *		posting to rec.humor.d.
+X *		Modified smiley.c to exit with nonzero status if the
+X *		search for a smiley fails.
+X *		Obtained bsearch.c and modified smiley.c to use
+X *		bsearch() to look for a smiley in the smiley table.
+X *		Modified Makefile to sort faces.in when feeding it to
+X *		mkfaces.  I keep faces.in sorted anyway, but it does not
+X *		hurt to play it safe.
+X *
+X * 16 Mar 91	Fixed example of ps1sed() in smiley.1 not to \-quote
+X *		the doubled !.  The extra quoting hurts nothing, but it
+X *		is superfluous.
+X *
+X * 15 Mar 91	Eliminated #include of <string.h> in mkfaces.c for
+X *		greater portability.
+X *
+X * 14 Mar 91	version 1@0 sent to comp.sources.misc
+X */
+X
+Xstatic char version[] = " version 4 patchlevel 0: ";
+END_OF_FILE
+if test 3851 -ne `wc -c <'patchlevel.h'`; then
+    echo shar: \"'patchlevel.h'\" unpacked with wrong size!
+fi
+# end of 'patchlevel.h'
+fi
+if test -f 'smiley.h' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'smiley.h'\"
+else
+echo shar: Extracting \"'smiley.h'\" \(359 characters\)
+sed "s/^X//" >'smiley.h' <<'END_OF_FILE'
+X/*
+X * s m i l e y . h
+X *
+X * DaviD W. Sanderson
+X */
+X
+X/*
+X * Each smiley has a face and a description.
+X */
+X
+Xstruct smiley
+X{
+X	char *face;
+X	char *desc;
+X};
+X
+X/*
+X * faces[] is the array of smileys, nfaces is the number of elements
+X * in faces.
+X *
+X * Definitions for these are generated by mkfaces from faces.in.
+X */
+X
+Xextern struct smiley	faces[];
+Xextern int		nfaces;
+END_OF_FILE
+if test 359 -ne `wc -c <'smiley.h'`; then
+    echo shar: \"'smiley.h'\" unpacked with wrong size!
+fi
+# end of 'smiley.h'
+fi
+echo shar: End of shell archive.
+exit 0
+
+exit 0 # Just in case...
+-- 
+Kent Landfield                   INTERNET: kent@sparky.IMD.Sterling.COM
+Sterling Software, IMD           UUCP:     uunet!sparky!kent
+Phone:    (402) 291-8300         FAX:      (402) 291-4362
+Please send comp.sources.misc-related mail to kent@uunet.uu.net.

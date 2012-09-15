@@ -1,0 +1,13 @@
+===============
+Proc QuitAppend
+===============
+
+#   This proc will suppress the final page eject, so that additional
+# IPL runs can be run later and appended, resulting in all the
+# graphics on the same page.  Should be used only when running
+# tipl and capturing the postscript output into a file.  Should
+# not be used with pipl, since pipl routes postscript to the printer
+# and could overlay onto someone else's output.  To print a file
+# of postscript manually, use: lpr my-postscript-file.
+#   Note that all settings, such as paper position, will have to
+# be re-specified for subsequent runs.

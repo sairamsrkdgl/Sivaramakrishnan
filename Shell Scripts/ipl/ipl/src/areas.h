@@ -1,0 +1,42 @@
+/* # area.coords
+# 
+#   The following is a list of predefined graphics areas (windows) on the page.
+# Some use the whole page; those beginning with '2' are for doing two plots 
+# per page, 3 for three plots per page, etc.
+#   These names can be used as the Area in Proc Areadef.  If none
+# of these is suitable, Area.left, Area.right, etc. can be defined explicitly.
+# Coordinates are in inches, with the origin in the lower left.
+#
+#                 ---portrait----    ---landscape---
+# format is: 
+# AREA NAME (must be followed by space(s))
+#               XLO YLO XHI YHI    XLO YLO XHI YHI
+# */
+
+char *Areacoords[30] = {
+"standard     1.2 3.5 7.4 8.0   1.5 1.5 9.0 6.2",
+"square       1.2 2.0 7.2 8.0   2.2 0.8 8.2 6.8",
+"dist1        1.2 6.5 7.2 8.0   2.2 5.3 8.2 6.8",
+"whole        1.2 1.0 7.4 9.0   1.5 1.2 9.0 7.0",
+"2hi          1.0 6.0 7.6 9.5   1.0 4.5 9.0 7.5",
+"2lo          1.0 1.5 7.6 5.0   1.0 0.75 9.0 3.75",
+"2left        1.0 1.0 4.0 9.5   1.0 1.0 5.25 6.5",
+"2right       5.0 1.0 8.0 9.5   6.25 1.0 10.5 6.5",
+"3hi          1.0 7.0 7.6 9.0   1.0 5.5 9.0 7.5",
+"3mid         1.0 4.0 7.6 6.0   1.0 3.0 9.0 5.0",
+"3lo          1.0 1.0 7.6 3.0   1.0 0.5 9.0 2.5",
+"4nw          1.0 6.0 4.0 9.0   1.0 4.0 5.25 7.0",
+"4ne          4.5 6.0 7.5 9.0   6.25 4.0 10.5 7.0",
+"4sw          1.0 1.5 4.0 4.5   1.0 0.5 5.25 3.5",
+"4se          4.5 1.5 7.5 4.5   6.25 0.5 10.5 3.5",
+"map          0.4 2.0 6.8 8.4   1.4 0.8 7.8 7.2",
+"usamap       .5  5 8 9.5        .5  1 10.5 7",
+"lifetab      1.0 1.0 7.0 4.5   1.5 1.0 7.5 4.5",
+"nicetab      1.0 0.5 7.5 10    1.5 0.5 9.0 7.0",
+"narrowtab    2.0 0.5 6.0 10    3.0 0.5 8.0 7.0",
+"narrowleft   1.0 0.4 4.0 10.5  1.0 1.0 5.25 6.5",
+"narrowright  5.0 0.4 8.0 10.5  6.25 1.0 10.5 6.5" ,
+"tabhi        1.0 5.5 8.0 10.5  1.0 4.3 10.0 8.0",
+"tablo        1.0 0.5 8.0 5.5   1.0 0.5 10.0 4.2"
+	} ;
+int Nareas = 25;

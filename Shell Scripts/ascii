@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# ascii - search for the octal value of a character.
+
+# $file is a file containing an ASCII character chart with the octal and
+# hexadecimal value of each ASCII character.
+file=/usr/pub/ascii
+
+# Make pattern with spaces to match field in $file exactly:
+case "$1" in
+[[\\/])	pat=" \\$1 " ;;    # lets us search for [, \ and /
+?)	pat=" $1 " ;;
+??)	pat="$1 " ;;
+???)	pat="$1" ;;
+*)	echo "Usage: `basename $0` char
+	(char must be single character like 'a' or name like 'soh')." 1>&2
+	;;
+esac
+
+# Search for the octal representation of character(s) specified
+sed -n "1,/^\$/s/.*|\([0-9][0-9][0-9]\) $pat|.*/\1/p" $file

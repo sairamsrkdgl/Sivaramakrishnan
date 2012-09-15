@@ -1,0 +1,63 @@
+#! /bin/sh
+#
+###	motd.diff - show changes (additions) to /etc/motd (message of day)
+###	Usage: motd.diff
+##
+##	motd.diff IS HANDY IF YOU TEND TO IGNORE YOUR SYSTEM MESSAGES
+##	(motd FILE) WHEN YOU LOG IN; motd.diff WILL BE SURE YOU SEE ANY
+##	NEW MESSAGES.
+##
+##	IF YOU RUN motd.diff FROM YOUR .login OR .profile FILES, IT WILL
+##	WATCH THE SYSTEM MESSAGE-OF-THE-DAY FILE, /etc/motd.
+##	IF THE MESSAGE HASN'T CHANGED SINCE THE LAST TIME YOU LOGGED IN,
+##	OR IF PART OF THE MESSAGE HAS BEEN DELETED, motd.diff WON'T SHOW
+##	ANYTHING.  OTHERWISE, motd.diff WILL SHOW YOU ANY LINES THAT HAVE
+##	BEEN ADDED TO THE FILE (THESE ARE USUALLY NEW NOTICES).
+##
+##	AFTER SHOWING YOU THE NEW MESSAGES, motd.diff WILL WAIT FOR YOU
+##	TO PRESS THE RETURN KEY.  THIS KEEPS MESSAGES FROM SCROLLING
+##	OFF THE SCREEN BEFORE YOU READ THEM.  (NOTE: IT WON'T WAIT IF
+##	THE STANDARD INPUT IS NOT A TERMINAL -- IF YOU'RE RUNNING IT FROM
+##	AN at JOB, FOR INSTANCE.)
+##
+##	(THIS PROGRAM KEEPS A FILE NAMED .motd.diff.$HOST IN YOUR HOME
+##	DIRECTORY; IT HOLDS THE MOST-RECENT VERSION OF motd FILE FOR YOUR
+##	CURRENT HOST, WHERE $HOST IS THE HOSTNAME.)
+
+# IF $HOME NOT SET, BARF AND EXIT:
+: ${HOME?"cannot find in your environment; quitting"}
+
+temp=/tmp/MOTD.DIFF$$
+
+# UNCOMMENT THE RIGHT LINE FOR YOUR UNIX:
+# echo="echo -n" nnl= 	# BSD
+# echo=echo      nnl="\c"	# SYSV
+echo="echo -n" nnl= 	PATH=/usr/bin:$PATH; export PATH	# SunOS
+
+# GET BASENAME OF HOSTNAME; USE IN FILE EXTENSION
+# SO THAT NETWORKED MACHINES WHICH ALL USE THE SAME HOME DIRECTORY
+# WILL HAVE DIFFERENT .motd.diff FILES:
+hostname="`expr \`hostname\` : '\([^.]*\).*'`"
+lastmotd=$HOME/.last.motd.$hostname
+
+>> $lastmotd	# BE SURE $lastmotd EXISTS SO diff WON'T BOMB
+trap 'rm -f $temp; exit' 0 1 2 15
+
+if diff $lastmotd /etc/motd > $temp
+then :
+else
+	if grep "^>" $temp >/dev/null	# diff USES > TO MARK NEW LINES
+	then
+		echo "Additions to system message-of-the-day:"
+		# ONLY PRINT LINES WHICH HAD A '>' AT THE START
+		# (REMOVE THE '> ' FIRST):
+		sed -n -e 's/^> //p' $temp | more
+		# IF USER IS USING A TERMINAL, WAIT FOR A <RETURN>:
+		if test -t 0
+		then
+			$echo "Hit RETURN to continue: $nnl"
+			read dummy
+		fi
+	fi
+	cat /etc/motd > $lastmotd	# cp MAY SCREW UP FILE MODE
+fi

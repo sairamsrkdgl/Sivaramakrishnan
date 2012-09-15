@@ -1,0 +1,275 @@
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # variable with wildcards to match all names starting with "."
+# set dots=".[`echo Y--0-Z | tr YZ \\001\\177`]*"
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # aliases for vi -- switching between .exrc files and calling vi with
+# #                   a search
+# 
+# setenv EXSTAT text        # INITIALIZATION FOR 'vi' ALIAS
+# 
+#         # --- THESE ALIASES RESET THE .exrc FILE --- #
+# # SET 'vi' FOR 4-CHARACTER TABS/SHIFTS:
+# alias 4vi 'cp ~/lib/vi/exrc4 ~/.exrc; setenv EXSTAT programming'
+# # SET 'vi' FOR 8-CHARACTER TABS/SHIFTS:
+# alias 8vi 'cp ~/lib/vi/exrc8 ~/.exrc; setenv EXSTAT text'
+# # SET 'vi' FOR QUICK WORK WHEN SYSTEM IS SLOW (NO .exrc FILE):
+# alias qvi 'rm ~/.exrc; setenv EXSTAT quick'
+# 
+#         # --- THESE ARE THE vi ALIASES. ONE SETS THE vi MODE FIRST --- #
+# alias vi 'echo "MODE: $EXSTAT"; /usr/ucb/vi \!*'
+# # CALL vi WITH A SEARCH:
+# alias vs '8vi; vi +/\!*'
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # Automatic Setup When You Enter and Exit A Directory
+# #
+# # When you cd into a directory and a file named `.enter.csh' exists,
+# # the commands in it will be run by your current C shell.
+# # When you leave a directory and a file named `.exit.csh' exists,
+# # the commands in it will be run by your current C shell.
+# 
+# alias cd 'if (-o .exit.csh) source .exit.csh; chdir \!*; if (-o .enter.csh) source .enter.csh'
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # quote and makealias -- Get quoting right in csh aliases
+# 
+# alias quote     "/bin/sed -e 's/\\!/\\\\\!/g' -e 's/'\\\''/'\\\'\\\\\\\'\\\''/g' -e 's/^/'\''/' -e 's/"\$"/'\''/'"
+# alias makealias "quote | /bin/sed 's/^/alias \!:1 /' \!:2*"
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # Set and remove write permissions from a file
+# 
+# # change mode to read only
+# alias -w chmod -w
+# 
+# # change mode to add write permission
+# alias +w chmod u+w
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # Aliases to alter your umask
+# #
+# # With these two values of umask, new files and directories will have
+# # permissions of 775 or 755, respectively.
+# 
+# alias open umask 002
+# alias shut umask 022
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # Show repeated words.  Reads from files or standard input.
+# #
+# # CHOOSE ONE:
+# # For Berkeley tr(1):
+# alias ww 'cat \!* | tr -cs "a-z'\''" "\012" | uniq -d'
+# # For System V tr(1):
+# #alias ww 'cat \!* | tr -cs "[a-z]'\''" "[\012*]" | uniq -d'
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # Find files only in the current directory with -prune
+# 
+# # print using -print (complete path name only)
+# alias find. 'find . \( -type d ! -name . -prune \) -o \( \!* -print \)'
+# 
+# # print using -s (gives output similar to `ls -ilds')
+# alias find.ls 'find . \( -type d ! -name . -prune \) -o \( \!* -ls \)'
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # This sets a three-line prompt: one blank line, one line with the hostname
+# # and current directory, and a third with the history number and a
+# # percent sign.  This should be placed in your .cshrc file.
+# #
+# # The prompt will look something like:
+# # <blank line>
+# # username@hostname current_directory
+# # history_number % 
+# 
+# set hostname=`uname -n`
+# alias setprompt 'set prompt="\\
+# ${hostname:h}:${cwd}\\
+# \! % "'
+# alias cd 'chdir \!* && setprompt'
+# setprompt           # to set the initial prompt
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # VT102 alias: puts $host:$cwd in status line. Escape sequences are:
+# # ${e}7 = save cursor position, ${e}[25;1f = move to start of status line
+# # (line 25), ${e}[0K = erase line, ${e}8 = restore cursor
+# 
+# set e="`echo -n x | tr x \\033`"        # MAKE AN ESCAPE CHARACTER
+# set host=`uname -n`
+# alias cd 'chdir \!* && echo -n "${e}7${e}[25;1f${e}[0K${host:h}:${cwd}${e}8"'
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # Make a blinking prompt.  This example makes the prompt:
+# # root:hostname
+# # with `root' blinking.
+# #
+# # Put ESCape character in $e.  Use to start blinking mode (${e}[5m)
+# # and go back to normal mode (${e}[0m) on VT100-series terminals:
+# 
+# set e="`echo x | tr x \\033`"
+# set prompt="${e}[5mroot${e}[0m@`uname -n`# "
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # This makes a multi-line prompt that shows the directory stack.  These
+# # commands should be put in your .cshrc file.
+# #
+# # The prompt will look something like:
+# # <blank line>
+# # username@hostname directory_stack
+# # history_number % 
+# #
+# # The pushd and popd commands are used to push and pop directories
+# # onto the stack.
+# #
+# # This makes a blank line before each prompt; to avoid that, join the
+# # first and second lines of the setprompt alias.
+# 
+# # PUT hostname.domain.name IN $hostname AND hostname IN $HOST:
+# set hostname=`uname -n`
+# setenv HOST `expr $hostname : '\([^.]*\).*'`
+# alias setprompt 'set prompt="\\
+# ${USER}@${HOST} `dirs`\\
+# \! % "'
+# alias cd  'chdir \!* && setprompt'
+# alias pushd  'pushd \!* && setprompt'
+# alias popd  'popd  \!* && setprompt'
+# setprompt       # SET THE INITIAL PROMPT
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # This alias shows only the tail of each path in the dirs output.  
+# #
+# # The C shell :gt globally edits all words, leaving the tail of each pathname:
+# #
+# # The prompt will look something like:
+# # <blank line>
+# # username@hostname tailed_directory_stack
+# # history_number % 
+# 
+# alias setprompt 'set dirs=(`dirs`); set prompt="\\
+# ${USER}@${HOST} $dirs:gt\\
+# \! % "'
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # print a file, lines folded at right margin, filename in heading:
+# alias prF 'fold \!^ | pr -h "\!^"'
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # number lines and print, lines folded at right margin, filename in heading:
+# alias prnF 'cat -n \!^ | fold | pr -h "\!^"'
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # Use perl to find all "text" files (files that contain less than
+# # 10% non-control characters) in the current directory:
+# alias findtext 'perl -le '\''-T && print while $_ = shift'\'' *'
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # alias that prints the name of the newest file in a group
+# alias newer "ls -dt \!* | head -1"
+# # Use this instead if your system doesn't have "head":
+# #alias newer "ls -dt \!* | sed 1q"
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # Aliases for pushd and popd that store the directory stack in the
+# # $dirs array.  Then you can type commands like
+# #	ls $dirs[2]
+# # to list the second directory in your stack.  Or use:
+# #	cp somefile $dirs[2]
+# # to copy a file into that directory from your current directory
+# # (your current directory will be $dirs[1], always).
+# alias pushd 'pushd \!* && set dirstack=(`dirs`)'
+# alias popd 'popd \!* && set dirstack=(`dirs`)'
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # An example of putting if-then-else in an alias.
+# # (This alias compiles a C program and makes the executable unreadable.)
+# alias C 'eval "if (\!* =~ *.c) then \\
+# 	echo "C quitting: no .c on end of \!* please." \\
+# else \\
+# 	if (-e \!*) mv \!* \!*.old \\
+# 	echo \!*.c SENT TO cc \\
+# 	cc -s \!*.c -o \!* \\
+# 	if (-e \!*) chmod 311 \!* \\
+# endif"'
+# 
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # compare modification times of /etc/motd and ~/.hushlogin to see
+# # which is newer.  If /etc/motd is newer, show it.
+# 
+# # list files by time (most recently modified file first)
+# set files=(`ls -t /etc/motd ~/.hushlogin`)
+# 
+# # If /etc/motd is the first file in $files, then it's newer
+# if ( $files[1] == /etc/motd ) then
+#     cat /etc/motd
+#     touch ~/.hushlogin
+# endif
+# unset files
+# 
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # This alias is for systems that don't have the tail(1) utility.
+# # It outputs the last ten lines of a file or standard input.
+# alias ptail sed -e :a -e \''$q;N;11,$D;ba'\'
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # Alias front-end to the "which" utility on the Power Tools disc.
+# # Edit the "/usr/local/bin/which" to the right pathname for your system.
+# alias which alias !\$ \| /usr/local/bin/which -i !\*
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # Runs vi on the filename you give; adds today's date to end of name
+# alias vid "vi \!:1.`date +%m.%d`"
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # cd with abbreviated pathnames -- Just type the initials (first
+# # letter, or more) of each directory in the pathname, starting at the
+# # root direcctory.  Put a period after each part.
+# #   eg: c u.i.h.  might match with /usr/include/hsfs
+# #
+# # THIS VERSION PRINTS No match IF NO MATCH, BUT cd ALIAS WON'T WORK...
+# alias c 'set d=`echo \!^* | sed "s/\([^.]*\)\./\/\1*/g"`/; echo $d; \\
+# 	if ("$d" == "") echo No match.; if ("$d" != "") cd $d'
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # cd with abbreviated pathnames -- Just type the initials (first
+# # letter, or more) of each directory in the pathname, starting at the
+# # root direcctory.  Put a period after each part.
+# #   eg: c u.i.h  might match with /usr/include/hsfs
+# #
+# # THIS VERSION WORKS WITH cd ALIAS, BUT DOUBLE cd AT THE END IS A KLUDGE:
+# alias c 'set d=`echo \!^* | sed "s/\([^.]*\)\./\/\1*/g"`/; echo $d; \\
+# 	if ("$d" == "") echo No match.; if ("$d" != "") chdir $d; cd .'
+# 
+# # - - - - - - - - - - - - - -
+# 
+# # alias to search down, starting at the current directory, for any
+# # file or directory name which contains the name you give the alias.
+# alias ff "find . -name '*\!{*}*' -ls"

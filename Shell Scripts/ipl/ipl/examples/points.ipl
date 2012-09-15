@@ -1,0 +1,638 @@
+Proc	Page:
+Title:	IPL Symbols for Legends and Plots
+
+Proc Text:
+Position:	1.75 9.25
+Text:	sym1_
+
+Proc Text:
+Position:	2.75 9.25
+Text:	sym2_
+
+Proc Text:
+Position:	3.75 9.25
+Text:	sym3_
+
+Proc Text:
+Position:	4.75 9.25
+Text:	sym4_
+
+Proc Text:
+Position:	5.75 9.25
+Text:	sym5_
+
+Proc Text:
+Position:	6.75 9.25
+Text:	sym6_
+
+Proc Text:
+Position:	1 9
+Text:	sym_a
+
+Proc Text:
+Position:	1 8.5
+Text:	sym_b
+
+Proc Text:
+Position:	1 8
+Text:	sym_c
+
+Proc Text:
+Position:	1 7.5
+Text:	sym_d
+
+Proc Text:
+Position:	1 7
+Text:	sym_e
+
+Proc Text:
+Position:	1 6.5
+Text:	sym_f
+
+Proc Text:
+Position:	1 6
+Text:	sym_g
+
+Proc Text:
+Position:	1 5.5
+Text:	sym_h
+
+Proc Text:
+Position:	1 5
+Text:	sym_i
+
+Proc Text:
+Position:	1 4.5
+Text:	sym_j
+
+Proc Text:
+Position:	1 4
+Text:	sym_k
+
+Proc Text:
+Position:	1 3.5
+Text:	sym_l
+
+Proc Text:
+Position:	1 3
+Text:	sym_m
+
+Proc Text:
+Position:	1 2.5
+Text:	sym_n
+
+Proc Text:
+Position:	1 2
+Text:	sym_o
+
+Proc Text:
+Position:	1 1.5
+Text:	sym_p
+
+Proc Text:
+Position:	1 1
+Text:	sym_q
+
+Proc Text:
+Position:	1 0.5
+Text:	sym_r
+
+Proc Point:
+Mark:		sym1a
+Size:	8
+Position:	2 9
+
+Proc Point:
+Mark:		sym2a
+Size:	8
+Position:	3 9
+
+Proc Point:
+Mark:		sym3a
+Size:	8
+Position:	4 9
+
+Proc Point:
+Mark:		sym4a
+Size:	8
+Position:	5 9
+
+Proc Point:
+Mark:		sym5a
+Size:	8
+Position:	6 9
+
+Proc Point:
+Mark:		sym6a
+Size:	8
+Position:	7 9
+
+Proc Point:
+Mark:		sym1b
+Size:	8
+Position:	2 8.5
+
+Proc Point:
+Mark:		sym2b
+Size:	8
+Position:	3 8.5
+
+Proc Point:
+Mark:		sym3b
+Size:	8
+Position:	4 8.5
+
+Proc Point:
+Mark:		sym4b
+Size:	8
+Position:	5 8.5
+
+Proc Point:
+Mark:		sym5b
+Size:	8
+Position:	6 8.5
+
+Proc Point:
+Mark:		sym6b
+Size:	8
+Position:	7 8.5
+
+Proc Point:
+Mark:		sym1c
+Size:	8
+Position:	2 8
+
+Proc Point:
+Mark:		sym2c
+Size:	8
+Position:	3 8
+
+Proc Point:
+Mark:		sym3c
+Size:	8
+Position:	4 8
+
+Proc Point:
+Mark:		sym4c
+Size:	8
+Position:	5 8
+
+Proc Point:
+Mark:		sym5c
+Size:	8
+Position:	6 8
+
+Proc Point:
+Mark:		sym6c
+Size:	8
+Position:	7 8
+
+Proc Point:
+Mark:		sym1d
+Size:	8
+Position:	2 7.5
+
+Proc Point:
+Mark:		sym2d
+Size:	8
+Position:	3 7.5
+
+Proc Point:
+Mark:		sym3d
+Size:	8
+Position:	4 7.5
+
+Proc Point:
+Mark:		sym4d
+Size:	8
+Position:	5 7.5
+
+Proc Point:
+Mark:		sym5d
+Size:	8
+Position:	6 7.5
+
+Proc Point:
+Mark:		sym6d
+Size:	8
+Position:	7 7.5
+
+Proc Point:
+Mark:		sym1e
+Size:	8
+Position:	2 7
+
+Proc Point:
+Mark:		sym2e
+Size:	8
+Position:	3 7
+
+Proc Point:
+Mark:		sym3e
+Size:	8
+Position:	4 7
+
+Proc Point:
+Mark:		sym4e
+Size:	8
+Position:	5 7
+
+Proc Point:
+Mark:		sym5e
+Size:	8
+Position:	6 7
+
+Proc Point:
+Mark:		sym6e
+Size:	8
+Position:	7 7
+
+Proc Point:
+Mark:		sym1f
+Size:	8
+Position:	2 6.5
+
+Proc Point:
+Mark:		sym2f
+Size:	8
+Position:	3 6.5
+
+Proc Point:
+Mark:		sym3f
+Size:	8
+Position:	4 6.5
+
+Proc Point:
+Mark:		sym4f
+Size:	8
+Position:	5 6.5
+
+Proc Point:
+Mark:		sym5f
+Size:	8
+Position:	6 6.5
+
+Proc Point:
+Mark:		sym6f
+Size:	8
+Position:	7 6.5
+
+Proc Point:
+Mark:		sym1g
+Size:	8
+Position:	2 6
+
+Proc Point:
+Mark:		sym2g
+Size:	8
+Position:	3 6
+
+Proc Point:
+Mark:		sym3g
+Size:	8
+Position:	4 6
+
+Proc Point:
+Mark:		sym4g
+Size:	8
+Position:	5 6
+
+Proc Point:
+Mark:		sym5g
+Size:	8
+Position:	6 6
+
+Proc Point:
+Mark:		sym6g
+Size:	8
+Position:	7 6
+
+Proc Point:
+Mark:		sym1h
+Size:	8
+Position:	2 5.5
+
+Proc Point:
+Mark:		sym2h
+Size:	8
+Position:	3 5.5
+
+Proc Point:
+Mark:		sym3h
+Size:	8
+Position:	4 5.5
+
+Proc Point:
+Mark:		sym4h
+Size:	8
+Position:	5 5.5
+
+Proc Point:
+Mark:		sym5h
+Size:	8
+Position:	6 5.5
+
+Proc Point:
+Mark:		sym6h
+Size:	8
+Position:	7 5.5
+
+Proc Point:
+Mark:		sym1i
+Size:	8
+Position:	2 5
+
+Proc Point:
+Mark:		sym2i
+Size:	8
+Position:	3 5
+
+Proc Point:
+Mark:		sym3i
+Size:	8
+Position:	4 5
+
+Proc Point:
+Mark:		sym4i
+Size:	8
+Position:	5 5
+
+Proc Point:
+Mark:		sym5i
+Size:	8
+Position:	6 5
+
+Proc Point:
+Mark:		sym6i
+Size:	8
+Position:	7 5
+
+Proc Point:
+Mark:		sym1j
+Size:	8
+Position:	2 4.5
+
+Proc Point:
+Mark:		sym2j
+Size:	8
+Position:	3 4.5
+
+Proc Point:
+Mark:		sym3j
+Size:	8
+Position:	4 4.5
+
+Proc Point:
+Mark:		sym4j
+Size:	8
+Position:	5 4.5
+
+Proc Point:
+Mark:		sym5j
+Size:	8
+Position:	6 4.5
+
+Proc Point:
+Mark:		sym6j
+Size:	8
+Position:	7 4.5
+
+Proc Point:
+Mark:		sym1k
+Size:	8
+Position:	2 4
+
+Proc Point:
+Mark:		sym2k
+Size:	8
+Position:	3 4
+
+Proc Point:
+Mark:		sym3k
+Size:	8
+Position:	4 4
+
+Proc Point:
+Mark:		sym4k
+Size:	8
+Position:	5 4
+
+Proc Point:
+Mark:		sym5k
+Size:	8
+Position:	6 4
+
+Proc Point:
+Mark:		sym6k
+Size:	8
+Position:	7 4
+
+Proc Point:
+Mark:		sym1l
+Size:	8
+Position:	2 3.5
+
+Proc Point:
+Mark:		sym2l
+Size:	8
+Position:	3 3.5
+
+Proc Point:
+Mark:		sym3l
+Size:	8
+Position:	4 3.5
+
+Proc Point:
+Mark:		sym4l
+Size:	8
+Position:	5 3.5
+
+Proc Point:
+Mark:		sym5l
+Size:	8
+Position:	6 3.5
+
+Proc Point:
+Mark:		sym6l
+Size:	8
+Position:	7 3.5
+
+Proc Point:
+Mark:		sym1m
+Size:	8
+Position:	2 3
+
+Proc Point:
+Mark:		sym2m
+Size:	8
+Position:	3 3
+
+Proc Point:
+Mark:		sym3m
+Size:	8
+Position:	4 3
+
+Proc Point:
+Mark:		sym4m
+Size:	8
+Position:	5 3
+
+Proc Point:
+Mark:		sym5m
+Size:	8
+Position:	6 3
+
+Proc Point:
+Mark:		sym6m
+Size:	8
+Position:	7 3
+
+Proc Point:
+Mark:		sym1n
+Size:	8
+Position:	2 2.5
+
+Proc Point:
+Mark:		sym2n
+Size:	8
+Position:	3 2.5
+
+Proc Point:
+Mark:		sym3n
+Size:	8
+Position:	4 2.5
+
+Proc Point:
+Mark:		sym4n
+Size:	8
+Position:	5 2.5
+
+Proc Point:
+Mark:		sym5n
+Size:	8
+Position:	6 2.5
+
+Proc Point:
+Mark:		sym6n
+Size:	8
+Position:	7 2.5
+
+Proc Point:
+Mark:		sym1o
+Size:	8
+Position:	2 2
+
+Proc Point:
+Mark:		sym2o
+Size:	8
+Position:	3 2
+
+Proc Point:
+Mark:		sym3o
+Size:	8
+Position:	4 2
+
+Proc Point:
+Mark:		sym4o
+Size:	8
+Position:	5 2
+
+Proc Point:
+Mark:		sym5o
+Size:	8
+Position:	6 2
+
+Proc Point:
+Mark:		sym6o
+Size:	8
+Position:	7 2
+
+Proc Point:
+Mark:		sym1p
+Size:	8
+Position:	2 1.5
+
+Proc Point:
+Mark:		sym2p
+Size:	8
+Position:	3 1.5
+
+Proc Point:
+Mark:		sym3p
+Size:	8
+Position:	4 1.5
+
+Proc Point:
+Mark:		sym4p
+Size:	8
+Position:	5 1.5
+
+Proc Point:
+Mark:		sym5p
+Size:	8
+Position:	6 1.5
+
+Proc Point:
+Mark:		sym6p
+Size:	8
+Position:	7 1.5
+
+Proc Point:
+Mark:		sym1q
+Size:	8
+Position:	2 1
+
+Proc Point:
+Mark:		sym2q
+Size:	8
+Position:	3 1
+
+Proc Point:
+Mark:		sym3q
+Size:	8
+Position:	4 1
+
+Proc Point:
+Mark:		sym4q
+Size:	8
+Position:	5 1
+
+Proc Point:
+Mark:		sym5q
+Size:	8
+Position:	6 1
+
+Proc Point:
+Mark:		sym6q
+Size:	8
+Position:	7 1
+
+Proc Point:
+Mark:		sym1r
+Size:	8
+Position:	2 0.5
+
+Proc Point:
+Mark:		sym2r
+Size:	8
+Position:	3 0.5
+
+Proc Point:
+Mark:		sym3r
+Size:	8
+Position:	4 0.5
+
+Proc Point:
+Mark:		sym4r
+Size:	8
+Position:	5 0.5
+
+Proc Point:
+Mark:		sym5r
+Size:	8
+Position:	6 0.5
+
+Proc Point:
+Mark:		sym6r
+Size:	8
+Position:	7 0.5

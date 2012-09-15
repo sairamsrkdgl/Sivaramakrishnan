@@ -1,0 +1,46 @@
+============
+Proc Getdata
+============
+
+The following is an alphabetical list of the Getdata parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+-------------------------------------------------------------------
+Append:		{y,n}				: n		
+  Allows new data will be put "below" existing data.
+-------------------------------------------------------------------
+Datafile:	token (M)  			: 		**	
+  Data file name
+-------------------------------------------------------------------
+Data:		text				:		**
+  The following lines contain data.
+-------------------------------------------------------------------
+Join:		{y,n}				: n		
+  Allows new data to be put "beside" existing data.
+-------------------------------------------------------------------
+Percents:	dfield (list20)			:		
+  Convert the specified fields from N to percentages of column 
+  total.
+-------------------------------------------------------------------
+Selectfields:	token (list20)			: all		
+  Select only these fields from input.
+-------------------------------------------------------------------
+Startline:	number				: 1		
+  This allows only a portion of the rows of data in a file to be
+  read into IPL.  This specifies the line to start with (first line 
+  is line 1).  See also Stopline.
+-------------------------------------------------------------------
+Stopline:	number  			: 9999		
+  Stop reading after this line is read.  (See Startline)
+-------------------------------------------------------------------
+#
+# This Proc must be used before doing any plotting.  Data can be
+# read from a file (Datafile) or contained within the Data 
+# parameter.  A few data manipulation functions are included,
+# but the intent is for most of this kind of thing to be done
+# using Unix utilites.
+#
+# BUGS: It would be nice to be able to do percents based on the
+#   row total.

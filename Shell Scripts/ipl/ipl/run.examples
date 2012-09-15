@@ -1,0 +1,88 @@
+#!/bin/sh
+#runs off some examples
+#
+
+echo -n "This will produce a number of IPL examples,
+along with listings of the control files that generated
+them.  It may tie up the printer for a while.
+
+Enter a command for printing the control files.  Use
+small text if possible, or lpr(1); use echo(1) if you
+don't want to print the control files at all.
+
+Command: "
+
+read PCOM
+
+echo -n "Using: $PCOM
+
+Begin? (y/n) "
+
+read x
+if [ $x = "n" ] 
+then 
+exit
+fi
+
+cd /550/pub/src/ipl_1.0
+cd examples
+
+pipl areadef1.g
+$PCOM areadef1.g
+pipl areadef2.g
+$PCOM areadef2.g
+
+pipl arrow.g
+$PCOM arrow.g
+
+pipl bargraph1.g
+$PCOM bargraph1.g
+
+pipl distrib1.g
+$PCOM distrib1.g
+pipl distrib2.g
+$PCOM distrib2.g
+pipl point1.g
+
+pipl errorbar1.g
+$PCOM errorbar1.g
+
+pipl legend1.g
+$PCOM legend1.g
+
+pipl lineplot1.g
+$PCOM lineplot1.g
+
+pipl map1.g
+$PCOM map1.g
+
+pipl nicetab1.g
+$PCOM table10
+$PCOM nicetab1.g
+
+pipl points.ipl
+$PCOM2 points.ipl
+
+pipl rangebar1.g
+$PCOM rangebar1.g
+
+pipl vbargraph1.g
+$PCOM vbargraph1.g
+
+pipl vector1.g
+$PCOM vector1.g
+
+pipl vrangebar1.g
+$PCOM vrangebar1.g
+
+# misc examples
+pipl examp12.g
+$PCOM examp12.g
+pipl examp1.g
+$PCOM examp1.g
+pipl examp16.g
+$PCOM examp16.g
+pipl examp3.g
+$PCOM examp3.g
+pipl examp10.g
+$PCOM examp10.g

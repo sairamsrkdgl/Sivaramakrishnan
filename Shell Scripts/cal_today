@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# cal_today - if user doesn't give an argument, put > < around today's 
+# date on this month's calendar
+
+case $# in
+0) set x `date`   # Get the current day of the month into $4
+   /usr/bin/cal |
+   # Put > < around $4 (shell expands $4 inside the doublequotes)
+   sed -e 's/^/ /' -e "s/ $4$/>$4</" -e "s/ $4 />$4</"
+   ;;
+# If arguments are given, just run the normal cal
+*) /usr/bin/cal "$@" ;;
+esac

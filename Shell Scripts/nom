@@ -1,0 +1,32 @@
+#! /bin/sh
+#
+###	nom - return names of non-matching files from current directory
+###	Usage: nom files     (example:  lpr `nom *.ms`)
+##
+## nom TAKES FILENAMES (USUALLY, EXPANDED BY THE SHELL) FROM ITS COMMANDLINE.
+## IT OUTPUTS ALL FILENAMES IN THE CURRENT DIRECTORY THAT *DON'T* MATCH.
+## NOTE: nom DOESN'T KNOW ABOUT FILES WHOSE NAMES BEGIN WITH "."
+##
+## EXAMPLES:
+## TO GET THE NAMES OF ALL FILES THAT *DON'T* END WITH ".ms":
+##	% nom *.ms
+## TO EDIT ALL FILES WHOSE NAMES DON'T HAVE ANY LOWER-CASE LETTERS:
+##	% vi `nom *[a-z]*`
+## TO COPY ALL FILES TO A DIRECTORY NAMED Backup (EXCEPT Backup ITSELF):
+##	% cp `nom Backup` Backup
+
+temp=/tmp/NOM$$
+stat=1	# ERROR EXIT STATUS (SET TO 0 BEFORE NORMAL EXIT)
+trap 'rm -f $temp; exit $stat' 0 1 2 15
+
+# MUST HAVE AT LEAST ONE ARGUMENT, AND ALL HAVE TO BE IN CURRENT DIRECTORY:
+case "$*" in
+"")	echo Usage: `basename $0` pattern 1>&2; exit ;;
+*/*)	echo "`basename $0` quitting: I can't handle '/'s." 1>&2; exit ;;
+esac
+
+# GET FILENAMES WE DON'T WANT TO MATCH; REPLACE BLANKS WITH NEWLINES:
+echo "$*" | tr ' ' '\012' | sort > $temp
+# COMPARE TO CURRENT DIRECTORY (-1 = ONE NAME PER LINE); OUTPUT NAMES WE WANT:
+ls -1 | comm -23 - $temp
+stat=0

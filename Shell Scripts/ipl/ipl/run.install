@@ -1,0 +1,121 @@
+#!/bin/sh
+
+h=`hostname`
+TODAY=`date +%m%d%y`
+
+echo -n "
+IPL graphic utility 
+
+This script does not need to be run by superuser.  It will prompt you
+for some parameters, build an install.h file, go to the source directory,
+and do a 'make'.  You can ^C at any time.  It will put one executable in
+bin/ipl (moving it will cause problems).
+
+Indicate the following by pressing return for the [default]
+or entering a response:
+
+"
+d=`pwd`
+echo -n "
+
+Doing a pwd from here yields: \"$d.\"
+If this pathname will be usable from everywhere on your network, press return.
+Otherwise, enter the fully qualified pathname: "
+read x; if [ "$x " != " " ]; then d=$x; fi
+
+cd $d
+
+
+p=lpr
+echo -n "Your command for routing postscript code to printer [$p]: "
+read x; 
+if [ "$x " != " " ]; then 
+  p=$x; 
+  sed "s/ lpr$/ $p/" < bin/pipl > bin/foo
+  mv bin/foo bin/pipl
+fi
+
+t=/usr/tmp
+echo -n "Place for temp files to go [$t]: "
+read x; if [ "$x " != " " ]; then t=$x; fi
+
+echo "
+IPL uses a fixed 2-D (rows, fields) array of char strings for internal
+plot data storage.
+You can specify maximum number of rows, max number of fields per row,
+and max number of characters in each field."
+
+r=1000
+echo -n "Maximum number of rows (observations) [$r]: "
+read x; if [ "$x " != " " ]; then r=$x; fi
+
+c=24
+echo -n "Maximum number of fields (variables) [$c]: "
+read x; if [ "$x " != " " ]; then c=$x; fi
+
+z=20
+echo -n "Maximum number of characters in a field [$z]: "
+read x; if [ "$x " != " " ]; then z=$x; fi
+
+> install.h
+echo "#define INSTALL_TMP \"$t\"" >> install.h
+echo "#define PATHNAME_LEN 80" >> install.h
+echo "#define HBUFSIZ 4096" >> install.h
+echo "#define MAX_D_ROWS $r" >> install.h
+echo "#define MAX_D_COLS $c" >> install.h
+echo "#define DATAITEM_LEN $z" >> install.h
+echo "#define TEMPLATE_PATH \"$d/tplates\"" >> install.h
+echo "#define MONTHSTUB_PATH \"$d/tplates/month.stubs\"" >> install.h
+
+echo "
+Here are the defines:"
+cat install.h
+echo -n "
+
+Proceed with installation? "
+read x
+if [ $x = "n" ]; then exit; fi
+
+echo "${TODAY} IPL installed on $h at: $d" >> Introduction
+
+cd $d
+
+# make pipl shell script
+chmod 755 ./bin/pipl
+
+
+#compile ipl
+cd $d/src
+make 
+
+cd $d/examples
+ln -s $d/bin/ipl sipl
+ln -s $d/bin/ipl tipl
+ln -s $d/bin/pipl pipl
+ln -s $d/bin/ipl vipl
+ln -s $d/bin/nicetab nicetab
+
+
+echo "
+You can now try out IPL by going to the examples directory and running:
+ - demo.sipl (if in Sunview), 
+		OR
+ - demo.pipl which produces postscript output
+
+If you want to make links from a system bin (such as /usr/local/bin)
+do the following: cd /usr/local/bin
+		  ln $d/bin/ipl sipl 
+		  ln $d/bin/ipl tipl 
+		  ln $d/bin/ipl vipl 
+		  ln $d/bin/pipl pipl
+		  ln $d/bin/nicetab nicetab
+
+The command names are important-- changing them will cause problems:
+tipl		displays control files, outputs postscript 
+sipl		displays control files under Sunview
+vipl		allows interactive annotation under Sunview
+pipl		displays control files, and routes postscript to printer
+nicetab 	table beautifier
+
+Good luck!!
+"

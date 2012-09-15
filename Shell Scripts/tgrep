@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+
+# Usage: tgrep [-l] pattern [files]
+
+# Handle
+if ($ARGV[0] eq '-l') {
+    shift;
+    $action = <<'EOF';
+            print $file,"\n";
+            next FILE;
+EOF
+}
+else {
+    $action = <<'EOF';
+            print $file,":\t", $_;
+EOF
+}
+
+# Get pattern and protect the delimiter we'll use.
+
+$pat = shift;
+$pat =~ s/!/\\!/g;
+
+# Generate the program.
+
+$prog = <<EOF;
+FILE: foreach \$file (\@ARGV) {
+    open(FILE,\$file) || do {
+        print STDERR "Can't open \$file: \$!\\n";
+        next;
+    };
+    next if -d FILE;    # ignore directories
+    next if -B FILE;    # ignore binary files
+    while (<FILE>) {
+        if (m!$pat!) {
+            $action
+        }
+    }
+}
+EOF
+
+# We often put in lines like this while developing scripts, so we
+# can see what program the program is writing.
+
+print $prog if $debugging;
+
+# And finally, do it.
+
+eval $prog;
+die $@ if $@;

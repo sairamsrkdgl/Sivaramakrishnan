@@ -1,0 +1,48 @@
+#! /bin/sh
+#
+###	stree - make simple directory tree
+###	Usage: stree [-a] reldirpath
+##
+##	stree IS A SIMPLE WAY TO MAKE A DIRECTORY TREE.  THOUGH THERE ARE
+##	BETTER ONES ELSEWHERE, stree IS SIMPLE AND HAS SOME NEAT USES OF
+##	sed AND tr IN IT.
+##
+##	IF YOU GIVE IT THE PATH TO A DIRECTORY (USE A RELATIVE PATH!):
+##		% stree bin
+##	IT'LL SHOW YOU ONLY THE SUBDIRECTORIES.  WITH THE -a OPTION:
+##		% stree -a bin
+##	IT SHOWS DIRECTORIES AND FILES.
+#
+#	Posted to USENET by
+#		James A. Woods  {hplabs,hao,ihnp4}!ames!jaw  (jaw@riacs.ARPA)
+#	Attributed to
+#		Doug Kerr of Informatics General Corp.
+#
+#	Original one-liner (hacked up by Jerry Peek):
+#	echo $1; find $1 -type d -print | tr / \\1 | sort -f | tr \\1 / |\
+#	sed -e s,\^$1,, -e /\^$/d -e "s,[^/]*/, \"	,g"
+#
+#	Explanation:  it works by substituting tabs for pathname slashes
+#	(the invisible literal tab occurs before the ",g" above); the
+#	translits bracketing the sort helps alphabetize / before [a-zA-Z].
+#	And if you remember that other punctuation can replace the slash
+#	in ed/sed syntax (as the comma does in the script), you needn't
+#	say "Deadhead Ed had edited it" fifty times fast.
+
+case "$1" in
+-a)	shift
+	dir=${1-.}	# DEFAULT TO CURRENT DIRECTORY
+	echo Tree for directory $dir and its files:
+	;;
+*)	findtype="-type d" 	# IF NO -a FLAG, MAKE find USE "-type d"
+	dir=${1-.}
+	echo Tree for directory $dir:
+	;;
+esac
+
+echo "
+$dir"
+find $dir $findtype -print |
+tr / \\001 | sort -f | tr \\001 / |
+sed -e s@\^$dir@@ -e /\^$/d -e 's@[^/]*/@ "	@g'
+# THIS CHARACTER IS A TAB..................^

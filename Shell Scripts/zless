@@ -1,0 +1,51 @@
+#! /bin/sh
+### zless, zmore, zpg - "zcat | less", "zcat | more" or "zcat | pg" on file(s)
+### vless, vmore, vpg - same, except "cat -t -v -e" instead of "zcat"
+### rcsless, rcsmore, rcspg - same, except for RCS files: uses "co -p"
+### Usage: *{more,pg,less} [-options for pager] file [...files]
+
+myname="`basename $0`"
+
+# UNCOMMENT THE RIGHT LINE FOR YOUR UNIX:
+# echo="echo -n" nnl= 	# BSD
+# echo=echo      nnl="\c"	# SYSV
+echo="echo -n" nnl= 	PATH=/usr/bin:$PATH; export PATH	# SunOS
+
+case "$myname" in
+vless|vmore|vpg) cat="/bin/cat -t -v -e" ;;
+zless|zmore|zpg) cat=/usr/local/bin/gzcat ;;
+rcsless|rcsmore|rcspg) cat="/usr/local/bin/co -p -q" ;;
+*)	echo "$0: quitting: I don't know how to run myself!" 1>&2; exit 1 ;;
+esac
+
+case "$myname" in
+*less) prog=/usr/local/bin/less ;;
+*more) prog=/usr/ucb/more ;;
+*pg) prog=/usr/5bin/pg ;;
+esac
+
+# PUT LEADING OPTIONS (UP TO FIRST FILENAME) IN $opts AND shift THEM AWAY:
+while :
+do
+	case "$1" in
+	-*) opts="$opts $1"; shift ;;
+	*) break ;;
+	esac
+done
+
+while :
+do
+	case "$1" in
+	"") break ;;
+	*) $cat "$1" | $prog $opts ;;
+	esac
+
+	# IF MORE FILES, WAIT:
+	case "$2" in
+	?*)	$echo "$myname: Press RETURN to see next file, '$2': $nnl"
+		read dummy
+		;;
+	esac
+
+	shift
+done

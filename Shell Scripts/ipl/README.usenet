@@ -1,0 +1,30 @@
+Subject:  v21i032:  2D graphic system with table beautifier, Part01/14
+Newsgroups: comp.sources.unix
+Approved: rsalz@uunet.UU.NET
+X-Checksum-Snefru: eda626f5 fdf50b5e ae715bc8 9011af1b
+
+Submitted-by: Steve Grubb <uunet!lsr-vax!scg>
+Posting-number: Volume 21, Issue 32
+Archive-name: ipl/part01
+
+[  Yes there are many shar files, but the size is small.  -r$ ]
+
+ipl	a 2-D graphic production system with table beautifier
+
+Version 1.0, January 1990.
+  This directory contains the sources and examples for ipl,
+a 2-D graphics production system.  It produces scatterplots, 
+lineplots, bargraphs, range displays, pie graphs, U.S./Canada 
+maps, schedule charts, boxes, arrows, text, etc.  Produces 
+Postscript or Sunview output, based on a user-supplied control 
+file.  Included are a gallery of several dozen examples.  
+Also includes:
+  [] A table beautifier which is useful for taking plain text 
+tables, spreadsheet output, etc. and setting in a nice font.
+  [] A low-level subroutine library for producing nearly equivalent
+graphics (with shading) on Postscript and Sunview.
+
+There are 14 shar files of 20-35 KBytes each.  
+
+	Steve Grubb
+	uunet!lsr-vax!scg

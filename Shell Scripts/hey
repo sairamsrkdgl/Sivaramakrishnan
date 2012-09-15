@@ -1,0 +1,25 @@
+#!/bin/sh
+# hey - script that complains about commands from other operating systems,
+# then runs the UNIX equivalent.
+#
+# Link this to whatever command names you want to complain about,
+# and put the links in some directory ahead of the original command.
+#
+# For example, if you (or other people) keep typing "dir" on UNIX
+# when they mean "ls", link this script to be named "dir"; it will
+# enable the first case below:
+
+# Write snide comments to stderr so they won't mess up redirection:
+echo "Hey!  This is UNIX!  Well, okay... but just this once..." 1>&2
+
+# To add new commands, add the new name with a * before it at left.
+# Then add command you want to run instead.
+# The ${1+"$@"} is a portable way to insert command-line arguments;
+# if the command doesn't need command-line arguments, don't add it:
+case "$0" in
+*dir)	ls -l ${1+"$@"} ;;
+*md)	mkdir ${1+"$@"} ;;
+*)	echo "Error in 'hey' script setup... shouldn't get here!" 1>&2
+	exit 1
+	;;
+esac

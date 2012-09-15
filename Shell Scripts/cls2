@@ -1,0 +1,40 @@
+#! /bin/sh
+### clf,cls,clf2,cls2 - compressed "ls" and "ls -F" directory listings
+### Usage: cmd [dirs]
+
+# To install the program, put it in an executable file named \fIcls\fP.
+# Then make three links to it:
+#
+# % chmod 755 cls
+# % ln cls clf
+# % ln cls cls2
+# % ln cls clf2
+
+# UNCOMMENT THE RIGHT ONE FOR YOUR SYSTEM:
+ls='/bin/ls -1'     # BSD
+#ls='/bin/ls'       # Sys V
+
+temp=/tmp/CLS$$     # TEMP FILE
+umask 077           # MAKE TEMP FILE PRIVATE
+
+# pr PROGRAM: MAKE 5 COLUMNS, NO HEADING, 78 COLUMNS WIDE:
+pr='pr -5 -t -w78'
+
+# sed SCRIPT:  IF LINE IS OVER 14 CHARACTERS AND ENDS WITH SYMBOL
+# "*", "/", "@", OR "=", TRUNCATE AFTER 12 AND REPLACE WITH >SYMBOL...
+# OTHERWISE, IF NAME IS OVER 14 CHARACTERS, TRUNCATE AFTER 13; ADD A >
+sed='/[/@*=]$/s/^\(............\)...*\([/@*=][/@*=]*\)$/\1>\2/
+s/^\(.............\)...*/\1>/'
+
+case "$0" in
+*clf2)  $ls -F ${1+"$@"} | sed -e "$sed" | $pr -l1; exit ;;
+*cls2)  $ls ${1+"$@"} | sed -e "$sed" | $pr -l1; exit ;;
+*clf)   $ls -F ${1+"$@"} | sed -e "$sed" > $temp ;;
+*cls)   $ls ${1+"$@"} | sed -e "$sed" > $temp ;;
+*)  echo "$0: Help!  Shouldn't get here!"; exit 1 ;;
+esac
+
+# (THESE COMMANDS ONLY DONE BY cls AND clf.)
+# LENGTH OF LISTING = ( number of files / 5 ) + 1
+$pr -l`expr \( \`wc -l < $temp\` / 5 \) + 1` $temp
+rm -f $temp

@@ -1,0 +1,37 @@
+#! /bin/sh
+# SENDS VT102 AND COMPATIBLE TERMINAL CONTROL ESCAPE SEQUENCES
+
+e="`echo e | tr e '\033'`"  # Make an ESCape character portably
+
+case "$0" in
+*Clear) seq="${e}[;H${e}[2J"  ;;# move to top left, clear screen
+
+# ALTERNATE CHARACTER SETS.  YOU USUALLY WANT "NOG" TO CLEAR THESE
+# WHEN YOUR TERMINAL GETS IN THIS MODE ACCIDENTALLY:
+
+*NOG) seq="${e}(B" ;;       # cancel graphics
+*Graphics) seq="${e}(0" ;;  # lower-case letters become graphics
+
+# NOTE: THESE WON'T WORK FOR FULL-SCREEN APPLICATIONS LIKE vi.
+# BETTER TO RESET YOUR TERMINAL PARAMETERS (tset, stty):
+
+*C132) seq="${e}[?3;h" ;;   # 132-column mode
+*C80) seq="${e}[?3;l" ;;    # 80-column mode
+
+*Revvid) seq="${e}[?5;h" ;; # Reverse video
+*Normal) seq="${e}[?5;l" ;; # Normal video
+
+# WRITE MESSAGE TO TERMINAL STATUS LINE (NICE FOR REMINDERS)
+#       EXAMPLE:  ToStatus Clean out your files!
+# AND CLEAR IT.
+
+*ToStatus) seq="${e}7${e}[25;1f${e}[0K$*${e}8" ;;
+*ClrStatus) seq="${e}7${e}[25;1f${e}[0K${e}8" ;;
+*) echo "$0: HELP -- can't run myself." 1>&2; exit 1;;
+esac
+
+# SEND $seq TO TERMINAL WITHOUT INTERPRETATION BY SYSTEM V echo:
+cat << END_OF_seq
+$seq
+END_OF_seq
+exit 0

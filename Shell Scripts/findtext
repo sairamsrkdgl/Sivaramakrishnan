@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+# findtext - tell which files are textual in a list of filenames you supply
+#
+# PIPE OUTPUT OF file THROUGH sed TO PRINT FILENAMES FROM LINES WE LIKE.
+# NOTE: DIFFERENT VERSIONS OF file RETURN DIFFERENT MESSAGES.  CHECK YOUR
+# SYSTEM WITH 'strings /usr/bin/file' OR 'cat /etc/magic' AND ADAPT THIS.
+
+/usr/bin/file "$@" |
+sed -n  '
+/MMDF mailbox/b print
+/Interleaf ASCII document/b print
+/PostScript document/b print
+/Frame Maker MIF file/b print
+/c program text/b print
+/fortran program text/b print
+/assembler program text/b print
+/shell script/b print
+/c-shell script/b print
+/shell commands/b print
+/c-shell commands/b print
+/English text/b print
+/ascii text/b print
+/\[nt\]roff, tbl, or eqn input text/b print
+/executable .* script/b print
+b
+:print
+s/:	.*//p'

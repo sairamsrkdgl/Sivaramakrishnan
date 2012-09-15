@@ -1,0 +1,87 @@
+=============
+Proc Lineplot
+=============
+
+The following is an alphabetical list of the Lineplot parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+Accum:		{y,n}				: n		
+  Allows accumulation of yalues of y, for cumulative curves.
+------------------------------------------------------------------
+Label: 		text				: 		
+  This allows one line of text to be placed at the end of
+  (each) curve, for identification.  Use one line of text per 
+  curve.
+------------------------------------------------------------------
+Label.size:	charsize			: 8		
+  Char size for line identifier (see Label).
+------------------------------------------------------------------
+Linetype:	0 to 8 (list8)		: 0 1 2 3 4 5 6 7	
+  Line dash type.  See the legend example for a display of
+  available line types.  Specify one value for each curve.
+------------------------------------------------------------------
+Linetype.magnify: 0 to 10 (list8)	: 3 3 3 3 3 3 3 3 	
+  Line dash magnification factor.  Increasing this number will 
+  make each segment of the dash pattern longer.  Specify one
+  value per curve.
+------------------------------------------------------------------
+Linethick:	0 to 10 (list8)		: 1 1 1 1 1 1 1 1 	
+  Line thickness.  Increasing this value will make the line
+  thicker.  Specify one value per curve.
+------------------------------------------------------------------
+Mark:		list				: 		
+  It is possible to overlay point markers for each data point.
+  Specify them here, one per curve. 
+------------------------------------------------------------------
+Mark.size:	charsize			: 7	
+  Size for mark chars in points.
+------------------------------------------------------------------
+Numberfinal:	{y,n}				: n		
+  Allows the final Y value to be printed near the end of the curve.
+------------------------------------------------------------------
+Numbers:	{y,n}				: n		
+  Allows the Y value of every data point to be displayed.  For
+  stairstep curves, this value is centered between X locations.
+------------------------------------------------------------------
+Numbers.offset:	-1 to 1				: 0.015		
+  Allows control of the numbers generated when Numbers is in 
+  effect.  Distance of numbers (+) above or (-)below line, in 
+  inches.
+------------------------------------------------------------------
+Shade:		color (list8)			:               
+  It is possible to shade the area below the curve.  This will
+  happen when a shade is specified here.  There should be one
+  shade given for each line.
+------------------------------------------------------------------
+Stairstep:	{y,n}				: n		
+  Causes lines to form steps rather than diagonals, like square
+  waves.  Note: shading and marking don't work when this is on.
+------------------------------------------------------------------
+Stairstep.bars:	{y,n}				: n		
+  This is used when superimposing a stairstep line plot over a
+  bargraph.  It has the effect of moving the line plot over a
+  half unit.
+------------------------------------------------------------------
+Xfield:		dfield				: 	        **
+  This should contain the data field containing the X component
+  of the line.  Note that although multiple curves can be generated,
+  only one set of X components is used.  This parameter can be
+  omitted, causing X to default to ordinal (X=0, X=1, X=2..).
+------------------------------------------------------------------
+Xstart.0or1:	{0,1}				: 0		
+  If X is defaulting to ordinal (see Xfield) this parameter 
+  adjusts the starting point (either 0 or 1).
+------------------------------------------------------------------
+Yfield:		dfield (list8) (M)		: 		**
+  This should contain the data field where the Y component can
+  be found.  One should be given for each curve.
+------------------------------------------------------------------
+Zeroat:		number				: 0		
+  This allows setting the value in Y where a "zero crossing"
+  takes place.  See the lineplot example.
+------------------------------------------------------------------
+#
+# Line plotting.  Can do up to eight curves.
+#

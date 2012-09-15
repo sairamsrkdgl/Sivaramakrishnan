@@ -1,0 +1,19 @@
+#! /bin/sh
+#
+# squoze
+last=
+ls -ldg
+IFS='
+'
+while :
+do
+        set `ls -f | tail -10r`
+        for i do
+                case "$i" in "$last"|.|..) break 2;; esac
+                # _ (underscore) is the "safe, short" filename
+                /bin/mv -i "$i" _ && /bin/mv _ "$i"
+        done
+        last="$i"
+done
+ls -ldg
+

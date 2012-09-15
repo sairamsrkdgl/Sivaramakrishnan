@@ -1,0 +1,58 @@
+ipl	a 2-D graphic production system with table beautifier
+
+Version 1.0, January 1990.
+  This directory contains the sources and examples for ipl,
+a 2-D graphics production system.  It produces scatterplots, 
+lineplots, bargraphs, range displays, pie graphs, U.S./Canada 
+maps, schedule charts, boxes, arrows, text, etc.  Produces 
+Postscript or Sunview output, based on a user-supplied control 
+file.  Included are a gallery of several dozen examples.  
+Also includes:
+  [] A table beautifier which is useful for taking plain text 
+tables, spreadsheet output, etc. and setting in a nice font.
+  [] A low-level subroutine library for producing nearly equivalent
+graphics (with shading) on Postscript and Sunview.
+
+ Developed on a SPARC machine (Solbourne 5/600) running SunOS 4.0, with 
+Sunview and Apple Laser-writers.  Also verified on Sun-3. 
+ I won't be able to send fixes or answer mail after 2-28-90.
+For anyone interested in converting to this XView-- sunview code is
+contained in one file only: sunv.c.
+
+Written by: 	Steve Grubb
+		Johns Hopkins University School of Medicine
+		550 North Broadway, 9th Floor
+		Baltimore, MD 21205  USA
+
+
+
+TO VIEW THE SUNVIEW EXAMPLES: Do the following:
+	cd examples 
+	demo.sipl
+TO PRINT THE POSTSCRIPT EXAMPLES: Do the following:
+	cd examples
+	demo.pipl
+TO READ ONLINE DOCUMENTATION: read the "Introduction" file
+TO PRINT A COPY OF THE USER'S GUIDE: Enter run.manual
+TO PRINT A COPY OF THE EXAMPLES GUIDE: Enter run.examples
+
+TO INSTALL: 
+     Uses ~ 1116 blocks after building.
+     Root permission is not required.
+     Run the shell script run.install, which will: 
+        build an install.h file 
+	do a "make" on the contents of the src directory
+     Executable will go in ./bin.  
+     You will have to create links in a "real" bin:
+	cd /usr/local/bin  (or whatever)
+	ln -s $d/bin/ipl tipl   # postscript 
+	ln -s $d/bin/ipl sipl   # sunview
+	ln -s $d/bin/ipl vipl   # interactive annotator
+	ln -s $d/bin/pipl pipl  # postscript to lpr(1)
+	ln -s $d/bin/nicetab nicetab  # the table beautifier
+
+TO MODIFY CODE:
+     If IPL has already been installed and you are modifying 
+     code in the src directory, just do a "make".
+
+

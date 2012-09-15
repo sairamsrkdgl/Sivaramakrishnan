@@ -1,0 +1,23 @@
+#!/bin/sh
+# manindex: Generate a list of topic lines that you can grep through.
+# Then create 'apropos' and other aliases to search the list.
+# Run this periodically--once a month should suffice
+mandir=/usr/share/man     # where the manual pages are stored
+manlist="cat1 cat2 cat3"  # list particular directories you care about
+indexfile="/home/mike/manindex.txt"
+
+rm -f $indexfile
+for directory in $manlist
+do
+        cd $mandir/$directory
+        # the sed command turns filenames into "manual page" names
+        # e.g., converts sed.1.z to sed.  
+        # BUG:  won't handle names like a.out.4.Z correctly
+        for manpage in `ls | sed -e 's/\..*$//g'`
+        do
+                # use man to unpack the manual page; it might be compressed
+                # use col to strip garbage characters
+                # egrep looks for spaces, manual page name, and dash
+                man $manpage | col -b -x | egrep "^ +$manpage.* - " | uniq
+        done
+done > $indexfile

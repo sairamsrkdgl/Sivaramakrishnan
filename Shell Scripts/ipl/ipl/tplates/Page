@@ -1,0 +1,38 @@
+=========
+Proc Page
+=========
+
+The following is an alphabetical list of the Page parameters.
+Given are: the parameter name; the parameter data type; a default
+value if any; and a description.  Especially important parameters
+have a "**" in the right margin.
+
+------------------------------------------------------------------
+Paperway:	{portrait,landscape,screen}	: portrait	
+  Selects the page orientation.  Screen produces an 11x11 square.
+------------------------------------------------------------------
+Standard.linethick: 0 to 6			: 1		
+  Allows setting of default line thickness for entire page.
+------------------------------------------------------------------
+Standard.font:  font				: /Helvetica	
+  Allows setting of default font for all text on the page.
+------------------------------------------------------------------
+Title:		text				: 	      **
+  The page title is specified here.  It will be centered on the
+  page.  For subtitles, see Areadef.
+------------------------------------------------------------------
+Title.file:	token				:		
+  The page title may be taken from this file.
+------------------------------------------------------------------
+Title.font:	font				: 		
+  Font for page title.
+------------------------------------------------------------------
+Title.size:	charsize			: 12		
+  Char size of title.
+------------------------------------------------------------------
+Title.belowtop: -12 to 12 (T)			: 0.2		
+  Distance of 1st title line below top of page.
+------------------------------------------------------------------
+
+# This sets page-wide things.  It should be used before doing
+# any drawing on the page.

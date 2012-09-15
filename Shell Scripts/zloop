@@ -1,0 +1,38 @@
+#! /bin/sh
+## zloop - loop through compressed/gzipped file(s), running command on each
+## Usage: zloop 'command to run' file.(Z|gz) [files.(Z|gz)...]
+
+myname="`basename $0`"
+zcat=/usr/local/bin/gzcat	# GNU zcat THAT HANDLES BOTH compress AND gzip
+
+case $# in
+0|1) echo "Usage: $myname 'command to run' file.Z [files.Z...]" 1>&2
+	exit 1
+	;;
+esac
+
+# AT LEAST, CATCH PROBLEM WHERE MULTI-WORD COMMAND ISN'T QUOTED:
+case "$2" in
+*.Z|*.gz) ;;
+*) echo "Usage: $myname 'command to run' file.(Z|gz) [files.(Z|gz)...]
+	('$2' doesn't look like a compressed file.Z or gzipped file.gz)." 1>&2
+	exit 1
+	;;
+esac
+
+cmd="$1"; shift
+
+for file
+do
+	# DO IN ONE echo BECAUSE echo SUB-PROCESS IS ALREADY WASTE OF TIME:
+	echo "
+==== $myname: zcat $file | $cmd ====" 1>&2
+	eval $zcat $file \| $cmd
+	status=$?
+	case "$status" in
+	0) ;;
+	*)	echo "$myname: note: that command returned $status (non-zero) status:
+		'$zcat $file | $cmd'" 1>&2
+		;;
+	esac
+done
