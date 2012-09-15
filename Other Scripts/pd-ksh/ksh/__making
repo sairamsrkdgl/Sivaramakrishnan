@@ -1,0 +1,55 @@
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c version.c
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c main.c
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c misc.c
+"misc.c", line 204: warning: illegal pointer combination, op =
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c syn.c
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c lex.c
+"lex.c", line 438: redeclaration of getsc_
+*** Error code 1
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c edit.c
+"edit.c", line 479: redeclaration of x_flush
+"edit.c", line 485: redeclaration of x_putc
+"edit.c", line 492: redeclaration of x_puts
+"edit.c", line 1130: warning: illegal pointer combination, op =
+"edit.c", line 1140: warning: illegal pointer combination, op =
+"edit.c", line 1339: DIR undefined
+"edit.c", line 1339: dirp undefined
+"edit.c", line 1340: syntax error
+"edit.c", line 1387: len undefined
+"edit.c", line 1389: dp undefined
+"edit.c", line 1390: warning: struct/union or struct/union pointer required
+"edit.c", line 1396: loc undefined
+"edit.c", line 1400: multi undefined
+"edit.c", line 1410: loc undefined
+"edit.c", line 1416: multi undefined
+*** Error code 1
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c tree.c
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c exec.c
+"exec.c", line 51: warning: illegal pointer combination, op =
+"exec.c", line 223: warning: illegal pointer combination, op =
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c jobs.c
+"jobs.c", line 204: warning: illegal pointer combination, op =
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c trap.c
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c c_sh.c
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c c_ksh.c
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c c_test.c
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c ulimit.c
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c getopts.c
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c expr.c
+"expr.c", line 238: warning: illegal pointer combination, op =
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c history.c
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c var.c
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c table.c
+"table.c", line 59: warning: illegal pointer combination, op =
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c alloc.c
+"alloc.c", line 90: warning: illegal pointer combination, op =
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c io.c
+	cc  -O -I../std/h -D_SYSV -DEDIT -DSILLY   -c eval.c
+"eval.c", line 535: DIR undefined
+"eval.c", line 535: dirp undefined
+"eval.c", line 536: syntax error
+"eval.c", line 541: d undefined
+"eval.c", line 542: warning: struct/union or struct/union pointer required
+"eval.c", line 647: warning: illegal pointer/integer combination, op =
+*** Error code 1
+`ksh' not remade because of errors

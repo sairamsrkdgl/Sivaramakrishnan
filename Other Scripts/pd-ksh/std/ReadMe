@@ -1,0 +1,39 @@
+	Notes on the Standard C / POSIX P1003.1 package
+
+This package contains header files and library routines
+to provide a standard C (ANSI) and POSIX enviroment for portable programs.
+It supplements the existing libraries and header files
+of a AT&T-derived Unix system (System V and BSD in particular).
+
+Contents:
+stdc/*:		The standard C header files and library.
+posix/*:	The POSIX header files and library.
+h/*, h/sys/*:	Links to the header files in stdc/ and posix/.
+libstdc.a:	The standard C library.
+libposix.a:	The POSIX emulation library.
+
+To create the header files and libraries, perform the following
+three steps in the stdc and posix directories:
+	One of _BSD, _SYSV, or _V7 should be defined in the Makefile.
+	Do "make link" first to set up the links from *.h to ../h.
+	Do "make" to create the library.
+Compile applications with -Ih, link them with the libraries.
+
+	Notes on the standard C package
+Setvbuf has not been ported for _SYSV yet.
+The files <locale.h>, <assert.h>, and <math.h> don't exist yet.
+Many standard C functions are not implemented yet.
+These include strtol, strtoul, atexit, tempfile(?), etc.
+The str* routines are by Henry Spencer.
+
+Known portability problems include:
+size_t and ptrdiff_t in <stddef.h> are int,
+some systems (80*86) require unsigned int or long.
+The method of creating <stdio.h> from /usr/include/stdio.h and stdio.h_std
+may not work on some versions of UNIX.
+
+	Notes on the POSIX package
+Only headers and function required by the PD KornShell are implemented.
+I do not intend to develop this into a full POSIX emulation package.
+Unlink h/dirent.h if you are not compiling under BSD.
+

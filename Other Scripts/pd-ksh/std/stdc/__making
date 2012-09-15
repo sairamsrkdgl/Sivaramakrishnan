@@ -1,0 +1,4 @@
+	cc -O  -I../h -D_SYSV -c setvbuf.c
+"setvbuf.c", line 49: warning: illegal pointer combination, op =
+"setvbuf.c", line 55: warning: illegal pointer combination, op =
+	ar r libstdc.a clock.o stdio.o setvbuf.o vprintf.o fprintf.o sprintf.o strstr.o memmove.o memcpy.o memset.o memcmp.o memchr.o
