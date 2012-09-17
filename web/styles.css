@@ -1,0 +1,35 @@
+h1 { 
+   background-color:#CC6633;
+   color:white;
+   font:700 30pt arial;
+   letter-spacing:5pt;
+   margin:0px;
+   text-align:center;
+}
+h2 {
+color:white;
+   color:black;
+   font:700 20pt arial;
+   margin:0px;
+}
+
+body {
+ background-color:#dddddd;
+ font:12pt verdana;
+ margin:2px
+}
+td {
+ font:12pt verdana;
+}
+th {
+   background-color: red;
+   color: white;
+   font: 700 12pt verdana;
+   font-size: 12;
+   font-weight: bold
+}
+th.subhead {
+  background-color :gray ;
+  font:700 12pt verdana;
+  color:white;
+}
